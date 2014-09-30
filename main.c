@@ -13,17 +13,12 @@ FILE *source;
       return 0;
    }
 
-   if ((source = fopen(argv[1],"r")) == NULL)
+  if ((source = fopen(argv[1],"r")) == NULL)
    {
       fprintf(stderr,"Failed to open\n");
 
       return 0;
    }
-
-
-
-
-
 
 
 
