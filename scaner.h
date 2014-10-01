@@ -2,7 +2,7 @@
 #define SUCCESS 0
 #define FAIL -1          /* hodit do hlavicky error.h*/
 
-
+//TOKENY 
 
 #define ID  10            // IDENTIFICATOR    
 #define BEGIN 11
@@ -12,9 +12,9 @@
 #define END 15
 #define FIND 17
 #define FORWARD 18
-#define FUNCTION 19        // IDENTIFICATION
-#define IF 20              //
-#define INTEGER 21         //
+#define FUNCTION 19        
+#define IF 20              
+#define INTEGER 21         
 #define READLN 22          // LOAD FROM STDIN
 #define REAL 23            //
 #define SORT 24            //
