@@ -1,5 +1,5 @@
-/* **************************** main.c ************************************** */
-/* Soubor:              main.c - Riadiacy cast interpretu                     */
+/* **************************** scaner.c ************************************ */
+/* Soubor:              scaner.c - Lexikalna analyza                          */
 /* Kodovani:            UTF-8                                                 */
 /* Datum:               11.2014                                               */
 /* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
@@ -9,52 +9,38 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Ji≈ô√≠ Dost√°l             xdosta40              */
+/*                              Ji¯Ì Dost·l             xdosta40              */
 /* ****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "scaner.h"
-
-
-int main(int argc, char *argv[])
-{
 
 FILE *source;
 
-/*source file opening*/
 
-  if (argc == 1)
-   {
-      fprintf(stderr,"No input file\n");
-      return FAIL;
-   }
+/** \brief funkcia inicializuje zdrojovy subor
+ *
+ * \param  File pointer
+ *
+ */
+void SourceInitialize(FILE *f)
+{
 
-  if ((source = fopen(argv[1],"r")) == NULL)
-   {
-      fprintf(stderr,"Failed to open\n");
+source=f;
 
-      return FAIL;
-   }
-
-/* Inicializcia zdrojoveho suboru pre Lexikalnu analyzu */
-
-SourceInitialize(source);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-close(source);
-return 0;
 }
+
+
+int getnextToken ()
+{
+
+
+
+
+
+
+
+}
+
+
+
