@@ -45,3 +45,4 @@
 #define COPY 48            // FUNCTION
 
 
+void SourceInitialize(FILE *f);
