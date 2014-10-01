@@ -2,7 +2,7 @@
 #define SUCCESS 0
 #define FAIL -1          /* hodit do hlavicky error.h*/
 
-//TOKENY 
+// TOKENY 
 
 #define ID  10            // IDENTIFICATOR    
 #define BEGIN 11
