@@ -1,0 +1,12 @@
+{KOMENTAR}
+
+var 
+a:integer;
+vysl: integer;
+
+begin
+
+write('BLAH');
+
+end.
+

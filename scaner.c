@@ -19,12 +19,6 @@
 FILE *source;
 
 
-char keywords[]={ "begin","end"
-};
-
-
-
-
 /** \brief funkcia inicializuje zdrojovy subor
  *
  * \param  File pointer
@@ -45,42 +39,88 @@ source=f;
 int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
 {
     char c;   // premenna do ktorej si ukladame znak
+    int state=0;   // stav v ktorom sme
+    int ccount=0; //ulozime pocet nacitanych znakov
 
     while(1)
     {
+        c=getc(source);
+        ccount++;
+// switch pre unarne operatory bez potreby pola pocet znakov max 1
+        if(ccount==1)
+        {
+            switch(c)
+            {
+                case '+': return PLUS;
+                case '-': return MINUS;
+                case '*': return MULTIPLY;
+                case '/': return DIVIDE;
+                case ':': return APOSTROF;
+                case ';': return BODKOCIARKA;
+                case '=': return EQUAL;
+                case '{': state=LEFT;
+                    break; //oznacime si zaciatok komentu
+                case '}': return FAIL;
+                case '<': return LESS;
+                case '>': return GREATER;
+            }
+        }
 
-      c=getc(source);
-
- // switch pre unarne operatory bez potreby pola
-
-      switch(c)
-      {
-        case '+': return PLUS;
-        case '-': return MINUS;
-        case '*': return MULTIPLY;
-        case '/': return DIVIDE;
-        case ':': return APOSTROF;
-        case ';': return BODKOCIARKA;
-        case '=': return EQUAL;
-        case '{': return LEFT_VINCULUM;
-        case '}': return RIGHT_VINCULUM;
-        case '<': return LESS;
-        case '>': return GREATER;
-      }
-
-
-
-
-
-
-
-
+/*KOMENT*/
+   if((c=='}')&&(state==LEFT))
+     return KOMENT;
 
 
 
 
 
-        return FAIL;           // ked ziaden z uvedenych znakov vratime lexikalnu chybu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if ((c == EOF)&& (state == LEFT))
+            return FAIL; //syntakticka chyba nedokonceny koment
+
+
+        if ((c == EOF) && (state == 0))    /*na konci suboru vrati Token EOFILE*/
+            return EOFILE;
+
     }
 
 

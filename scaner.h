@@ -33,8 +33,8 @@
 #define CHAR 38            //#i (256)
 #define TRUE 39            // BOOLEAN VALUE
 #define FALSE 38           // BOOLEAN VALUE
-#define LEFT_VINCULUM  39  // '{'
-#define RIGHT_VINCULUM 40  // '}'
+#define KOMENT 39
+#define EOFILE 40
 #define DVOJBODKA 41       //:
 #define BODKOCIARKA 42     //;
 #define CIARKA 43          //,
@@ -44,6 +44,8 @@
 #define LENGTH 47          // FUNCTION
 #define COPY 48            // FUNCTION
 #define CONST 49           // NUMBER
+#define LEFT 50
+#define RIGHT 51
 
 
 void SourceInitialize(FILE *f);
