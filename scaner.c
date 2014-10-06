@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "scaner.h"
+#include "err.h"
 
 FILE *source;
 
@@ -46,6 +47,7 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
     {
         c=getc(source);
         ccount++;
+        
 // switch pre unarne operatory bez potreby pola pocet znakov max 1
         if(ccount==1)
         {
@@ -67,8 +69,8 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
         }
 
 /*KOMENT*/
-   if((c=='}')&&(state==LEFT))
-     return KOMENT;
+        if((c=='}')&&(state==LEFT))
+            return KOMENT;
 
 
 
@@ -115,7 +117,7 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
 
 
         if ((c == EOF)&& (state == LEFT))
-            return FAIL; //syntakticka chyba nedokonceny koment
+            return E_SYNTAX; //syntakticka chyba nedokonceny koment
 
 
         if ((c == EOF) && (state == 0))    /*na konci suboru vrati Token EOFILE*/
