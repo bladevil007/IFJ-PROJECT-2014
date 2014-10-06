@@ -47,7 +47,7 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
     {
         c=getc(source);
         ccount++;
-        
+
 // switch pre unarne operatory bez potreby pola pocet znakov max 1
         if(ccount==1)
         {
@@ -62,7 +62,7 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
                 case '=': return EQUAL;
                 case '{': state=LEFT;
                     break; //oznacime si zaciatok komentu
-                case '}': return FAIL;
+                case '}': return E_SYNTAX;
                 case '<': return LESS;
                 case '>': return GREATER;
             }
