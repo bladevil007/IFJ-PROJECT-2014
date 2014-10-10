@@ -15,5 +15,46 @@
 #include <stdlib.h>
 #include "scaner.h"
 #include "parser.h"
+#include "err.h">
 
 
+
+void Loadhashtable(TOKEN *TOKENptr, int state)
+
+{
+
+//funkcia vlozi strukturu token do hash table
+}
+
+
+
+
+int SyntacticAnalys ()
+{
+
+
+TOKEN *TOKENptr;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return 0;
+}

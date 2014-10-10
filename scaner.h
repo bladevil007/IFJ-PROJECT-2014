@@ -44,6 +44,12 @@
 #define LEFT 50
 #define RIGHT 51
 
+typedef struct {
+int druh;
+char *value;
+}TOKEN;
 
 void SourceInitialize(FILE *f);
-int getnextToken ();
+
+int getnextToken (TOKEN *TOKENptr);
+
