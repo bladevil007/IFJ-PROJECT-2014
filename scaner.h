@@ -51,5 +51,5 @@ char *value;
 
 void SourceInitialize(FILE *f);
 
-int getnextToken (TOKEN *TOKENptr);
+int getnextToken ();
 
