@@ -9,7 +9,7 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Ji¯Ì Dost·l             xdosta40              */
+/*                              Ji≈ô√≠ Dost√°l             xdosta40              */
 /* ****************************************************************************/
 
 #include <stdio.h>
@@ -40,7 +40,7 @@ source=f;
  * \return Token a klic v poli alebo  lexikalna chyba
  */
 
-int getnextToken (TOKEN *TOKENptr)    // parameter sa bude predavat ukazatel na strukturu TOKEN  viz scaner.h
+int getnextToken ()    // parameter sa bude predavat ukazatel na strukturu TOKEN  viz scaner.h
 {
 
 char c;   // premenna do ktorej si ukladame znak
