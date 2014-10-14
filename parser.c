@@ -19,12 +19,6 @@
 
 
 
-void Loadhashtable(TOKEN *TOKENptr, int state)
-
-{
-
-//funkcia vlozi strukturu token do hash table
-}
 
 
 
@@ -33,7 +27,6 @@ int SyntacticAnalys ()
 {
 
 
-TOKEN *TOKENptr;
 
 
 
