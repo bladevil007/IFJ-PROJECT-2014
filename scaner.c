@@ -9,12 +9,15 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Ji¯Ì Dost·l             xdosta40              */
+/*                              Ji≈ô√≠ Dost√°l             xdosta40              */
 /* ****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "scaner.h"
+#include "parser.h"
+#include "err.h"
 
 FILE *source;
 
@@ -24,6 +27,7 @@ FILE *source;
  * \param  File pointer
  *
  */
+
 void SourceInitialize(FILE *f)
 {
 
@@ -36,39 +40,15 @@ source=f;
  * \return Token a klic v poli alebo  lexikalna chyba
  */
 
-int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
+int getnextToken ()    // parameter sa bude predavat ukazatel na strukturu TOKEN  viz scaner.h
 {
-    char c;   // premenna do ktorej si ukladame znak
-    int state=0;   // stav v ktorom sme
-    int ccount=0; //ulozime pocet nacitanych znakov
+
+char c;   // premenna do ktorej si ukladame znak
+int state=0;   // stav v ktorom sme
+int ccount=0; //ulozime pocet nacitanych znakov
 
     while(1)
     {
-        c=getc(source);
-        ccount++;
-// switch pre unarne operatory bez potreby pola pocet znakov max 1
-        if(ccount==1)
-        {
-            switch(c)
-            {
-                case '+': return PLUS;
-                case '-': return MINUS;
-                case '*': return MULTIPLY;
-                case '/': return DIVIDE;
-                case ':': return APOSTROF;
-                case ';': return BODKOCIARKA;
-                case '=': return EQUAL;
-                case '{': state=LEFT;
-                    break; //oznacime si zaciatok komentu
-                case '}': return FAIL;
-                case '<': return LESS;
-                case '>': return GREATER;
-            }
-        }
-
-/*KOMENT*/
-   if((c=='}')&&(state==LEFT))
-     return KOMENT;
 
 
 
@@ -76,54 +56,10 @@ int getnextToken ()    // parameter sa bude predavat ukazatel na pole znakov
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if ((c == EOF)&& (state == LEFT))
-            return FAIL; //syntakticka chyba nedokonceny koment
-
-
-        if ((c == EOF) && (state == 0))    /*na konci suboru vrati Token EOFILE*/
-            return EOFILE;
-
+/// DOPLNIT LEXEMY
+///
+return 0;
     }
-
-
 
 }
 

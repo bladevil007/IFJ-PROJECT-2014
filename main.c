@@ -15,31 +15,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "scaner.h"
-
-
+#include "parser.h"
 int main(int argc, char *argv[])
 {
 
-FILE *source;
 
+FILE *source;
 /*source file opening*/
 
   if (argc == 1)
    {
       fprintf(stderr,"No input file\n");
-      return FAIL;
+      return 0;
    }
 
   if ((source = fopen(argv[1],"r")) == NULL)
    {
       fprintf(stderr,"Failed to open\n");
 
-      return FAIL;
+      return 0;
    }
 
 /* Inicializcia zdrojoveho suboru pre Lexikalnu analyzu */
 
 SourceInitialize(source);
+SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
+
+
+
+
+
+
+
 
 
 

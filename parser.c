@@ -15,5 +15,39 @@
 #include <stdlib.h>
 #include "scaner.h"
 #include "parser.h"
+#include "err.h">
 
 
+
+
+
+
+
+int SyntacticAnalys ()
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return 0;
+}

@@ -1,7 +1,4 @@
 
-#define SUCCESS 0
-#define FAIL -1          /* hodit do hlavicky error.h*/
-
 // TOKENY
 
 #define ID  10            // IDENTIFICATOR
@@ -47,6 +44,12 @@
 #define LEFT 50
 #define RIGHT 51
 
+typedef struct {
+int druh;
+char *value;
+}TOKEN;
 
 void SourceInitialize(FILE *f);
+
 int getnextToken ();
+
