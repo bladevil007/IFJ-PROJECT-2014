@@ -1,5 +1,4 @@
 {KOMENTAR}
-
 var 
 a:integer;
 vysl: integer;
