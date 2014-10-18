@@ -16,13 +16,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-#include "scaner.h"
 #include "parser.h"
 #include "err.h"
+#include "string.h"
+#include "scaner.h"
 
 FILE *source;
-char STACKCH;
 
 
 /** \brief funkcia inicializuje zdrojovy subor
@@ -38,23 +37,22 @@ source=f;
 
 }
 
-/** \brief funkcia vrati dalsi token , volana syntaktickou analyzou
+/** \brief funkcia vrati dalsi LEX_STRUCT , volana syntaktickou analyzou
  * \param  char pointer
- * \return Token a klic v poli alebo  lexikalna chyba
+ * \return LEX_STRUCT alebo lexikalna chyba
  */
 
-int getnextToken (TOKEN *TOKENptr)    // parameter sa bude predavat ukazatel na strukturu TOKEN  viz scaner.h + ukazatel na pole
+int getnextToken (LEX_STRUCT *LEX_STRUCTPTR)    // parameter sa bude predavat ukazatel na strukturu LEX_STRUCT  viz string.h + ukazatel na pole
 {
-  TOKENptr->druh=0;
-  TOKENptr->value=0;
-  TOKENptr->first_index=0;
+  LEX_STRUCTPTR->value=0;
+  strClear(LEX_STRUCTPTR);
 
 char c;   // premenna do ktorej si ukladame znak
 int state=0;   // stav v ktorom sme
-int ccount=0; //ulozime pocet nacitanych znakov
 
     while(1)
     {
+
 c=getc(source);
 ///ODSTRANENIE KOMENTOV
 if(c=='{' )
@@ -66,59 +64,40 @@ if ((state==KOMENT) && (c=='}'))
 if(state==0){
 switch(c) {
 case '<' :
-    TOKENptr->druh=LESS;
-
-    return SUCCESS;
+    return LESS;
 case '>' :
-    TOKENptr->druh=GREATER;
-    return SUCCESS;
+       return GREATER;
 case '=' :
-    TOKENptr->druh=EQUAL;
-    return SUCCESS;
+    return EQUAL;
 case '.' :
-    TOKENptr->druh=DOT;
-    return SUCCESS;
+    return DOT;
 case ':' :
-    TOKENptr->druh=DVOJBODKA;
-     return SUCCESS;
+     return DVOJBODKA;
 case ';' :
-    TOKENptr->druh=BODKOCIARKA;
-     return SUCCESS;
+     return BODKOCIARKA;
 case '+' :
-    TOKENptr->druh=PLUS;
-     return SUCCESS;
+     return PLUS;
 case '-' :
-    TOKENptr->druh=MINUS;
-     return SUCCESS;
+     return MINUS;
 case '/' :
-    TOKENptr->druh=DIVIDE;
-     return SUCCESS;
+     return DIVIDE;
 case '*' :
-   TOKENptr->druh=MULTIPLY;
-    return SUCCESS;
+    return MULTIPLY;
 case '(' :
-    TOKENptr->druh=LEFT_ROUND;
-    return SUCCESS;
+    return LEFT_ROUND;
 case ')' :
-    TOKENptr->druh=RIGHT_ROUND;
-    return SUCCESS;
+    return RIGHT_ROUND;
 case 39 :
-    TOKENptr->druh=APOSTROF;
-    return SUCCESS;
+    return APOSTROF;
 case '[' :
-    TOKENptr->druh=LEFT_HRANATA;
-    return SUCCESS;
+    return LEFT_HRANATA;
 case ']' :
-    TOKENptr->druh=RIGHT_HRANATA;
-    return SUCCESS;
+    return RIGHT_HRANATA;
 /**case 'e' :
 case 'E' :
    state=EXPONENT;*/
 }
 }
-
-
-
 
 ///CISLA A KONSTANTY
 /*
@@ -126,7 +105,7 @@ if(state==EXPONENT)
 {
  if((c >= '0') && (c <='9'))
  {
-     TOKENptr->druh=EXPONENT;
+     LEX_STRUCTPTR->druh=EXPONENT;
     return SUCCESS;
     ///posunut ukazatel
  }
@@ -137,36 +116,32 @@ if(state==EXPONENT)
 
 if((c >= '0') && (c <='9')){
 state=CONST;
-TOKENptr->value=(TOKENptr->value*10)+(c-'0');
+LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value*10)+(c-'0');
 }
 
 if((c < '0') || (c >'9')){
 if(state==CONST){
  if(isspace(c)!=0)
 {
-    TOKENptr->druh=CONST;
-    return SUCCESS;
+    return CONST;
  }
 
 else if((c=='.') || (c==';') || ( c== 'e') || (c=='E') ||(c=='+') || (c=='-') || (c=='*') || (c=='/'))
  {
      fseek(source,ftell(source)-1,SEEK_SET);
-     TOKENptr->druh=CONST;
-     return SUCCESS;
+     return CONST;
  }
  else
     if(c==EOF)
  {
-TOKENptr->druh=CONST;
-return SUCCESS;
+return CONST;
  }
  else
     return E_LEXICAL;
 
 }
 }
-///***********************************************************
-
+///*********************************************************** identifikatory a klucove slova
 
 
 

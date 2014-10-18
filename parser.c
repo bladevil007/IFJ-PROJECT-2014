@@ -15,30 +15,23 @@
 #include <stdlib.h>
 #include "scaner.h"
 #include "parser.h"
-#include "err.h">
+#include "string.h"
+#include "err.h"
 
 int SyntacticAnalys ()
 {
-TOKEN *TOKENptr;
-if(((TOKENptr=(TOKEN*)malloc(sizeof(TOKEN )))==NULL) ||(((TOKENptr->druh=malloc(sizeof(int)))==NULL)) ||
-  ((TOKENptr->value=malloc(sizeof(int)))==NULL) ||((TOKENptr->first_index=malloc(sizeof(int)))==NULL))
-        return E_INTERNAL;
+LEX_STRUCT *LEX_STRUCTPTR;
+///alokacia pomocnej struktury lexikalnej analyzy
+
+if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||
+    (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
+return E_INTERNAL;
 
 
 
 
-/**test only
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-*/
-
-
-
-free(TOKENptr); //TEMPORARY
+//test only
+printf("%i   LEX_STRUCT \n",getnextToken(LEX_STRUCTPTR));
 
 
 
@@ -63,5 +56,8 @@ free(TOKENptr); //TEMPORARY
 
 
 
+
+
+free(LEX_STRUCTPTR);
 return 0;
 }

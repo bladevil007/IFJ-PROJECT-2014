@@ -1,5 +1,8 @@
 
 // TOKENY
+#include "string.h"
+void SourceInitialize(FILE *f);
+int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 
 #define ID  10            // IDENTIFICATOR
 #define BEGIN 11
@@ -48,14 +51,5 @@
 #define LEFT_ROUND 54                 //ZATVORKA
 #define RIGHT_ROUND 55
 
-typedef struct {
-int druh;
-int first_index;       //zacinajuca pozicia v poly
-int value;
-}TOKEN;
-
-void SourceInitialize(FILE *f);
-
-int getnextToken (TOKEN *TOKENptr);
 
 
