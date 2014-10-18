@@ -155,6 +155,12 @@ else if((c=='.') || (c==';') || ( c== 'e') || (c=='E') ||(c=='+') || (c=='-') ||
      return SUCCESS;
  }
  else
+    if(c==EOF)
+ {
+TOKENptr->druh=CONST;
+return SUCCESS;
+ }
+ else
     return E_LEXICAL;
 
 }

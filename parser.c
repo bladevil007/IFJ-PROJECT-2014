@@ -27,15 +27,15 @@ if(((TOKENptr=(TOKEN*)malloc(sizeof(TOKEN )))==NULL) ||(((TOKENptr->druh=malloc(
 
 
 
-/* test only
+/**test only
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
 printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
-
 */
+
 
 
 free(TOKENptr); //TEMPORARY
