@@ -17,14 +17,28 @@
 #include "parser.h"
 #include "err.h">
 
-
-
-
-
-
-
 int SyntacticAnalys ()
 {
+TOKEN *TOKENptr;
+if(((TOKENptr=(TOKEN*)malloc(sizeof(TOKEN )))==NULL) ||(((TOKENptr->druh=malloc(sizeof(int)))==NULL)) ||
+  ((TOKENptr->value=malloc(sizeof(int)))==NULL) ||((TOKENptr->first_index=malloc(sizeof(int)))==NULL))
+        return E_INTERNAL;
+
+
+
+
+/* test only
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+printf("%i  %i TOKEN \n",TOKENptr->druh,getnextToken(TOKENptr));
+
+*/
+
+
+free(TOKENptr); //TEMPORARY
 
 
 

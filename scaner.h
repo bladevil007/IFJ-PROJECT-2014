@@ -41,15 +41,21 @@
 #define LENGTH 47          // FUNCTION
 #define COPY 48            // FUNCTION
 #define CONST 49           // NUMBER
-#define LEFT 50
-#define RIGHT 51
+#define LEFT_HRANATA 50
+#define RIGHT_HRANATA 51
+#define SUCCESS 52
+#define FAIL 53
+#define LEFT_ROUND 54                 //ZATVORKA
+#define RIGHT_ROUND 55
 
 typedef struct {
 int druh;
-char *value;
+int first_index;       //zacinajuca pozicia v poly
+int value;
 }TOKEN;
 
 void SourceInitialize(FILE *f);
 
-int getnextToken ();
+int getnextToken (TOKEN *TOKENptr);
+
 
