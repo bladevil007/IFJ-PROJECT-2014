@@ -52,13 +52,10 @@ char c;   // premenna do ktorej si ukladame znak
 int state=0;
 int plusminus=0;
 double value=0;
-int u=1;  // stav v ktorom sme
-
+int u=1;
+int plus_s=0; //
     while(1)
     {
-
-/////////////////////
-
 
 c=getc(source);
 ///********************************
@@ -83,40 +80,14 @@ else if((isspace(c)!=0) || c==EOF || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';')
 {
 
 LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
+if(plus_s==1)
+    LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
 fseek(source,ftell(source)-1,SEEK_SET);
 return CONST;
 }
 else
     return E_LEXICAL;
 }
-if(state==REAL_Mo)
-{
-if((c >= '0') && (c <='9'))
-{
-value=(value*10)+(c-'0');
-}
-
-else if(value==0)
-{
-if(plusminus==0)
-{
-fseek(source,ftell(source)-1,SEEK_SET);
-return E_LEXICAL;
-}
-
-fseek(source,ftell(source)-4,SEEK_SET);
-return CONST;
-}
-else if((isspace(c)!=0) || c==EOF || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';')
-{
-LEX_STRUCTPTR->value= (-1)*LEX_STRUCTPTR->value*pow(10,value);
-fseek(source,ftell(source)-1,SEEK_SET);
-return CONST;
-}
-else
-    return E_LEXICAL;
-}
-
 
 if(state==DOT)
 {
@@ -187,8 +158,10 @@ if(state==CONST){
  }
 
 else if(c=='-')
-state=REAL_M;
-
+{
+state=REAL;
+plus_s=1;
+}
 else if(c=='.')
 state=DOT;
 
@@ -230,28 +203,12 @@ else
      return CONST;
 }
 }
-
-if(state==REAL_M)
-{
-plusminus=1;
-c=getc(source);
-if((c=='e') || (c=='E'))
-   state=REAL_Mo;
-else
-{
-    fseek(source,ftell(source)-2,SEEK_SET);
-     return CONST;
-}
-}
-
 ///*********************************************************** identifikatory a klucove slova
 
 if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
 {
 
 return ID;
-
-
 }
 
 
