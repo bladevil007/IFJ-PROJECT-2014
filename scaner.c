@@ -23,7 +23,11 @@
 #include "scaner.h"
 
 FILE *source;
-
+char *key[]={"begin","end","boolean","do",
+"else","false","find","forward",
+"function","if","integer","readln","real","sort",
+"string","then","true","var","while","write"
+};
 
 /** \brief funkcia inicializuje zdrojovy subor
  *
@@ -58,6 +62,13 @@ int plus_s=0; //
     {
 
 c=getc(source);
+
+
+///ODSTRANENIE KOMENTOV
+if(c=='{' )
+    state=KOMENT;
+if ((state==KOMENT) && (c=='}'))
+    state=0;
 ///********************************
 if(state==REALo)
 {
@@ -102,11 +113,6 @@ state=CONST;
 }
 
 }
-///ODSTRANENIE KOMENTOV
-if(c=='{' )
-    state=KOMENT;
-if ((state==KOMENT) && (c=='}'))
-    state=0;
 
 ///STAVY TVORENE JEDNOU LEXEMOU
 if(state==0){
@@ -117,6 +123,8 @@ case '>' :
        return GREATER;
 case '=' :
     return EQUAL;
+case '.':
+    return DOT;
 case ':' :
      return DVOJBODKA;
 case ';' :
@@ -207,16 +215,54 @@ else
 
 if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
 {
+state=STRING;
+}
+if(state==STRING)
+{
+if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c <='9')))
 
-return ID;
+    AddChar_str(LEX_STRUCTPTR,c);
+
+    else
+    {
+    for(int i=0;i<20;i++)
+    {
+
+     if((CmpConst_str(LEX_STRUCTPTR,key[i]))==0)
+     {
+         fseek(source,ftell(source)-1,SEEK_SET);
+         switch(i)
+         {
+             case 0:return BEGIN;
+             case 1:return END;
+             case 2:return BOOLEAN;
+             case 3:return DO;
+             case 4:return ELSE;
+             case 5:return FALSE;
+             case 6:return FIND;
+             case 7:return FORWARD;
+             case 8:return FUNCTION;
+             case 9:return IF;
+             case 10:return INTEGER;
+             case 11:return READLN;
+             case 12:return REAL;
+             case 13:return SORT;
+             case 14:return STRING;
+             case 15:return THEN;
+             case 16:return TRUE;
+             case 17:return VAR;
+             case 18:return WHILE;
+             case 19:return WRITE;
+
+         }
+     }
+    }
+    fseek(source,ftell(source)-1,SEEK_SET);
+    return ID;
+    }
 }
 
-
-
-
-
-
-
+///*****************************CONST STRINGS
 
 
 
@@ -246,8 +292,10 @@ if(c==EOF)
     else
         return SUCCESS;
 }
-/// DOPLNIT LEXEMY
-///
+if((isspace(c)==0)&&(state==0)&&(c!='}'))
+{
+  return E_LEXICAL;
+}
 
     }
 

@@ -50,8 +50,8 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define FAIL 53
 #define LEFT_ROUND 54                 //ZATVORKA
 #define RIGHT_ROUND 55
-#define REAL_M 56
+#define CONST_STRING 56
 #define REALo 57
-#define REAL_Mo 58
+
 
 
