@@ -30,6 +30,7 @@ int Init_str(LEX_STRUCT *LEX_STRUCTPTR)
    if ((LEX_STRUCTPTR->str = (char*) malloc(STRLEN)) == NULL)
       return E_INTERNAL;
 
+
   LEX_STRUCTPTR->str[0] = '\0';
   LEX_STRUCTPTR->length = 0;
   LEX_STRUCTPTR->mallocsize =STRLEN ;
@@ -78,7 +79,7 @@ int AddChar_str(LEX_STRUCT *LEX_STRUCTPTR, char c)
 */
 int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 {
-   return strcmp(LEX_STRUCTPTR->str, CONST_STR);
+   return strcmp(LEX_STRUCTPTR->str,CONST_STR);
 }
 
 

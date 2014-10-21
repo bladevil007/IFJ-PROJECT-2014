@@ -4,7 +4,7 @@
 #define STRLEN 8
 
 typedef struct {
-int value;
+double value;
 char *str;
 int length;
 int mallocsize;

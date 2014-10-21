@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include "parser.h"
 #include "err.h"
 #include "string.h"
@@ -48,12 +49,88 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR)    // parameter sa bude predavat uk
   strClear(LEX_STRUCTPTR);
 
 char c;   // premenna do ktorej si ukladame znak
-int state=0;   // stav v ktorom sme
+int state=0;
+int plusminus=0;
+double value=0;
+int u=1;  // stav v ktorom sme
 
     while(1)
     {
 
+/////////////////////
+
+
 c=getc(source);
+///********************************
+if(state==REALo)
+{
+if((c >= '0') && (c <='9'))
+{
+value=(value*10)+(c-'0');
+}
+
+else if(value==0)
+{
+if(plusminus==0)
+{
+fseek(source,ftell(source)-1,SEEK_SET);
+return E_LEXICAL;
+}
+fseek(source,ftell(source)-4,SEEK_SET);
+return CONST;
+}
+else if((isspace(c)!=0) || c==EOF || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';')
+{
+
+LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
+fseek(source,ftell(source)-1,SEEK_SET);
+return CONST;
+}
+else
+    return E_LEXICAL;
+}
+if(state==REAL_Mo)
+{
+if((c >= '0') && (c <='9'))
+{
+value=(value*10)+(c-'0');
+}
+
+else if(value==0)
+{
+if(plusminus==0)
+{
+fseek(source,ftell(source)-1,SEEK_SET);
+return E_LEXICAL;
+}
+
+fseek(source,ftell(source)-4,SEEK_SET);
+return CONST;
+}
+else if((isspace(c)!=0) || c==EOF || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';')
+{
+LEX_STRUCTPTR->value= (-1)*LEX_STRUCTPTR->value*pow(10,value);
+fseek(source,ftell(source)-1,SEEK_SET);
+return CONST;
+}
+else
+    return E_LEXICAL;
+}
+
+
+if(state==DOT)
+{
+
+if((c >= '0') && (c <='9')){
+LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value+((c-'0')*pow(10,-u)));
+u++;
+}
+if((c < '0') || (c >'9'))
+{
+state=CONST;
+}
+
+}
 ///ODSTRANENIE KOMENTOV
 if(c=='{' )
     state=KOMENT;
@@ -93,11 +170,12 @@ case ']' :
     return RIGHT_HRANATA;
 }
 }
-
 ///CISLA A KONSTANTY
-/*
-if((c >= '0') && (c <='9')){
-state=CONST;
+
+if((c >= '0') && (c <='9')&&(state==0))
+ state=CONST;
+
+if((c >= '0') && (c <='9')&& (state==CONST)){
 LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value*10)+(c-'0');
 }
 
@@ -107,21 +185,24 @@ if(state==CONST){
 {
     return CONST;
  }
-if(c=='-')
-state=REALM;
 
-if(c=='.')
+else if(c=='-')
+state=REAL_M;
+
+else if(c=='.')
 state=DOT;
 
 
-if(c=='+')
+else if(c=='+')
 state=REAL;
 
-if((c=='e') || (c=='E'))
+
+else if((c=='e') || (c=='E'))
 state=REALo;
 
-else if (c==';')|| (c=='*') || (c=='/'))
+else if ((c==';')|| (c=='*') || (c=='/'))
  {
+
      fseek(source,ftell(source)-1,SEEK_SET);
      return CONST;
  }
@@ -139,22 +220,39 @@ return CONST;
 
 if(state==REAL)
 {
+plusminus=1;
+c=getc(source);
+if((c=='e') || (c=='E'))
+   state=REALo;
+else
+{
+    fseek(source,ftell(source)-3,SEEK_SET);
+     return CONST;
+}
+}
 
-
-
-
-
-
-
+if(state==REAL_M)
+{
+plusminus=1;
+c=getc(source);
+if((c=='e') || (c=='E'))
+   state=REAL_Mo;
+else
+{
+    fseek(source,ftell(source)-2,SEEK_SET);
+     return CONST;
+}
+}
 
 ///*********************************************************** identifikatory a klucove slova
 
+if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
+{
+
+return ID;
 
 
-
-
-
-
+}
 
 
 
