@@ -69,8 +69,6 @@ case '>' :
        return GREATER;
 case '=' :
     return EQUAL;
-case '.' :
-    return DOT;
 case ':' :
      return DVOJBODKA;
 case ';' :
@@ -93,27 +91,11 @@ case '[' :
     return LEFT_HRANATA;
 case ']' :
     return RIGHT_HRANATA;
-/**case 'e' :
-case 'E' :
-   state=EXPONENT;*/
 }
 }
 
 ///CISLA A KONSTANTY
 /*
-if(state==EXPONENT)
-{
- if((c >= '0') && (c <='9'))
- {
-     LEX_STRUCTPTR->druh=EXPONENT;
-    return SUCCESS;
-    ///posunut ukazatel
- }
-
-    ///uloz do pola >>>>><<<<<<<<
-}
-*/
-
 if((c >= '0') && (c <='9')){
 state=CONST;
 LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value*10)+(c-'0');
@@ -125,8 +107,20 @@ if(state==CONST){
 {
     return CONST;
  }
+if(c=='-')
+state=REALM;
 
-else if((c=='.') || (c==';') || ( c== 'e') || (c=='E') ||(c=='+') || (c=='-') || (c=='*') || (c=='/'))
+if(c=='.')
+state=DOT;
+
+
+if(c=='+')
+state=REAL;
+
+if((c=='e') || (c=='E'))
+state=REALo;
+
+else if (c==';')|| (c=='*') || (c=='/'))
  {
      fseek(source,ftell(source)-1,SEEK_SET);
      return CONST;
@@ -141,6 +135,18 @@ return CONST;
 
 }
 }
+
+
+if(state==REAL)
+{
+
+
+
+
+
+
+
+
 ///*********************************************************** identifikatory a klucove slova
 
 
@@ -191,6 +197,5 @@ if(c==EOF)
     }
 
 }
-
 
 
