@@ -79,7 +79,7 @@ int AddChar_str(LEX_STRUCT *LEX_STRUCTPTR, char c)
 */
 int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 {
-   return strcmp(LEX_STRUCTPTR->str,CONST_STR);
+   return strcmpi(LEX_STRUCTPTR->str,CONST_STR);
 }
 
 

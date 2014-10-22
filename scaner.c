@@ -63,7 +63,58 @@ int plus_s=0; //
 
 c=getc(source);
 
+if(state==APOSTROF)
+{
+   if(c!=39)
+    {
+        AddChar_str(LEX_STRUCTPTR,c);
+    }
+  else
+    if(c==39)
+   {
+       c=getc(source);
+        if(c=='#')
+        {
+        c=getc(source);
+        state=HASHTAG;
+        }
 
+    else
+    if(c==39)
+    {
+     AddChar_str(LEX_STRUCTPTR,c);
+    }
+    else
+        if(c==EOF)
+    {
+        return CONST_STRING;
+    }
+    else
+   {
+       fseek(source,ftell(source)-1,SEEK_SET);
+       return CONST_STRING;
+   }
+   }
+}
+///*****
+if(state==HASHTAG)
+{
+if((c >= '0') && (c <='9'))
+{
+LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value*10)+(c-'0');
+plus_s=1;
+printf("tu som \n");
+}
+else
+    if((plus_s==1) && (LEX_STRUCTPTR->value<256) &&(c==39) && (LEX_STRUCTPTR->value>0))
+{
+    AddChar_str(LEX_STRUCTPTR,(int)LEX_STRUCTPTR->value);
+    LEX_STRUCTPTR->value=0;
+    state=APOSTROF;
+}
+    else
+    return E_LEXICAL;
+}
 ///ODSTRANENIE KOMENTOV
 if(c=='{' )
     state=KOMENT;
@@ -142,7 +193,10 @@ case '(' :
 case ')' :
     return RIGHT_ROUND;
 case 39 :
-    return APOSTROF;
+    {
+        state=APOSTROF;
+        break;
+    }
 case '[' :
     return LEFT_HRANATA;
 case ']' :
@@ -230,7 +284,8 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
 
      if((CmpConst_str(LEX_STRUCTPTR,key[i]))==0)
      {
-         fseek(source,ftell(source)-1,SEEK_SET);
+        if(c!=EOF)
+        fseek(source,ftell(source)-1,SEEK_SET);
          switch(i)
          {
              case 0:return BEGIN;
@@ -253,45 +308,27 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
              case 17:return VAR;
              case 18:return WHILE;
              case 19:return WRITE;
-
          }
      }
     }
-    fseek(source,ftell(source)-1,SEEK_SET);
+    if (c==EOF)
+    {
     return ID;
     }
+    else{
+   fseek(source,ftell(source)-1,SEEK_SET);
+    return ID;}
+    }
+
 }
-
-///*****************************CONST STRINGS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if(c==EOF)
 {   if(state!=0)
-        return E_LEXICAL;
+        return E_SYNTAX;
     else
         return SUCCESS;
 }
+
 if((isspace(c)==0)&&(state==0)&&(c!='}'))
 {
   return E_LEXICAL;

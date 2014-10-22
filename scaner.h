@@ -52,6 +52,6 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define RIGHT_ROUND 55
 #define CONST_STRING 56
 #define REALo 57
-
+#define HASHTAG 58
 
 
