@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -Wall -pedantic -g
+CFLAGS=-std=c99 -lm -Wall -pedantic -g
 BIN=project
 CC=gcc
 RM=rm -f

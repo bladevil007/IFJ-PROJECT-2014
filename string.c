@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ctype.h>
 #include "string.h"
 #include "parser.h"
@@ -79,7 +80,7 @@ int AddChar_str(LEX_STRUCT *LEX_STRUCTPTR, char c)
 */
 int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 {
-   return strcmpi(LEX_STRUCTPTR->str,CONST_STR);
+   return strcasecmp(LEX_STRUCTPTR->str,CONST_STR);
 }
 
 
