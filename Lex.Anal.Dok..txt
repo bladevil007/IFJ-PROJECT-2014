@@ -1,0 +1,72 @@
+Dokumentacia k lexikalnej analyze
+
+*LEX_STRUCTPTR musi byt alokovana v parser.c pred volanim !!! + musi byt volana aj funkcia INIT_str
+Lexikalna Anal. sa vola funkciou " getnextToken(LEX_STRUCT *LEX_STRUCTPTR)" <-ukazatel na strukturu 
+
+NAVRATOVE HODNOTY
+--------------------
+
+ID 10 			-IDENTIFIKATOR
+ulozeny je v LEX_STRUCTPTR->str
+------------------------------------------------------
+BEGIN 11 		-KLUCOVE SLOVO
+BOOLEAN 12 		-KLUCOVE SLOVO
+DO 13 			-KLUCOVE SLOVO
+ELSE 14 		-KLUCOVE SLOVO
+END 15 			-KLUCOVE SLOVO
+FIND 17			-KLUCOVE SLOVO
+FORWARD 18 		-KLUCOVE SLOVO
+FUNCTION 19 		-KLUCOVE SLOVO
+IF 20 			-KLUCOVE SLOVO
+INTEGER 21 		-KLUCOVE SLOVO
+READLN 22 		-KLUCOVE SLOVO
+REAL 23 		-KLUCOVE SLOVO
+SORT 24  		-KLUCOVE SLOVO
+STRING 25 		-KLUCOVE SLOVO
+THEN 26  		-KLUCOVE SLOVO
+VAR 28 			-KLUCOVE SLOVO
+WHILE 29    		-KLUCOVE SLOVO
+WRITE 30      		-KLUCOVE SLOVO
+PLUS 31			-KLUCOVE SLOVO
+MINUS 32  		-KLUCOVE SLOVO
+MULTIPLY 33 		-KLUCOVE SLOVO
+DIVIDE 34 		-KLUCOVE SLOVO
+
+-----------------------------------------
+
+DOT 35   		-dojde napriklad za  klucovym slovom "end." ukoncenym nulou 
+
+
+TRUE 39            -KLUCOVE SLOVO
+FALSE 38           -KLUCOVE SLOVO
+
+
+DVOJBODKA 41         	//:  
+BODKOCIARKA 42     	//;
+CIARKA 43          	//,
+GREATER 44         	//>
+LESS 45            	//<
+EQUAL 46           	//=
+LENGTH 47          	-KLUCOVE SLOVO
+COPY 48            	-KLUCOVE SLOVO
+
+CONST 49           	// cislo aj desatinne aj int 
+  
+hodnota cisla je ulozena v strukture LEX_STRUCTPTR->value
+------------------------------------
+
+LEFT_HRANATA 60                // [
+
+RIGHT_HRANATA 61               // ]
+
+SUCCESS 52                      //dokoncenie nacitania suboru  vsetko ok
+
+E_LEXICAL 1                      //definovana v err.h 
+
+
+LEFT_ROUND 54                 // (
+RIGHT_ROUND 55                // )
+
+CONST_STRING 56            //  stringovy retazec oddeleny apostrofmi  
+ulozeny je v LEX_STRUCTPTR->str
+
