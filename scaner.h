@@ -44,8 +44,8 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define LENGTH 47          // FUNCTION
 #define COPY 48            // FUNCTION
 #define CONST 49           // NUMBER
-#define LEFT_HRANATA 50
-#define RIGHT_HRANATA 51
+#define LEFT_HRANATA 60
+#define RIGHT_HRANATA 61
 #define SUCCESS 52
 #define FAIL 53
 #define LEFT_ROUND 54                 //ZATVORKA

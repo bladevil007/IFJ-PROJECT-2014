@@ -23,6 +23,8 @@
 #include "scaner.h"
 
 FILE *source;
+
+//klucove slova jazyka IFJ14
 char *key[]={"begin","end","boolean","do",
 "else","false","find","forward",
 "function","if","integer","readln","real","sort",
@@ -34,7 +36,6 @@ char *key[]={"begin","end","boolean","do",
  * \param  File pointer
  *
  */
-
 void SourceInitialize(FILE *f)
 {
 
@@ -49,28 +50,31 @@ source=f;
 
 int getnextToken (LEX_STRUCT *LEX_STRUCTPTR)    // parameter sa bude predavat ukazatel na strukturu LEX_STRUCT  viz string.h + ukazatel na pole
 {
-  LEX_STRUCTPTR->value=0;
-  strClear(LEX_STRUCTPTR);
+  LEX_STRUCTPTR->value=0;    //vynulujeme hodnotu  value
+  strClear(LEX_STRUCTPTR);   //vymazeme pole aby sme mohli znova nacitat
 
-char c;   // premenna do ktorej si ukladame znak
-int state=0;
-int plusminus=0;
-double value=0;
-int u=1;
-int plus_s=0; //
+char c;                     // premenna do ktorej si ukladame znak
+int state=0;                // stav k ktorom sme po nacitani znaku
+int plusminus=0;            //hodnota ci bol nacitany plus alebo minus
+double value=0;            // pomocna premenna na vypocet const
+int u=1;                   // pomocna premenna do cyklu
+int plus_s=0; //           // premenna ma hodnotu 1 ked sa nacita +
+
+//hlavny cyklus vypoctu Tokenu
     while(1)
     {
 
-c=getc(source);
+c=getc(source);    //nacitame znak
 
+//stav kedy po nacitani apostrofu nacitame CONST_STRING
 if(state==APOSTROF)
 {
    if(c!=39)
     {
-        AddChar_str(LEX_STRUCTPTR,c);
+        AddChar_str(LEX_STRUCTPTR,c);  //dokym nemame dalsi apostrof nacitame do pola
     }
   else
-    if(c==39)
+    if(c==39)              //mame dalsi apostrof tak zistime ci dalsi znak je apostrof alebo hashtag alebo nieco ine
    {
        c=getc(source);
         if(c=='#')
@@ -96,14 +100,14 @@ if(state==APOSTROF)
    }
    }
 }
-///*****
+
+//pri nacitani HASHTAGU ma nasledovat cislo
 if(state==HASHTAG)
 {
 if((c >= '0') && (c <='9'))
 {
 LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value*10)+(c-'0');
 plus_s=1;
-printf("tu som \n");
 }
 else
     if((plus_s==1) && (LEX_STRUCTPTR->value<256) &&(c==39) && (LEX_STRUCTPTR->value>0))
@@ -115,15 +119,18 @@ else
     else
     return E_LEXICAL;
 }
+
+
 ///ODSTRANENIE KOMENTOV
-if(c=='{' )
+if(c=='{' )                 //komentar zacina zlozenou zatvorkou
     state=KOMENT;
 if ((state==KOMENT) && (c=='}'))
     state=0;
 ///********************************
+
 if(state==REALo)
 {
-if((c >= '0') && (c <='9'))
+if((c >= '0') && (c <='9'))  //nacitame cisla
 {
 value=(value*10)+(c-'0');
 }
@@ -135,19 +142,36 @@ if(plusminus==0)
 fseek(source,ftell(source)-1,SEEK_SET);
 return E_LEXICAL;
 }
-fseek(source,ftell(source)-4,SEEK_SET);
+if(c==EOF)
+{
+fseek(source,ftell(source)-2,SEEK_SET);   //mame nacita napr 12+e a za "e" neni ziadne cislo
 return CONST;
 }
-else if((isspace(c)!=0) || c==EOF || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';')
-{
+else
+fseek(source,ftell(source)-3,SEEK_SET);   //mame nacita napr 12+e a za "e" neni ziadne cislo
+return CONST;
+}
 
+else if((isspace(c)!=0) || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';' || c==')'|| c==']' || c==','|| c== '<'|| c=='>' || c=='='||c==':' ) //tieto znaky nasleduju za cislom
+{
 LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
 if(plus_s==1)
-    LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
+LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
+
 fseek(source,ftell(source)-1,SEEK_SET);
 return CONST;
 }
 else
+if (c==EOF )
+{
+LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
+if(plus_s==1)
+LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
+return CONST;
+}
+
+else
+    if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_')))
     return E_LEXICAL;
 }
 
@@ -162,7 +186,6 @@ if((c < '0') || (c >'9'))
 {
 state=CONST;
 }
-
 }
 
 ///STAVY TVORENE JEDNOU LEXEMOU
@@ -172,6 +195,8 @@ case '<' :
     return LESS;
 case '>' :
        return GREATER;
+case ',' :
+    return CIARKA;
 case '=' :
     return EQUAL;
 case '.':
@@ -235,9 +260,8 @@ state=REAL;
 else if((c=='e') || (c=='E'))
 state=REALo;
 
-else if ((c==';')|| (c=='*') || (c=='/'))
- {
-
+else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':')
+{
      fseek(source,ftell(source)-1,SEEK_SET);
      return CONST;
  }
@@ -261,7 +285,7 @@ if((c=='e') || (c=='E'))
    state=REALo;
 else
 {
-    fseek(source,ftell(source)-3,SEEK_SET);
+    fseek(source,ftell(source)-2,SEEK_SET);
      return CONST;
 }
 }
@@ -322,14 +346,19 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
 
 }
 
+
 if(c==EOF)
-{   if(state!=0)
-        return E_SYNTAX;
+{   if(state==KOMENT)
+        return SUCCESS;
+    else
+        if(state!=0)
+        return E_LEXICAL;
     else
         return SUCCESS;
 }
 
-if((isspace(c)==0)&&(state==0)&&(c!='}'))
+
+if((isspace(c)==0)&&(state==0)&&(c!='}'))   //chyba ak mame nedefinovany stav znak ktory nepozname
 {
   return E_LEXICAL;
 }
