@@ -16,8 +16,7 @@
 #define FALSE 0
 #define TRUE 1
 
-int escSekv(char *s, int *index);
 int length(char *s);
-char copy(char *s, int i, int n);
+char *copy(char *s, int i, int n);
 int find(char *s, char *search);
-char sort(char *s);
+char *sort(char *s);
