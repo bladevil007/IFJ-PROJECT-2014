@@ -17,6 +17,13 @@
 #define TRUE 1
 
 int length(char *s);
+
 char *copy(char *s, int i, int n);
+
+void failKMP(char *p, int pl, int *fail);
+
+int matchKMP(char *search, char *txt, int pl, int tl, int *fail);
+
 int find(char *s, char *search);
+
 char *sort(char *s);
