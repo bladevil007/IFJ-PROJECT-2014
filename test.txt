@@ -10,7 +10,7 @@ write('Zadejtecisloprovypocetfaktorialu:');
 readln(a);
 
 
-ifa < 0 then
+if a < 0 then
 
 begin
 
