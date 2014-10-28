@@ -26,4 +26,8 @@ int matchKMP(char *search, char *txt, int pl, int tl, int *fail);
 
 int find(char *s, char *search);
 
+void siftDown(char *s, int left, int right);
+
+void heapSort(char *s, int n);
+
 char *sort(char *s);
