@@ -1,0 +1,12 @@
+12.e5
+
+12-e5
+
+
+{SADASASDAS DASD ASD ASDASDASDASDASDAS}
+BEGIN
+ begin
+
+ AD ASD   ASDAS   bEGIN 
+
+'test 1 zo znakmi '#010'SVE''TE'#33''

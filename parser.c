@@ -30,10 +30,15 @@ return E_INTERNAL;
 
 
 
-//test only
-printf("%i   LEX_STRUCT \n",getnextToken(LEX_STRUCTPTR));
+//test only,erase 
+int k=getnextToken(LEX_STRUCTPTR);
 
-
+while((k!=SUCCESS) && (k!=E_LEXICAL)){
+printf("%iX",k);
+printf("%.2fX",LEX_STRUCTPTR->value);
+printf("%s\n",LEX_STRUCTPTR->str);
+k=getnextToken(LEX_STRUCTPTR);
+}
 
 
 
