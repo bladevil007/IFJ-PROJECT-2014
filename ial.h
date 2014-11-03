@@ -31,3 +31,4 @@ void siftDown(char *s, int left, int right);
 void heapSort(char *s, int n);
 
 char *sort(char *s);
+
