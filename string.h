@@ -3,6 +3,7 @@
 #define STRING_H
 #define STRLEN 8
 
+
 typedef struct {
 double value;
 char *str;
@@ -20,6 +21,16 @@ void strClear(LEX_STRUCT *LEX_STRUCTPTR);
 int AddChar_str(LEX_STRUCT *LEX_STRUCTPTR, char c);
 
 int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR);
+
+//nekonecne pole
+#define ARR_INC 8
+
+int add_str(inf_array *a, char* strin);
+
+void free_array(inf_array *a);
+
+int init_array(inf_array *a);
+
 #endif
 
 
