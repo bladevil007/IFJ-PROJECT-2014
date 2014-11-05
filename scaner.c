@@ -122,7 +122,7 @@ else
 
 
 ///ODSTRANENIE KOMENTOV
-if(c=='{' )                 //komentar zacina zlozenou zatvorkou
+if(c=='{' )                 //komenta  printf("tu som ");r zacina zlozenou zatvorkou
     state=KOMENT;
 if ((state==KOMENT) && (c=='}'))
     state=0;
@@ -133,31 +133,39 @@ if(state==REALo)
 if((c >= '0') && (c <='9'))  //nacitame cisla
 {
 value=(value*10)+(c-'0');
+plusminus=1;
+
 }
 
 else if(value==0)
 {
 if(plusminus==0)
 {
+
 fseek(source,ftell(source)-1,SEEK_SET);
 return E_LEXICAL;
+
 }
 if(c==EOF)
 {
-fseek(source,ftell(source)-2,SEEK_SET);   //mame nacita napr 12+e a za "e" neni ziadne cislo
-return CONST;
+fseek(source,ftell(source)-1,SEEK_SET);
+return E_LEXICAL;
+
 }
 else
-fseek(source,ftell(source)-3,SEEK_SET);   //mame nacita napr 12+e a za "e" neni ziadne cislo
-return CONST;
+fseek(source,ftell(source)-1,SEEK_SET);   //mame nacita napr 12+e a za "e" neni ziadne cislo
+return E_LEXICAL;
 }
 
 else if((isspace(c)!=0) || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';' || c==')'|| c==']' || c==','|| c== '<'|| c=='>' || c=='='||c==':' ) //tieto znaky nasleduju za cislom
 {
-LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
-if(plus_s==1)
-LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
 
+if(plus_s==1)
+{
+LEX_STRUCTPTR->value= LEX_STRUCTPTR->value/pow(10,value);
+}
+else
+LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
 fseek(source,ftell(source)-1,SEEK_SET);
 return CONST;
 }
@@ -182,11 +190,17 @@ if((c >= '0') && (c <='9')){
 LEX_STRUCTPTR->value=(LEX_STRUCTPTR->value+((c-'0')*pow(10,-u)));
 u++;
 }
-if((c < '0') || (c >'9'))
+else if(u==1)
+    return E_LEXICAL;
+
+
+else if((c < '0') || (c >'9'))
 {
 state=CONST;
 }
 }
+
+
 
 ///STAVY TVORENE JEDNOU LEXEMOU
 if(state==0){
@@ -244,23 +258,13 @@ if(state==CONST){
     return CONST;
  }
 
-else if(c=='-')
-{
-state=REAL;
-plus_s=1;
-}
 else if(c=='.')
 state=DOT;
 
-
-else if(c=='+')
+else if((c=='e') || (c=='E'))
 state=REAL;
 
-
-else if((c=='e') || (c=='E'))
-state=REALo;
-
-else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':')
+else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':' || c=='+' ||c== '-')
 {
      fseek(source,ftell(source)-1,SEEK_SET);
      return CONST;
@@ -279,16 +283,32 @@ return CONST;
 
 if(state==REAL)
 {
-plusminus=1;
 c=getc(source);
-if((c=='e') || (c=='E'))
-   state=REALo;
+if(c=='-')
+{
+    plus_s=1;
+    state=REALo;
+}
+else
+    if(c=='+')
+      state=REALo;
+else
+    if((c >= '0') && (c <='9'))
+{
+    state=REALo;
+    fseek(source,ftell(source)-1,SEEK_SET);
+}
+
 else
 {
-    fseek(source,ftell(source)-2,SEEK_SET);
-     return CONST;
+    fseek(source,ftell(source)-1,SEEK_SET);
+     return E_LEXICAL;
 }
 }
+
+
+
+
 ///*********************************************************** identifikatory a klucove slova
 
 if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
