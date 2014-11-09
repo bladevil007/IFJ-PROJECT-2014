@@ -8,19 +8,6 @@ make
 #-----
 
 #TESTS
-
-#test1
-./project  files/test1.f > files/test1.out
-
-OK=$(diff files/test1.k files/test1.out)
-
-if [ "$OK" = "" ]; then
-echo -e '\E[32;1m'"----------------> SUCCESS TEST1"; tput sgr0
-else
-diff files/test1.k files/test1.out
-fi
-
-
 #test2
 ./project  files/test2.f > files/test2.out
 
