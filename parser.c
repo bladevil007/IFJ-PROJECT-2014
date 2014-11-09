@@ -35,7 +35,6 @@ if(token==E_SYNTAX)return E_SYNTAX;
 if(token==BEGIN)
 {
  token=prog();
- printf("token %i",token);
 if(token==E_LEXICAL)return E_LEXICAL;
 if(token==E_SYNTAX)return E_SYNTAX;
 }
@@ -200,7 +199,6 @@ int iffunction()
 {
 
     int token=getnextToken(LEX_STRUCTPTR);
-    printf("%iIDE\n",token);
     if(token==ID)
     {
         ///ULOZIT NAZOV DO TABULKY
@@ -214,11 +212,9 @@ int iffunction()
                         {
                          if(token==BODKOCIARKA)
                          {
-
-
                          return declarelist();
                          }
-                         else E_SYNTAX;
+                         else return E_SYNTAX;
                         }
 
            }
