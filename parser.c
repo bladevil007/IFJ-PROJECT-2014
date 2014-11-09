@@ -20,47 +20,56 @@
 
 LEX_STRUCT *LEX_STRUCTPTR;
 
-int SyntacticAnalys ()
+
+////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
+int program(token)
 {
 
-///alokacia pomocnej struktury lexikalnej analyzy
-
-if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||
-    (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
-
-return E_INTERNAL;
-
-
-
-
-//test only,erase
-int token=getnextToken(LEX_STRUCTPTR);
-
-while((token!=SUCCESS) && (token!=E_LEXICAL)){
+   while(1){
 if(token==VAR)
+{
 token=declarelist();
+if(token==E_LEXICAL)return E_LEXICAL;
+if(token==E_SYNTAX)return E_SYNTAX;
 
-if (token == BEGIN)
-    token = prog();
-
-
-token=getnextToken(LEX_STRUCTPTR);
+if(token==BEGIN)
+{
+ token=prog();
+ printf("token %i",token);
+if(token==E_LEXICAL)return E_LEXICAL;
+if(token==E_SYNTAX)return E_SYNTAX;
+}
 }
 
 
+if(token==SUCCESS)
+    return SUCCESS;
 
+}
+}
 
+///Hlavna funkcia syntaktickej analyzi
+int SyntacticAnalys ()
+{
+///alokacia pomocnej struktury lexikalnej analyzy
+if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||
+    (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
+return E_INTERNAL;
 
-
-
-
-
-
-
+int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
+if(token==E_LEXICAL)return E_LEXICAL;///pri chybe v lexikalnej analyze skonci
+if(token==SUCCESS)return SUCCESS;
+int ok=program(token);
+if(ok==SUCCESS)
+    return SUCCESS;
+if(ok==E_SYNTAX)
+    return E_SYNTAX;
+if(ok==E_LEXICAL)
+    return E_LEXICAL;
 
 free(LEX_STRUCTPTR);
 return 0;
-}
+}/////////////////////////////////////////////********/*/*/*/
 
 
 int progcondition()
@@ -87,30 +96,87 @@ int progcondition()
     }
 }
 
-
+///<prog>  BEGIN <PRIKAZ> V <CYKLY> END.
 int prog()
 {
     int token;
     token = getnextToken(LEX_STRUCTPTR);
+//////////////////////////////////////////////////////////
+if(token==LENGTH)  ///vstavana funkcia;
+{
+token=command(token);
+if(token==E_LEXICAL)return E_LEXICAL;
+if(token==E_SYNTAX)return E_SYNTAX;
+}
+else
+    return E_SYNTAX;
+/////////////////////////////////////////////////////////
 
-
-
-
-
-
-    if (token == SUCCESS)
+    if (token == E_SYNTAX)
         return E_SYNTAX;
 
     if (token == E_LEXICAL)
         return E_LEXICAL;
 
-    if (token == END)
-    {
-        token = getnextToken(LEX_STRUCTPTR);
+    if(token==SUCCESS)
+{
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==END)
+            token=getnextToken(LEX_STRUCTPTR);
         if(token==DOT)
-            return token;
+            return SUCCESS;
+        else return prog();
+}
+}
+
+
+
+int command(value)
+{
+    if(value==LENGTH)
+    {
+     int token=getnextToken(LEX_STRUCTPTR);
+     if(token==LEFT_ROUND)
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==CONST_STRING || token==ID)
+        token=getnextToken(LEX_STRUCTPTR);
+            if(token==RIGHT_ROUND);
+            return SUCCESS;
     }
 }
+/*****************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
 int iffunction()
 {
@@ -127,14 +193,14 @@ int iffunction()
         return E_SYNTAX;
     }
 }
-
+*/
 
 
  int declarelist()
 {
 
     int token=getnextToken(LEX_STRUCTPTR);
-    printf("%i ide\n",token);
+    printf("%iIDE\n",token);
     if(token==ID)
     {
         ///ULOZIT NAZOV DO TABULKY
@@ -143,8 +209,6 @@ int iffunction()
                         token=getnextToken(LEX_STRUCTPTR);
                     if(token==REAL || token==INTEGER || token==STRING || token == BOOLEAN)
                         token=getnextToken(LEX_STRUCTPTR);
-
-
                         ///pridat do tabulky
 
                         {
@@ -159,14 +223,12 @@ int iffunction()
 
            }
            else return E_SYNTAX;
-
-
     }
     else return token;
 }
 
 
-
+/*
 int condition()
 {
   int token=getnextToken(LEX_STRUCTPTR);
@@ -184,17 +246,6 @@ int condition()
 
 
 }
-
-
-
-
-int value()
-{
- float value=LEX_STRUCTPTR->value;
-
-
-
-}
-
+*/
 
 

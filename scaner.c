@@ -28,7 +28,7 @@ FILE *source;
 char *key[]={"begin","end","boolean","do",
 "else","false","find","forward",
 "function","if","integer","readln","real","sort",
-"string","then","true","var","while","write"
+"string","then","true","var","while","write","copy","length"
 };
 
 /** \brief funkcia inicializuje zdrojovy subor
@@ -323,7 +323,7 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
 
     else
     {
-    for(int i=0;i<20;i++)
+    for(int i=0;i<22;i++)
     {
 
      if((CmpConst_str(LEX_STRUCTPTR,key[i]))==0)
@@ -352,6 +352,8 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
              case 17:return VAR;
              case 18:return WHILE;
              case 19:return WRITE;
+             case 20:return COPY;
+             case 21:return LENGTH;
          }
      }
     }

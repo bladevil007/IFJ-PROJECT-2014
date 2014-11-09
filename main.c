@@ -39,11 +39,11 @@ FILE *source;
 /* Inicializcia zdrojoveho suboru pre Lexikalnu analyzu */
 
 SourceInitialize(source);
-SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
+int ok=SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
 
 
 
-
+printf("navratova hodnota %i",ok);
 
 
 

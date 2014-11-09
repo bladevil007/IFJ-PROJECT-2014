@@ -53,5 +53,7 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define CONST_STRING 56
 #define REALo 57
 #define HASHTAG 58
+#define LENGTH 59
+#define COPY  70
 
 
