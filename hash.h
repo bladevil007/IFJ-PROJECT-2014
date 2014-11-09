@@ -37,4 +37,12 @@ typedef struct
 	struct record *ptr[];
 } THash_table;
 
+//prototypy funkci:
+void stringtolower (char *key);
+THash_table *hashtable_init (unsigned size);
+unsigned int hash_function (const char *str, unsigned hashtable_size);
+void hashtable_clear (THash_table *table);
+void hashtable_free(THash_table *table);
+struct record *hashtable_search(THash_table *table, char *key);
+struct record *hashtable_add(THash_table *table, int id, char *key, int type, char *params);
 #endif

@@ -1,7 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "hash.h"
+
+void stringtolower (char *key) //funkce ktera prevede vsechny znaky v retezci na male znaky
+{
+	int i = 0;
+	while (key[i] != '\0')
+	{
+		key[i] = tolower(key[i]);
+		i++;		
+	}	
+}
 
 THash_table *hashtable_init (unsigned size) //funkce na inicializaci tabulky
 { 
@@ -61,7 +72,7 @@ void hashtable_free(THash_table *table) //funkce na uvolneni cele tabulky
 struct record *hashtable_search(THash_table *table, char *key) //funkce na vyhledani zaznamu
 { 
 	unsigned int index = 0; //promenna, do ktere se ulozi index z hashovaci funkce
-
+	stringtolower(key); //prevedeni retezce na mala pismena
 	index = hash_function(key, table->hashtable_size); //zjisteni indexu v tabulce pro ulozeni zaznamu
 	for (struct record *tmp = table->ptr[index]; tmp != NULL; tmp = tmp->next) //projizdeni jednotlivych zaznamu linearniho seznamu
 	{ 
@@ -76,19 +87,10 @@ struct record *hashtable_search(THash_table *table, char *key) //funkce na vyhle
 
 struct record *hashtable_add(THash_table *table, int id, char *key, int type, char *params) //funkce pro pridani zaznamu do tabulky 
 {
-	//nejdrive se zjisti, zda se v tabulce nenachazi stejny identifikator:
 	unsigned int index = 0; //promenna, do ktere se ulozi index z hashovaci funkce
-
+	stringtolower(key); //prevedeni retezce na mala pismena
 	index = hash_function(key, table->hashtable_size); //zjisteni indexu v tabulce pro ulozeni zaznamu
-	for (struct record *tmp = table->ptr[index]; tmp != NULL; tmp = tmp->next) //projizdeni jednotlivych zaznamu linearniho seznamu
-	{ 
-		if (strcmp(tmp->key, key) == 0) //porovna se hledane slovo se slovem ve strukture
-		{ 
-			fprintf(stderr, "ERROR: Identifier is already in symbol table.\n");
-			return NULL; //pokud uz se stejny identifikator vyskytl v tabulce, vraci NULL -> chyba   
-		}   
-	}
-	//pokud se program dostane do tohoto mista, znamena to, identifikator zatim v tabulce neexistuje:
+	
 	struct record *tmp; //pomocna promenna
 	if ((tmp = malloc(sizeof(struct record))) == NULL) //pokud nelze alokovat pamet
 	{
