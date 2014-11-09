@@ -22,16 +22,6 @@ int length;
 int mallocsize;
 }LEX_STRUCT;
 
-#define ARR_INC 8
-
-
-typedef struct
-{
-  char* str;		// misto pro dany retezec ukonceny znakem '\0'
-  int length;		// skutecna delka retezce
-  int act_pos;      // aktualna pozicia
-  int allocSize;	// velikost alokovane pameti
-} inf_array;
 
 int Init_str(LEX_STRUCT *LEX_STRUCTPTR);
 
