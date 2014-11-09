@@ -34,9 +34,9 @@ return E_INTERNAL;
 
 
 //test only,erase
-int k=getnextToken(LEX_STRUCTPTR);
+int token=getnextToken(LEX_STRUCTPTR);
 
-while((k!=SUCCESS) && (k!=E_LEXICAL)){
+while((token!=SUCCESS) && (token!=E_LEXICAL)){
 if(token==VAR)
 token=declarelist();
 
@@ -44,7 +44,7 @@ if (token == BEGIN)
     token = prog();
 
 
-k=getnextToken(LEX_STRUCTPTR);
+token=getnextToken(LEX_STRUCTPTR);
 }
 
 
@@ -115,7 +115,7 @@ int prog()
 int iffunction()
 {
     int token;
-    if((token = condition() == SUCCESS)
+    if((token = condition()) == SUCCESS)
     {
         progcondition();
         token=getnextToken(LEX_STRUCTPTR);
@@ -127,6 +127,8 @@ int iffunction()
         return E_SYNTAX;
     }
 }
+
+
 
  int declarelist()
 {
@@ -164,7 +166,7 @@ int iffunction()
 }
 
 
-/*
+
 int condition()
 {
   int token=getnextToken(LEX_STRUCTPTR);
@@ -181,15 +183,18 @@ int condition()
         }
 
 
-}*/
-/*
+}
+
+
+
+
 int value()
 {
- float value=LEX_STRUCTPTR->value
+ float value=LEX_STRUCTPTR->value;
 
 
 
 }
 
-*/
+
 
