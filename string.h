@@ -3,6 +3,17 @@
 #define STRING_H
 #define STRLEN 8
 
+#define ARR_INC 8
+
+
+typedef struct
+{
+  char* str;		// misto pro dany retezec ukonceny znakem '\0'
+  int length;		// skutecna delka retezce
+  int act_pos;      // aktualna pozicia
+  int allocSize;	// velikost alokovane pameti
+} inf_array;
+
 
 typedef struct {
 double value;
