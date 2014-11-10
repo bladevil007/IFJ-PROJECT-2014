@@ -20,31 +20,32 @@
 
 LEX_STRUCT *LEX_STRUCTPTR;
 
+///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
+int ERRORRET(int value)
+{
+    return ((value==E_LEXICAL) ? E_LEXICAL : E_SYNTAX);
+}
+
 
 ////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
-int program(token)
+int program(int token)
 {
 
-   while(1){
 if(token==VAR)
 {
 token=declarelist();
-if(token==E_LEXICAL)return E_LEXICAL;
-if(token==E_SYNTAX)return E_SYNTAX;
-
+if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
 if(token==BEGIN)
 {
- token=prog();
-if(token==E_LEXICAL)return E_LEXICAL;
-if(token==E_SYNTAX)return E_SYNTAX;
+token=prog();
+if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
 }
 }
 
+if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE)
+return SUCCESS;
+else return ERRORRET(token);
 
-if(token==SUCCESS)
-    return SUCCESS;
-
-}
 }
 
 ///Hlavna funkcia syntaktickej analyzi
@@ -57,15 +58,13 @@ return E_INTERNAL;
 
 int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
 if(token==E_LEXICAL)return E_LEXICAL;///pri chybe v lexikalnej analyze skonci
-if(token==SUCCESS)return SUCCESS;
+if(token==EOFILE)return SUCCESS;
 int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
-if(ok==E_SYNTAX)
-    return E_SYNTAX;
-if(ok==E_LEXICAL)
-    return E_LEXICAL;
-
+else
+    return ERRORRET(ok);
+strClear(LEX_STRUCTPTR);
 free(LEX_STRUCTPTR);
 return 0;
 }/////////////////////////////////////////////********/*/*/*/
@@ -95,55 +94,141 @@ int progcondition()
     }
 }
 
-///<prog>  BEGIN <PRIKAZ> V <CYKLY> END.
+///<prog>  BEGIN <PRIKAZ> V <CYKLY> V <DEFINOVANA FUNKCIA> V <VSTAVANAFUNKCIA> END.
+///nonterminal prog definuje oddelenie hlavneho programu begin ----> end.
 int prog()
 {
     int token;
     token = getnextToken(LEX_STRUCTPTR);
-//////////////////////////////////////////////////////////
-if(token==LENGTH)  ///vstavana funkcia;
-{
-token=command(token);
-if(token==E_LEXICAL)return E_LEXICAL;
-if(token==E_SYNTAX)return E_SYNTAX;
-}
-else
-    return E_SYNTAX;
-/////////////////////////////////////////////////////////
-
-    if (token == E_SYNTAX)
-        return E_SYNTAX;
-
-    if (token == E_LEXICAL)
-        return E_LEXICAL;
+  ///vstavane funkcie copy,length,find,sort
+    switch(token)
+    {
+        case  LENGTH:
+        case  COPY:
+        case  FIND:
+        case  SORT:
+        {
+            token=command(token);
+            if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
+            break;
+        }
+        default: return ERRORRET(token);
+    }
 
     if(token==SUCCESS)
 {
         token=getnextToken(LEX_STRUCTPTR);
         if(token==END)
-            token=getnextToken(LEX_STRUCTPTR);
+        {
+        token=getnextToken(LEX_STRUCTPTR);
         if(token==DOT)
             return SUCCESS;
+        }
         else return prog();
 }
 }
 
 
 
-int command(value)
+
+/** <command>  |  <id>  := <hodnota> v <cykly> v <vstavanafunkcia> v <definovanefunkcie>
+*/
+int command(int value)
 {
+    int token;
+    ///Vstavane funkcie
     if(value==LENGTH)
     {
-     int token=getnextToken(LEX_STRUCTPTR);
+     token=getnextToken(LEX_STRUCTPTR);
      if(token==LEFT_ROUND)
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==CONST_STRING || token==ID)
+            {
+            token=getnextToken(LEX_STRUCTPTR);
+                if(token==RIGHT_ROUND)
+                    return SUCCESS;
+                else return ERRORRET(token);
+
+            }else return ERRORRET(token);
+
+        }else return ERRORRET(token);
+    }
+
+    else if(value==COPY)
+    {
+       token=getnextToken(LEX_STRUCTPTR);
+       if(token==LEFT_ROUND)
+       {
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==CONST_STRING || token==ID)
+            {
+                token=getnextToken(LEX_STRUCTPTR);
+                if(token==CIARKA)
+                {
+                  token=getnextToken(LEX_STRUCTPTR);
+                  if(token==ID || token== CONST)
+                  {
+                    token=getnextToken(LEX_STRUCTPTR);
+                        if(token==CIARKA)
+                        {
+                         token=getnextToken(LEX_STRUCTPTR);
+                                if(token==ID || token==CONST)
+                                {
+                                   token=getnextToken(LEX_STRUCTPTR);
+                                   if(token==RIGHT_ROUND)
+                                        return SUCCESS;
+                                     else return ERRORRET(token);
+                                }else return ERRORRET(token);
+                        }else return ERRORRET(token);
+                  }else return ERRORRET(token);
+
+                }else return ERRORRET(token);
+            }else return ERRORRET(token);
+       }else return ERRORRET(token);
+
+    }
+    else if(value==FIND)
+    {
         token=getnextToken(LEX_STRUCTPTR);
-        if(token==CONST_STRING || token==ID)
-        token=getnextToken(LEX_STRUCTPTR);
-            if(token==RIGHT_ROUND);
-            return SUCCESS;
+        if(token==LEFT_ROUND)
+        {
+           token=getnextToken(LEX_STRUCTPTR);
+                if(token==CONST_STRING || token==ID)
+                {
+                    token=getnextToken(LEX_STRUCTPTR);
+                    if(token==CIARKA)
+                    {
+                         token=getnextToken(LEX_STRUCTPTR);
+                         if(token==CONST_STRING || token==ID)
+                         {
+                            token=getnextToken(LEX_STRUCTPTR);
+                            if(token==RIGHT_ROUND)
+                                return SUCCESS;
+                            else return ERRORRET(token);
+                         }else return ERRORRET(token);
+                    }else return ERRORRET(token);
+                }else return ERRORRET(token);
+        }else return ERRORRET(token);
+    }
+    else if(value==SORT)
+    {
+      token=getnextToken(LEX_STRUCTPTR);
+      if(token==LEFT_ROUND)
+      {
+          token=getnextToken(LEX_STRUCTPTR);
+          if(token==CONST_STRING || token==ID)
+          {
+              token=getnextToken(LEX_STRUCTPTR);
+              if(token==RIGHT_ROUND)
+                return SUCCESS;
+                else return ERRORRET(token);
+          }else return ERRORRET(token);
+      }else return ERRORRET(token);
     }
 }
-/*****************************************
+
+
 
 
 
