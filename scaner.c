@@ -371,12 +371,12 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
 
 if(c==EOF)
 {   if(state==KOMENT)
-        return SUCCESS;
+        return EOFILE;
     else
         if(state!=0)
         return E_LEXICAL;
     else
-        return SUCCESS;
+        return EOFILE;
 }
 
 
