@@ -107,6 +107,7 @@ int prog()
         case  COPY:
         case  FIND:
         case  SORT:
+        case  ID:
         {
             token=command(token);
             if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
@@ -124,10 +125,21 @@ int prog()
         if(token==DOT)
             return SUCCESS;
         }
-        else return prog();
+        else if(token==BODKOCIARKA)
+        return prog();
+        else
+            return ERRORRET(token);
 }
 }
 
+
+/*int value() /// <hodota> kontrola syntaxe
+{
+   ///kontrola id=2;
+
+return SUCCESS;
+}
+*/
 
 
 
@@ -226,8 +238,24 @@ int command(int value)
           }else return ERRORRET(token);
       }else return ERRORRET(token);
     }
-}
+    else if(value==ID)
+    {
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==DVOJBODKA)
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==EQUAL)
+            {
+                token=getnextToken(LEX_STRUCTPTR);
+                if(token==CONST)
+                {
+                   // return  value(); //funkcia hodnota na vycislenie prikazu priradenia hodnotou
+                }else return ERRORRET(token);
+            }else return ERRORRET(token);
 
+        }else return ERRORRET(token);
+    }
+}
 
 
 

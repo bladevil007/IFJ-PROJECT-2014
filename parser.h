@@ -9,5 +9,6 @@ int progcondition();
 int prog();
 int command(int );
 declarelist();
+void value();
 
 
