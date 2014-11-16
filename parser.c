@@ -109,7 +109,8 @@ int prog()
         case  COPY:
         case  FIND:
         case  SORT:
-        case  ID:
+        case  WRITE:
+        case  READLN:
         {
             token=command(token);
             if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
@@ -257,16 +258,10 @@ int command(int value)
 
         }else return ERRORRET(token);
     }
-}
+    else if(value==READLN)
 
-//neterminal <inout>   =>   readln(ID)  alebo write(<term>,<term>,...)
-
-int inout()
 {
-    int token=getnextToken(LEX_STRUCTPTR);
 
-    if(token==READLN)
-    {
         token=getnextToken(LEX_STRUCTPTR);
         if (token==LEFT_ROUND)
         {
@@ -284,8 +279,9 @@ int inout()
         }
         else
             return ERRORRET(token);
+
     }
-    /*else if(token==WRITE)
+    /*else if(value==WRITE)
     {
         token=getnextToken(LEX_STRUCTPTR);
         if(token==LEFT_ROUND)
@@ -297,36 +293,8 @@ int inout()
             }
         }
     }*/
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*
