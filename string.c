@@ -116,10 +116,10 @@ int add_str(inf_array *a, char* strin)
 {
     if((a->allocSize - a->length) <= (strlen(strin) + 1))       //ak je nedostatok volneho miesta v poli tak realokuj
     {
-        if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC)) == NULL)
+        if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC + strlen(strin))) == NULL)
             return -1;
 
-        a->allocSize = a->allocSize + ARR_INC;                  //aktualizacia premennej
+        a->allocSize = a->allocSize + ARR_INC + strlen(strin);                  //aktualizacia premennej
     }
 
 
@@ -138,5 +138,6 @@ int add_str(inf_array *a, char* strin)
 
     return ret_val;
 }
+
 
 

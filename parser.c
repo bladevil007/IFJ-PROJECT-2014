@@ -30,21 +30,23 @@ int ERRORRET(int value)
 ////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 int program(int token)
 {
-
-if(token==VAR)
-{
-token=declarelist();
-if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
-if(token==BEGIN)
-{
-token=prog();
-if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
-}
+    if(token==VAR)
+    {
+        token=declarelist();
+    if(token==E_SYNTAX || token==E_LEXICAL)
+        return ERRORRET(token);
+    if(token==BEGIN)
+    {
+        token=prog();
+        if(token==E_SYNTAX || token==E_LEXICAL)
+            return ERRORRET(token);
+    }
 }
 
 if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE)
-return SUCCESS;
-else return ERRORRET(token);
+    return SUCCESS;
+else
+    return ERRORRET(token);
 
 }
 
@@ -257,6 +259,45 @@ int command(int value)
     }
 }
 
+//neterminal <inout>   =>   readln(ID)  alebo write(<term>,<term>,...)
+
+int inout()
+{
+    int token=getnextToken(LEX_STRUCTPTR);
+
+    if(token==READLN)
+    {
+        token=getnextToken(LEX_STRUCTPTR);
+        if (token==LEFT_ROUND)
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==ID)
+            {
+                token=getnextToken(LEX_STRUCTPTR);
+                if(token==RIGHT_ROUND)
+                    return SUCCESS;
+                else
+                    return ERRORRET(token);
+            }
+            else
+                return ERRORRET(token);
+        }
+        else
+            return ERRORRET(token);
+    }
+    /*else if(token==WRITE)
+    {
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==LEFT_ROUND)
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==ID || token==CONST_STRING)
+            {
+
+            }
+        }
+    }*/
+}
 
 
 
