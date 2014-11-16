@@ -30,16 +30,17 @@ int ERRORRET(int value)
 ////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 int program(int token)
 {
-
-if(token==VAR)
-{
-token=declarelist();
-if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
-if(token==BEGIN)
-{
-token=prog();
-if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
-}
+    if(token==VAR)
+    {
+        token=declarelist();
+    if(token==E_SYNTAX || token==E_LEXICAL)
+        return ERRORRET(token);
+    if(token==BEGIN)
+    {
+        token=prog();
+        if(token==E_SYNTAX || token==E_LEXICAL)
+            return ERRORRET(token);
+    }
 }
 
 if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE)
@@ -226,6 +227,9 @@ int command(int value)
           }else return ERRORRET(token);
       }else return ERRORRET(token);
     }
+	//15.11.2014 READLN, WRITE
+	else if(value==READLN)
+	
 }
 
 
