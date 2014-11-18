@@ -40,18 +40,9 @@ FILE *source;
 
 SourceInitialize(source);
 int ok=SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
-
-
-
-printf("navratova hodnota %i",ok);
-
-
-
-
-
-
-
-
+if(ok==52)
+ok=0;
+printf("%i",ok);
 
 
 
