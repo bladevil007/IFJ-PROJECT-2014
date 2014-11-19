@@ -458,6 +458,7 @@ else if(value==LENGTH)
 int funkcia()
 {
     int token;
+    //int i;
     if((token = getnextToken(LEX_STRUCTPTR)) == ID)
     {
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
