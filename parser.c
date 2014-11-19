@@ -32,7 +32,6 @@ int ERRORRET(int value)
         exit(E_SYNTAX);
 }
 
-
 ////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 int program(int token)
 {
@@ -52,13 +51,41 @@ else if(token==BEGIN)
     {
         token=prog();
     }
+
  ///program sa sklada z funkcii a programu
 else if(token == FUNCTION)
     {
-        token = funkcia();
+        funkcia();  // pri chybe program skonci sam
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==FORWARD)    /// len hlavicka funkcie ziadne telo za nou nenasleduje
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+                if(token==BODKOCIARKA)
+                {
+                    token=getnextToken(LEX_STRUCTPTR);
+                    return program(token);
+                }
+                else
+                    return ERRORRET(token);
 
+        }
+        else if(token==BEGIN || token==VAR)
+        {
+            if(token==VAR)
+            {
+            declarelist();
+            }
+            progfunction();
+            token=getnextToken(LEX_STRUCTPTR);
+            if(token==E_LEXICAL)exit(E_LEXICAL);
+            ///bud ide dalsia funkcia alebo ide uz telo programu
+            return program(token);
+        }
+        else
+            return ERRORRET(token);
     }
-if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE)
+
+if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE) /// za end. nesmie nasledovat nic ine
     return SUCCESS;
 else
     return ERRORRET(token);
@@ -75,7 +102,7 @@ exit(E_INTERNAL);
 
 int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
 if(token==E_LEXICAL)exit(E_LEXICAL);///pri chybe v lexikalnej analyze skonci
-if(token==EOFILE)return SUCCESS;
+if(token==EOFILE) exit(E_SYNTAX);
 int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
@@ -84,6 +111,49 @@ free(LEX_STRUCTPTR);
 return 0;
 }/////////////////////////////////////////////********/*/*/*/
 
+
+
+///telo programu pre funkciu zacina begin a konci end;
+int progfunction()
+{
+   int token;
+    token = getnextToken(LEX_STRUCTPTR);
+  ///vstavane funkcie copy,length,find,sort + ostatne mozne prikazy
+    switch(token)
+    {
+        case ID:
+        case WHILE:
+        case IF:
+        case  LENGTH:
+        case  COPY:
+        case  FIND:
+        case  SORT:
+        case  WRITE:
+        case  READLN:
+        {
+            token=command(token);
+            break;
+        }
+        default: return ERRORRET(token);
+    }
+
+
+    if(token==SUCCESS)
+{
+        token=getnextToken(LEX_STRUCTPTR);
+        if(token==END)
+        {
+            token=getnextToken(LEX_STRUCTPTR);
+               if(token==BODKOCIARKA)
+                    return SUCCESS;
+               else return ERRORRET(token);
+        }
+        else if(token==BODKOCIARKA)
+        return progfunction();
+        else
+            return ERRORRET(token);
+}
+}
 
 ///telo programu pre TELA cyklov  IF a While
 int progcondition()
@@ -205,7 +275,7 @@ int command(int value)
     if(value==COPY || value==FIND ||value==LENGTH || value==SORT)
         return Libraryfunction(value);
 
-    else if(value==ID)
+    else if(value==ID)  /// riesit zvlast lebo konci  strednikem
     {
         token=getnextToken(LEX_STRUCTPTR);
         if(token==DVOJBODKA)
@@ -430,7 +500,6 @@ else if(value==LENGTH)
 }
 
 
-
 ///DEFINOVANIE FUNKCIE
 int funkcia()
 {
@@ -439,15 +508,29 @@ int funkcia()
     {
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
+
                 token = fun_params();
                 if(token==E_SYNTAX || token==E_LEXICAL)
                     return ERRORRET(token);
-
                 if(token == RIGHT_ROUND)
                 {
                     token = getnextToken(LEX_STRUCTPTR);
+                    if(token==DVOJBODKA)
+                    {
+                     token = getnextToken(LEX_STRUCTPTR);
+                        if (token == INTEGER || token  == BOOLEAN || token == STRING || token == REAL)
+                        {
+                         token = getnextToken(LEX_STRUCTPTR);
+                            if(token==BODKOCIARKA)
+                            {
+                                return SUCCESS;               ///hlavicka je OK
+                            }else return ERRORRET(token);
 
-                }
+                        }else return ERRORRET(token);
+                    }else return ERRORRET(token);
+
+
+                }else return ERRORRET(token);
         }
         else return ERRORRET(token); // za ID nenasleduje zatvorka
     }
