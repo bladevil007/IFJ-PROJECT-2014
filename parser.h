@@ -8,7 +8,7 @@ int progcondition();
 
 int prog();
 int command(int );
-declarelist();
+int declarelist();
 void value();
 
 
