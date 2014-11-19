@@ -26,7 +26,10 @@ int IF_ENABLE=0;///na pouzitie else v progcondition
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
 int ERRORRET(int value)
 {
-    return ((value==E_LEXICAL) ? E_LEXICAL : E_SYNTAX);
+    if(value==E_LEXICAL)
+        exit(E_LEXICAL);
+    else
+        exit(E_SYNTAX);
 }
 
 
@@ -37,13 +40,9 @@ int program(int token)
     if(token==VAR)
     {
         token=declarelist();
-    if(token==E_SYNTAX || token==E_LEXICAL)
-        return ERRORRET(token);
     if(token==BEGIN)
     {
         token=prog();
-        if(token==E_SYNTAX || token==E_LEXICAL)
-            return ERRORRET(token);
     }else
     return ERRORRET(token);
 
@@ -52,15 +51,11 @@ int program(int token)
 else if(token==BEGIN)
     {
         token=prog();
-        if(token==E_SYNTAX || token==E_LEXICAL)
-            return ERRORRET(token);
     }
  ///program sa sklada z funkcii a programu
 else if(token == FUNCTION)
     {
         token = funkcia();
-        if(token == E_SYNTAX || token == E_LEXICAL)
-            return ERRORRET(token);
 
     }
 if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE)
@@ -70,32 +65,24 @@ else
 
 }
 
-
-
-
 ///Hlavna funkcia syntaktickej analyzi
 int SyntacticAnalys ()
 {
 ///alokacia pomocnej struktury lexikalnej analyzy
 if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||
     (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
-return E_INTERNAL;
+exit(E_INTERNAL);
 
 int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
-if(token==E_LEXICAL)return E_LEXICAL;///pri chybe v lexikalnej analyze skonci
+if(token==E_LEXICAL)exit(E_LEXICAL);///pri chybe v lexikalnej analyze skonci
 if(token==EOFILE)return SUCCESS;
 int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
-else
-    return ERRORRET(ok);
 strClear(LEX_STRUCTPTR);
 free(LEX_STRUCTPTR);
 return 0;
 }/////////////////////////////////////////////********/*/*/*/
-
-
-
 
 
 ///telo programu pre TELA cyklov  IF a While
@@ -103,7 +90,7 @@ int progcondition()
 {
    int token;
     token = getnextToken(LEX_STRUCTPTR);
-  ///vstavane funkcie copy,length,find,sort
+  ///vstavane funkcie copy,length,find,sort + ostatne mozne prikazy
     switch(token)
     {
         case ID:
@@ -117,7 +104,6 @@ int progcondition()
         case  READLN:
         {
             token=command(token);
-            if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
             break;
         }
         default: return ERRORRET(token);
@@ -139,9 +125,6 @@ int progcondition()
 }
 
 
-
-
-
 ///<prog>  BEGIN <PRIKAZ> V <CYKLY> V <DEFINOVANA FUNKCIA> V <VSTAVANAFUNKCIA> END.
 ///nonterminal prog definuje oddelenie hlavneho programu begin ----> end.
 int prog()
@@ -151,8 +134,6 @@ int prog()
   ///vstavane funkcie copy,length,find,sort
     switch(token)
     {
-        case END:
-        break;
         case ID:
         case WHILE:
         case IF:
@@ -164,7 +145,6 @@ int prog()
         case  READLN:
         {
             token=command(token);
-            if(token==E_SYNTAX || token==E_LEXICAL) return ERRORRET(token);
             break;
         }
         default:
@@ -188,7 +168,7 @@ int prog()
              token=getnextToken(LEX_STRUCTPTR);
           if(token==BEGIN)
           {
-            token=progcondition();
+                token=progcondition();
                 if(token==SUCCESS)
                 {
                 token=getnextToken(LEX_STRUCTPTR);
@@ -213,15 +193,6 @@ int prog()
         else
             return ERRORRET(token);
 }
-else if(token==END)
-{
-token=getnextToken(LEX_STRUCTPTR);
-if(token==DOT)
-return SUCCESS;
-else
-    return ERRORRET(token);
-}
-
 }
 
 
@@ -249,6 +220,8 @@ int command(int value)
 
         }else return ERRORRET(token);
     }
+
+    ///Prikaz readln
     else if(value==READLN)
 
 {
@@ -271,9 +244,9 @@ int command(int value)
             return ERRORRET(token);
 
     }
+    ///IF podmienka sa vyhodnocuje zvlast v precendencnej analyze
     else if(value==IF)
     {
-
         ///dopisat
         IF_ENABLE=1;
         //return PrecedenceSA(LEX_STRUCTPTR);  VYHODNOTI SA PODMIENKA + NACITA SA THEN
@@ -283,10 +256,15 @@ int command(int value)
           return progcondition();
       }else ERRORRET(token);
     }
+    ///WHILE CYKLUS + VNORENE WHILE CYKLY
     else if(value==WHILE)
     {
         //return PrecedenceSA(LEX_STRUCTPTR);  VYHODNOTI SA PODMIENKA + NACITA SA do
-        return progcondition();
+
+            if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
+      {
+          return progcondition();
+      }else ERRORRET(token);
 
     }
     ///write funkcia pre lubovolny pocet parametrov
@@ -453,12 +431,10 @@ else if(value==LENGTH)
 
 
 
-
 ///DEFINOVANIE FUNKCIE
 int funkcia()
 {
     int token;
-    //int i;
     if((token = getnextToken(LEX_STRUCTPTR)) == ID)
     {
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
@@ -473,9 +449,9 @@ int funkcia()
 
                 }
         }
-        else return E_SYNTAX; // za ID nenasleduje zatvorka
+        else return ERRORRET(token); // za ID nenasleduje zatvorka
     }
-    else return E_SYNTAX; //za function nenasleduje ID
+    else return ERRORRET(token); //za function nenasleduje ID
 }
 
 int fun_params()
@@ -501,14 +477,14 @@ int fun_params()
                 {
                     return token;
                 }
-                else return E_SYNTAX; // po DTYPE nenasleduje ani zatvorka ani bodkociarka
+                else return ERRORRET(token); // po DTYPE nenasleduje ani zatvorka ani bodkociarka
             }
-            else return E_SYNTAX; //po dvojbodke nenasleduje DTYPE
+            else return ERRORRET(token); //po dvojbodke nenasleduje DTYPE
         }
-        else return E_SYNTAX; //po ID nenasleduje dvojbodka
+        else return ERRORRET(token); //po ID nenasleduje dvojbodka
     }
 
-    else return E_SYNTAX;   // po zatvorke nenasleduje ID ani zatvorka
+    else return ERRORRET(token);   // po zatvorke nenasleduje ID ani zatvorka
 }
 
 

@@ -14,10 +14,10 @@ int PrecedenceTABLE[20][20];
 
 
 ///Funckia ktora spravy precedencnu analyzu vyrazu alebo podmienky
-int PrecedenceSA(LEX_STRUCT *LEX_STRUCTPTR,int *type)
+int PrecedenceSA(LEX_STRUCT *LEX_STRUCTPTR,int type)
 {
 if(((stackPSA=stack_init())==NULL))
-    return E_INTERNAL;
+    exit(E_INTERNAL);
 
 int token=getnextToken(LEX_STRUCTPTR);
 
