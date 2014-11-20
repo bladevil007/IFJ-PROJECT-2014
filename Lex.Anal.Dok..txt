@@ -47,6 +47,8 @@ CIARKA 43          	//,
 GREATER 44         	//>
 LESS 45            	//<
 EQUAL 46           	//=
+LESSEQUAL               //<=
+GREATEREQUAL            //>=
 LENGTH 47          	-KLUCOVE SLOVO
 COPY 48            	-KLUCOVE SLOVO
 
