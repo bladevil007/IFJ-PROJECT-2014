@@ -44,9 +44,11 @@ int program(int token)
     if(token==VAR)
     {
         token=declarelist();
+
     if(token==BEGIN)
     {
         token=prog();
+
     }else
     return ERRORRET(token);
 
@@ -337,8 +339,7 @@ int command(int value)
     {
         ///dopisat
         IF_ENABLE=1;
-        //return PrecedenceSA(LEX_STRUCTPTR);  VYHODNOTI SA PODMIENKA + NACITA SA THEN
-
+        //PrecedenceSA(LEX_STRUCTPTR,IF);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
           return progcondition();

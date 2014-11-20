@@ -206,9 +206,25 @@ state=CONST;
 if(state==0){
 switch(c) {
 case '<' :
-    return LESS;
+     {
+        if(getc(source)=='=')
+            return LESSEQUAL;
+       else
+       {
+       fseek(source,ftell(source)-1,SEEK_SET);
+       return LESS;
+       }
+    }
 case '>' :
+    {
+        if(getc(source)=='=')
+            return GREATEREQUAL;
+       else
+       {
+       fseek(source,ftell(source)-1,SEEK_SET);
        return GREATER;
+       }
+    }
 case ',' :
     return CIARKA;
 case '=' :
