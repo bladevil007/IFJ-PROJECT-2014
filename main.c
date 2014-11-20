@@ -39,7 +39,7 @@ FILE *source;
 /* Inicializcia zdrojoveho suboru pre Lexikalnu analyzu */
 
 SourceInitialize(source);
-int ok=SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
+SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
 
 
 

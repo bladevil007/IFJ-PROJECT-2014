@@ -32,7 +32,12 @@ int ERRORRET(int value)
         exit(E_SYNTAX);
 }
 
-////<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
+///<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
+/**
+*Koren derivacneho stromu, neterminal,
+ plati pre tokeny < var > or <begin> or  <function>
+ alebo ich kombinacia pricom <function> musi zacinat ako prve
+**/
 int program(int token)
 {
     ///program zacina var a pokracuje begin bez funkcii
@@ -91,8 +96,10 @@ else
     return ERRORRET(token);
 
 }
-
-///Hlavna funkcia syntaktickej analyzi
+/***
+Hlavna funkcia syntaktickej analyzi
+Nepatri medzi neterminaly ale spusta dolezite akcie
+**/
 int SyntacticAnalys ()
 {
 ///alokacia pomocnej struktury lexikalnej analyzy
@@ -112,8 +119,10 @@ return 0;
 }/////////////////////////////////////////////********/*/*/*/
 
 
-
+/***
 ///telo programu pre funkciu zacina begin a konci end;
+Tento neterminal sa vola len pri prijati terminalu/tokenu <function>
+**/
 int progfunction()
 {
    int token;
@@ -153,9 +162,13 @@ int progfunction()
         else
             return ERRORRET(token);
 }
+return ERRORRET(token);
 }
-
-///telo programu pre TELA cyklov  IF a While
+/***
+///telo programu pre TELA cyklov  IF a While, su to neterminaly volane neterminalom/funckiou
+"command".Tento neterminal sa vola len pri prijati terminalu/tokenu <if> alebo <while>
+pretoze su ukoncene "end" bez bodky ci strednika
+**/
 int progcondition()
 {
    int token;
@@ -192,16 +205,18 @@ int progcondition()
         else
             return ERRORRET(token);
 }
+return ERRORRET(token);
 }
 
-
+/***
 ///<prog>  BEGIN <PRIKAZ> V <CYKLY> V <DEFINOVANA FUNKCIA> V <VSTAVANAFUNKCIA> END.
-///nonterminal prog definuje oddelenie hlavneho programu begin ----> end.
+Hlavne telo MAIN  program oddeleny Begin a end. pricom obsahuje prikazy.
+**/
 int prog()
 {
     int token;
     token = getnextToken(LEX_STRUCTPTR);
-  ///vstavane funkcie copy,length,find,sort
+  ///vstavane funkcie copy,length,find,sort+dalsie
     switch(token)
     {
         case ID:
@@ -263,10 +278,13 @@ int prog()
         else
             return ERRORRET(token);
 }
+return ERRORRET(token);
 }
 
 
 /** <command>  |  <id>  := <hodnota> v <cykly> v <vstavanafunkcia> v <definovanefunkcie>
+Neterminal/funckia Command , ktora je volana z neterminalov progcondition/prog/progfunction
+Pri chybe sa hned vola exit(cislo chyby)
 */
 int command(int value)
 {
@@ -348,12 +366,15 @@ int command(int value)
         }else ERRORRET(token);
     }
 
+return ERRORRET(token);
 }
 
 
 
-
+/**
 ///Vstavane funkcie COPY...
+Neterminal Libraryfunction je volana z neterminalu command kontroluje syntax vstavanych funckii
+*/
 int Libraryfunction(int value){
     int token;
 
@@ -465,11 +486,15 @@ else if(value==LENGTH)
           }else return ERRORRET(token);
       }else return ERRORRET(token);
     }
+return ERRORRET(token);
 }
 
 
 
 ///VAR DEKLARACIA GLOBALNYCH PREMENNYCH  < VAR >
+/**
+Neterminal na kontrolu syntaxe deklaracie premennych
+*/
  int declarelist()
 {
 
@@ -501,6 +526,9 @@ else if(value==LENGTH)
 
 
 ///DEFINOVANIE FUNKCIE
+/**
+Neterminal volany z neterminalu "program" ktory kontroluje syntax funckie
+*/
 int funkcia()
 {
     int token;
@@ -537,6 +565,10 @@ int funkcia()
     else return ERRORRET(token); //za function nenasleduje ID
 }
 
+/**
+Neterminal ktory je volany neterminalom "funkcia()"
+Tato funkcia kontroluje sytax parametrov vo vnutri zatvorky
+*/
 int fun_params()
 {
     int token;
