@@ -52,7 +52,7 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR)    // parameter sa bude predavat uk
 {
   LEX_STRUCTPTR->value=0;    //vynulujeme hodnotu  value
   strClear(LEX_STRUCTPTR);   //vymazeme pole aby sme mohli znova nacitat
-
+int isreal=0;
 char c;                     // premenna do ktorej si ukladame znak
 int state=0;                // stav k ktorom sme po nacitani znaku
 int plusminus=0;            //hodnota ci bol nacitany plus alebo minus
@@ -167,7 +167,7 @@ LEX_STRUCTPTR->value= LEX_STRUCTPTR->value/pow(10,value);
 else
 LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
 fseek(source,ftell(source)-1,SEEK_SET);
-return CONST;
+return REALo;
 }
 else
 if (c==EOF )
@@ -175,7 +175,7 @@ if (c==EOF )
 LEX_STRUCTPTR->value= LEX_STRUCTPTR->value*pow(10,value);
 if(plus_s==1)
 LEX_STRUCTPTR->value=LEX_STRUCTPTR->value*(-1);
-return CONST;
+return REALo;
 }
 
 else
@@ -196,6 +196,7 @@ else if(u==1)
 
 else if((c < '0') || (c >'9'))
 {
+isreal=1;
 state=CONST;
 }
 }
@@ -274,7 +275,13 @@ if((c < '0') || (c >'9')){
 if(state==CONST){
  if(isspace(c)!=0)
 {
-    return CONST;
+    if(isreal==1)
+    {
+
+     return REALo;
+    }else
+
+     return CONST;
  }
 
 else if(c=='.')
@@ -285,21 +292,29 @@ state=REAL;
 
 else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':' || c=='+' ||c== '-')
 {
+    if(isreal==1)
+    {
+     fseek(source,ftell(source)-1,SEEK_SET);
+     return REALo;
+    }else
      fseek(source,ftell(source)-1,SEEK_SET);
      return CONST;
  }
  else
     if(c==EOF)
  {
-return CONST;
+     if(isreal==1)
+    {
+     return REALo;
+    }else
+     return CONST;
  }
+
  else
     return E_LEXICAL;
 
 }
 }
-
-
 if(state==REAL)
 {
 c=getc(source);
@@ -324,10 +339,6 @@ else
      return E_LEXICAL;
 }
 }
-
-
-
-
 ///*********************************************************** identifikatory a klucove slova
 
 if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
@@ -387,7 +398,6 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
 
 }
 
-
 if(c==EOF)
 {   if(state==KOMENT)
         return EOFILE;
@@ -397,7 +407,6 @@ if(c==EOF)
     else
         return EOFILE;
 }
-
 
 if((isspace(c)==0)&&(state==0)&&(c!='}'))   //chyba ak mame nedefinovany stav znak ktory nepozname
 {

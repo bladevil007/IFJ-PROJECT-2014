@@ -417,7 +417,7 @@ int Libraryfunction(int value){
 if(value == FUNCTION)
 {
 	token=getnextToken(LEX_STRUCTPTR);
-            if(token==ID || token==CONST_STRING || token == TRUE || token == CONST || token==FALSE)
+            if(token==ID || token==CONST_STRING || token == TRUE || token == CONST || token==FALSE || token==REALo)
             {
               token=getnextToken(LEX_STRUCTPTR);
               if(token==CIARKA)
@@ -486,7 +486,7 @@ else if(value==LENGTH)
                         if(token==CIARKA)
                         {
                          token=getnextToken(LEX_STRUCTPTR);
-                                if(token==ID || token==CONST)
+                                if(token==ID || token==CONST )
                                 {
                                    token=getnextToken(LEX_STRUCTPTR);
                                    if(token==RIGHT_ROUND)

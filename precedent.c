@@ -292,6 +292,8 @@ case THEN:
    return PSA_DOLAR;
 case CONST:
     return PSA_ID;
+case REALo:
+    return PSA_ID;
 case PLUS:
     return PSA_PLUS;
 case MINUS:
@@ -430,15 +432,14 @@ if(((stackPSA=stack_init())==NULL))
 stack_push(stackPSA,PSA_DOLAR);///inicializacia vrcholu na dolar
 stack_top(stackPSA,&TOP_Stack);
 initPrecedenceTABLE();
-
    TOP_Stdin=getnextToken(LEX_STRUCTPTR);
    checklex(TOP_Stdin);
-    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST  && TOP_Stdin!=COPY && TOP_Stdin!=LENGTH && TOP_Stdin!=WRITE && TOP_Stdin!=FIND && TOP_Stdin!=SORT && TOP_Stdin!=READLN)
+    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST && TOP_Stdin!=REALo  && TOP_Stdin!=COPY && TOP_Stdin!=LENGTH && TOP_Stdin!=WRITE && TOP_Stdin!=FIND && TOP_Stdin!=SORT && TOP_Stdin!=READLN)
         return ERRORRET(TOP_Stdin);
 
 
 
-if(TOP_Stdin==ID || TOP_Stdin==LEFT_ROUND || TOP_Stdin==CONST)
+if(TOP_Stdin==ID || TOP_Stdin==LEFT_ROUND || TOP_Stdin==CONST || TOP_Stdin==REALo )
 {
 
 PrecedentAnal(LEX_STRUCTPTR,type);
