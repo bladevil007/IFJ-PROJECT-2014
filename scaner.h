@@ -55,5 +55,6 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define HASHTAG 58
 #define LESSEQUAL 59
 #define GREATEREQUAL 60
+#define NOTEQUAL 61
 
 

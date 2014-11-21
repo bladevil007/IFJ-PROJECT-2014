@@ -14,3 +14,4 @@ int fun_params();
 int Libraryfunction(int);
 int funkcia();
 
+int ID_ENABLE;

@@ -207,9 +207,12 @@ if(state==0){
 switch(c) {
 case '<' :
      {
-        if(getc(source)=='=')
+		c = getc(source);
+        if(c =='=')
             return LESSEQUAL;
-       else
+       else if (c == '>')
+			return NOTEQUAL;
+	   else
        {
        fseek(source,ftell(source)-1,SEEK_SET);
        return LESS;
