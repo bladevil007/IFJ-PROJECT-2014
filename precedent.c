@@ -30,7 +30,7 @@ static int rule7[3]={EXPRESION,PSA_GREATER,EXPRESION};///E->E>E
 static int rule8[3]={EXPRESION,PSA_LESSEQ,EXPRESION}; ///E->E<=E
 static int rule9[3]={EXPRESION,PSA_GREATEREQ,EXPRESION};///E->E>=E
 static int rule10[3]={EXPRESION,PSA_NOTEQUAL,EXPRESION};///E->E<>E
-static int rules[12]={rule0,rule1,rule2,rule3,rule4,rule5,rule6,rule7,rule8,rule9,rule10};
+static int *rules[12]={rule0,rule1,rule2,rule3,rule4,rule5,rule6,rule7,rule8,rule9,rule10};
 static int scan[3];///bude sa naplnat hodnotami zo zasobnika a nasledne porovnavat s pravidlami
 
 ///Funckia nam porovna so vsetkymi pravidlami ak najde
@@ -39,7 +39,7 @@ int Comparerule(int *scan)
 int i=0;
 while(i<11)
 {
-    if(strcmp(rules[i],scan)==0)
+    if(strcmp(*rules[i],scan)==0)
         return 0;
         i++;
 }
@@ -113,8 +113,8 @@ PrecedenceTABLE[PSA_ID][PSA_PLUS]=PT_GREATER;
 PrecedenceTABLE[PSA_ID][PSA_MINUS]=PT_GREATER;
 PrecedenceTABLE[PSA_ID][PSA_MULT]=PT_GREATER;
 PrecedenceTABLE[PSA_ID][PSA_DIVIDE]=PT_GREATER;
-PrecedenceTABLE[PSA_ID][PSA_ID]=NULL;
-PrecedenceTABLE[PSA_ID][PSA_LEFT]=NULL;
+PrecedenceTABLE[PSA_ID][PSA_ID]=0;
+PrecedenceTABLE[PSA_ID][PSA_LEFT]=0;
 PrecedenceTABLE[PSA_ID][PSA_RIGHT]=PT_GREATER;
 PrecedenceTABLE[PSA_ID][PSA_LESS]=PT_GREATER;
 PrecedenceTABLE[PSA_ID][PSA_GREATER]=PT_GREATER;
@@ -141,8 +141,8 @@ PrecedenceTABLE[PSA_RIGHT][PSA_PLUS]=PT_GREATER;
 PrecedenceTABLE[PSA_RIGHT][PSA_MINUS]=PT_GREATER;
 PrecedenceTABLE[PSA_RIGHT][PSA_MULT]=PT_GREATER;
 PrecedenceTABLE[PSA_RIGHT][PSA_DIVIDE]=PT_GREATER;
-PrecedenceTABLE[PSA_RIGHT][PSA_ID]=NULL;
-PrecedenceTABLE[PSA_RIGHT][PSA_LEFT]=NULL;
+PrecedenceTABLE[PSA_RIGHT][PSA_ID]=0;
+PrecedenceTABLE[PSA_RIGHT][PSA_LEFT]=0;
 PrecedenceTABLE[PSA_RIGHT][PSA_RIGHT]=PT_GREATER;
 PrecedenceTABLE[PSA_RIGHT][PSA_LESS]=PT_GREATER;
 PrecedenceTABLE[PSA_RIGHT][PSA_GREATER]=PT_GREATER;
@@ -158,12 +158,12 @@ PrecedenceTABLE[PSA_LESS][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_LESS][PSA_ID]=PT_LESS;
 PrecedenceTABLE[PSA_LESS][PSA_LEFT]=PT_LESS;
 PrecedenceTABLE[PSA_LESS][PSA_RIGHT]=PT_GREATER;
-PrecedenceTABLE[PSA_LESS][PSA_LESS]=NULL;
-PrecedenceTABLE[PSA_LESS][PSA_GREATER]=NULL;
-PrecedenceTABLE[PSA_LESS][PSA_LESSEQ]=NULL;
-PrecedenceTABLE[PSA_LESS][PSA_GREATEREQ]=NULL;
+PrecedenceTABLE[PSA_LESS][PSA_LESS]=0;
+PrecedenceTABLE[PSA_LESS][PSA_GREATER]=0;
+PrecedenceTABLE[PSA_LESS][PSA_LESSEQ]=0;
+PrecedenceTABLE[PSA_LESS][PSA_GREATEREQ]=0;
 PrecedenceTABLE[PSA_LESS][PSA_DOLAR]=PT_GREATER;
-PrecedenceTABLE[PSA_LESS][PSA_NOTEQUAL]=NULL;
+PrecedenceTABLE[PSA_LESS][PSA_NOTEQUAL]=0;
 
 PrecedenceTABLE[PSA_GREATER][PSA_PLUS]=PT_LESS;
 PrecedenceTABLE[PSA_GREATER][PSA_MINUS]=PT_LESS;
@@ -172,12 +172,12 @@ PrecedenceTABLE[PSA_GREATER][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_GREATER][PSA_ID]=PT_LESS;
 PrecedenceTABLE[PSA_GREATER][PSA_LEFT]=PT_LESS;
 PrecedenceTABLE[PSA_GREATER][PSA_RIGHT]=PT_GREATER;
-PrecedenceTABLE[PSA_GREATER][PSA_LESS]=NULL;
-PrecedenceTABLE[PSA_GREATER][PSA_GREATER]=NULL;
-PrecedenceTABLE[PSA_GREATER][PSA_LESSEQ]=NULL;
-PrecedenceTABLE[PSA_GREATER][PSA_GREATEREQ]=NULL;
+PrecedenceTABLE[PSA_GREATER][PSA_LESS]=0;
+PrecedenceTABLE[PSA_GREATER][PSA_GREATER]=0;
+PrecedenceTABLE[PSA_GREATER][PSA_LESSEQ]=0;
+PrecedenceTABLE[PSA_GREATER][PSA_GREATEREQ]=0;
 PrecedenceTABLE[PSA_GREATER][PSA_DOLAR]=PT_GREATER;
-PrecedenceTABLE[PSA_GREATER][PSA_NOTEQUAL]=NULL;
+PrecedenceTABLE[PSA_GREATER][PSA_NOTEQUAL]=0;
 
 PrecedenceTABLE[PSA_GREATEREQ][PSA_PLUS]=PT_LESS;
 PrecedenceTABLE[PSA_GREATEREQ][PSA_MINUS]=PT_LESS;
@@ -186,12 +186,12 @@ PrecedenceTABLE[PSA_GREATEREQ][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_GREATEREQ][PSA_ID]=PT_LESS;
 PrecedenceTABLE[PSA_GREATEREQ][PSA_LEFT]=PT_LESS;
 PrecedenceTABLE[PSA_GREATEREQ][PSA_RIGHT]=PT_GREATER;
-PrecedenceTABLE[PSA_GREATEREQ][PSA_LESS]=NULL;
-PrecedenceTABLE[PSA_GREATEREQ][PSA_GREATER]=NULL;
-PrecedenceTABLE[PSA_GREATEREQ][PSA_LESSEQ]=NULL;
-PrecedenceTABLE[PSA_GREATEREQ][PSA_GREATEREQ]=NULL;
+PrecedenceTABLE[PSA_GREATEREQ][PSA_LESS]=0;
+PrecedenceTABLE[PSA_GREATEREQ][PSA_GREATER]=0;
+PrecedenceTABLE[PSA_GREATEREQ][PSA_LESSEQ]=0;
+PrecedenceTABLE[PSA_GREATEREQ][PSA_GREATEREQ]=0;
 PrecedenceTABLE[PSA_GREATEREQ][PSA_DOLAR]=PT_GREATER;
-PrecedenceTABLE[PSA_GREATEREQ][PSA_NOTEQUAL]=NULL;
+PrecedenceTABLE[PSA_GREATEREQ][PSA_NOTEQUAL]=0;
 
 PrecedenceTABLE[PSA_LESSEQ][PSA_PLUS]=PT_LESS;
 PrecedenceTABLE[PSA_LESSEQ][PSA_MINUS]=PT_LESS;
@@ -200,12 +200,12 @@ PrecedenceTABLE[PSA_LESSEQ][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_LESSEQ][PSA_ID]=PT_LESS;
 PrecedenceTABLE[PSA_LESSEQ][PSA_LEFT]=PT_LESS;
 PrecedenceTABLE[PSA_LESSEQ][PSA_RIGHT]=PT_GREATER;
-PrecedenceTABLE[PSA_LESSEQ][PSA_LESS]=NULL;
-PrecedenceTABLE[PSA_LESSEQ][PSA_GREATER]=NULL;
-PrecedenceTABLE[PSA_LESSEQ][PSA_LESSEQ]=NULL;
-PrecedenceTABLE[PSA_LESSEQ][PSA_GREATEREQ]=NULL;
+PrecedenceTABLE[PSA_LESSEQ][PSA_LESS]=0;
+PrecedenceTABLE[PSA_LESSEQ][PSA_GREATER]=0;
+PrecedenceTABLE[PSA_LESSEQ][PSA_LESSEQ]=0;
+PrecedenceTABLE[PSA_LESSEQ][PSA_GREATEREQ]=0;
 PrecedenceTABLE[PSA_LESSEQ][PSA_DOLAR]=PT_GREATER;
-PrecedenceTABLE[PSA_LESSEQ][PSA_NOTEQUAL]=NULL;
+PrecedenceTABLE[PSA_LESSEQ][PSA_NOTEQUAL]=0;
 
 PrecedenceTABLE[PSA_DOLAR][PSA_PLUS]=PT_LESS;
 PrecedenceTABLE[PSA_DOLAR][PSA_MINUS]=PT_LESS;
@@ -226,19 +226,18 @@ PrecedenceTABLE[PSA_NOTEQUAL][PSA_MINUS]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_MULT]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_ID]=PT_LESS;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_LEFT]=PT_LESS;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_LEFT]=0;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_RIGHT]=PT_GREATER;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESS]=NULL;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATER]=NULL;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESSEQ]=NULL;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATEREQ]=NULL;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_DOLAR]=PT_GREATER;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_NOTEQUAL]=NULL;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESS]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATER]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESSEQ]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATEREQ]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_DOLAR]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_NOTEQUAL]=0;
 
 }
 int CheckEND(int end,int type)
 {
-        printf("som tu ");
  switch (end)
  {
    case THEN:
@@ -258,19 +257,19 @@ int CheckEND(int end,int type)
 
         if(type==ID)
 		{
-			ID_ENABLE = 1;
+			if(ID_ENABLE == 1)
 			return 0;
 		}
 	case END:
 	{
 		if(type==ID)
 		{
-			ID_ENABLE= 2;///end nenasleduje dalsi prikaz
+			if(ID_ENABLE == 2)
 			return 0;
 		}
 	}
-
-
+		
+        
        }
  }
        return ERRORRET(end);
@@ -283,16 +282,10 @@ switch(token)
 case DO:
     return PSA_DOLAR;
 case BODKOCIARKA:
-    ID_ENABLE = 1;
-    return PSA_DOLAR;
-case END:
-    ID_ENABLE= 2;
     return PSA_DOLAR;
 case THEN:
    return PSA_DOLAR;
 case CONST:
-    return PSA_ID;
-case REALo:
     return PSA_ID;
 case PLUS:
     return PSA_PLUS;
@@ -316,8 +309,6 @@ case LESSEQUAL:
     return PSA_LESSEQ;
 case GREATEREQUAL:
     return PSA_GREATEREQ;
-case NOTEQUAL:
-    return PSA_NOTEQUAL;
 default:
     return ERRORRET(token);
 }
@@ -359,7 +350,6 @@ int reduce(LEX_STRUCT *LEX_STRUCTPTR)
 		return ERRORRET(TOP_Stdin);
 	}
 	PSA_Stalker = PrecedenceTABLE[term][decodeSA(TOP_Stdin)];
-
 	if(PSA_Stalker == NULL)
 		exit(E_SYNTAX);
 	else if(PSA_Stalker == PT_GREATER)
@@ -381,14 +371,11 @@ if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
     return 0;
 }
 
-
 PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
 
     if(PSA_Stalker!=NULL)
     {
-
-
      if(PSA_Stalker==PT_LESS)
      {
          stack_push(stackPSA,ZARAZKA);
@@ -411,10 +398,9 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
            return PrecedentAnal(LEX_STRUCTPTR,type);
      }
-    }else if(TOP_Stdin==LEFT_ROUND)
-        return Libraryfunction(FUNCTION);
+    }else
 
-    else
+
     return ERRORRET(TOP_Stdin);
 
 
@@ -432,21 +418,13 @@ if(((stackPSA=stack_init())==NULL))
 stack_push(stackPSA,PSA_DOLAR);///inicializacia vrcholu na dolar
 stack_top(stackPSA,&TOP_Stack);
 initPrecedenceTABLE();
+
    TOP_Stdin=getnextToken(LEX_STRUCTPTR);
    checklex(TOP_Stdin);
-    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST && TOP_Stdin!=REALo  && TOP_Stdin!=COPY && TOP_Stdin!=LENGTH && TOP_Stdin!=WRITE && TOP_Stdin!=FIND && TOP_Stdin!=SORT && TOP_Stdin!=READLN)
+    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST)
         return ERRORRET(TOP_Stdin);
 
-
-
-if(TOP_Stdin==ID || TOP_Stdin==LEFT_ROUND || TOP_Stdin==CONST || TOP_Stdin==REALo )
-{
-
 PrecedentAnal(LEX_STRUCTPTR,type);
-}
-
-else
-   return command(TOP_Stdin);
 
 stack_free(stackPSA);
   return SUCCESS;
