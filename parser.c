@@ -81,6 +81,7 @@ else if(token == FUNCTION)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            ELEMENT->defined=false_hash;   ///nebola definova funckia*/
             token=getnextToken(LEX_STRUCTPTR);
                 if(token==BODKOCIARKA)
                 {
@@ -93,11 +94,11 @@ else if(token == FUNCTION)
         }
         else if(token==BEGIN || token==VAR)
         {
+            ELEMENT->defined=true_hash;   ///funkcia je definovana
             if(token==VAR)
             {
             IN_FUNCTION=1;
             declarelist();
-
             }
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
@@ -151,7 +152,6 @@ exit(E_INTERNAL);
 
 
 
-
 if((ELEMENT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
 exit(E_INTERNAL);
 
@@ -170,6 +170,8 @@ hashtable_free(LokalnaTAB);
 free(LEX_STRUCTPTR);
 return 0;
 }/////////////////////////////////////////////********/*/*/*/
+
+
 
 
 /***
@@ -196,11 +198,11 @@ int progfunction()
             token=command(token);
             break;
         }
-        default: return ERRORRET(token);
+        default:
+            return ERRORRET(token);
     }
 
-
-    if(token==SUCCESS)
+    if(token==SUCCESS && ID_ENABLE==0)
 {
         token=getnextToken(LEX_STRUCTPTR);
         if(token==END)
@@ -214,7 +216,11 @@ int progfunction()
         return progfunction();
         else
             return ERRORRET(token);
-}else if(token==SUCCESS && ID_ENABLE == 1)
+
+
+
+}
+else if(token==SUCCESS && ID_ENABLE == 1)
 {
 	ID_ENABLE = 0;
 	return progfunction();
@@ -255,8 +261,6 @@ int progcondition()
         }
         default: return ERRORRET(token);
     }
-
-
     if(token==SUCCESS && ID_ENABLE == 0)
 {
         token=getnextToken(LEX_STRUCTPTR);
@@ -381,7 +385,7 @@ int command(int value)
             if(IN_FUNCTION==0)///Kontrola ci je definovana
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
-                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+              ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
 
@@ -396,7 +400,8 @@ int command(int value)
 				return SUCCESS;
             }else return ERRORRET(token);
 
-        }else return ERRORRET(token);
+        }
+            else return ERRORRET(token);    ///Pridat pre funckie  do precedencnej
     }
 
     ///Prikaz readln
@@ -780,12 +785,30 @@ Neterminal na kontrolu syntaxe deklaracie premennych
 ///DEFINOVANIE FUNKCIE
 /**
 Neterminal volany z neterminalu "program" ktory kontroluje syntax funckie
-*/
+*/ ///zo semantickej do tejto funckie uz neni co dodat asi
 int funkcia()
 {
     int token;
     if((token = getnextToken(LEX_STRUCTPTR)) == ID)
     {
+
+     POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+                                                                                                    ///Zistime ci uz nemame taku polozku
+        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));
+                                                                                        ///Vrati na ukazatel na prvek v hash table
+         if(ELEMENT!=0)
+         {
+
+            if(ELEMENT->defined==true_hash)
+            {                                                                                   ///ci uz bola definovana
+            exit(E_SEMANTIC_UNDEF);
+            }
+
+         }else
+        hashtable_add(GlobalnaTAB,FUNCTION,POLE_ID_GLOBAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
+        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));     ///nastavime si aktualny ukazatel na nasu funkciu
+
+
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
 
@@ -800,9 +823,12 @@ int funkcia()
                      token = getnextToken(LEX_STRUCTPTR);
                         if (token == INTEGER || token  == BOOLEAN || token == STRING || token == REAL)
                         {
+                            ELEMENT->type=decodederSEM(token);   ///navratovy typ
+
                          token = getnextToken(LEX_STRUCTPTR);
                             if(token==BODKOCIARKA)
                             {
+
                                 return SUCCESS;               ///hlavicka je OK
                             }else return ERRORRET(token);
 
@@ -853,6 +879,7 @@ int fun_params()
 
     else return ERRORRET(token);   // po zatvorke nenasleduje ID ani zatvorka
 }
+
 
 
 ///Funckia dekoduje nase tokeny na hodnoty pre hashovaciu funkciu
