@@ -376,8 +376,16 @@ int command(int value)
     if(value==COPY || value==FIND ||value==LENGTH || value==SORT)
         return Libraryfunction(value);
 
-    else if(value==ID)  /// riesit zvlast lebo konci  strednikem
+    else if(value==ID)
     {
+            if(IN_FUNCTION==0)///Kontrola ci je definovana
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+
         token=getnextToken(LEX_STRUCTPTR);
         if(token==DVOJBODKA)
         {
@@ -453,9 +461,6 @@ int command(int value)
 
 return ERRORRET(token);
 }
-
-
-
 /**
 ///Vstavane funkcie COPY...
 Neterminal Libraryfunction je volana z neterminalu command kontroluje syntax vstavanych funckii
