@@ -39,7 +39,7 @@ int Comparerule(int *scan)
 int i=0;
 while(i<11)
 {
-    if(strcmp(*rules[i],scan)==0)
+    if(strcmp(rules[i],scan)==0)
         return 0;
         i++;
 }
@@ -268,8 +268,8 @@ int CheckEND(int end,int type)
 			return 0;
 		}
 	}
-		
-        
+
+
        }
  }
        return ERRORRET(end);
@@ -345,11 +345,17 @@ int reduce(LEX_STRUCT *LEX_STRUCTPTR)
 		scan[2] = 0;
 	}
 
+
+
 	if(Comparerule(scan) != 0){
 
 		return ERRORRET(TOP_Stdin);
 	}
+
 	PSA_Stalker = PrecedenceTABLE[term][decodeSA(TOP_Stdin)];
+
+
+
 	if(PSA_Stalker == NULL)
 		exit(E_SYNTAX);
 	else if(PSA_Stalker == PT_GREATER)
@@ -371,6 +377,7 @@ if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
     return 0;
 }
 
+
 PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
 
@@ -388,6 +395,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
      }
      else if (PSA_Stalker==PT_GREATER)
      {
+
             term= TOP_Stack;
            if((reduce(LEX_STRUCTPTR))==SUCCESS)
             return 0;
@@ -423,6 +431,7 @@ initPrecedenceTABLE();
    checklex(TOP_Stdin);
     if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST)
         return ERRORRET(TOP_Stdin);
+
 
 PrecedentAnal(LEX_STRUCTPTR,type);
 
