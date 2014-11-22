@@ -6,8 +6,11 @@
 #include "string.h"
 #include "precedent.h"
 #include "err.h"
+#include "ial.h"
 #include "stack.h"
 #define EXPRESION 100
+
+int PrecedenceSA(LEX_STRUCT*,int,THash_table*,THash_table*);
 
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
@@ -15,6 +18,7 @@ TStack *Helper;  ///na expresion
 int term ;
 int TOP_Stack;
 int TOP_Stdin;
+int concateT;
 int PSA_Stalker;
 
 int PrecedenceTABLE[13][13];
@@ -226,13 +230,13 @@ PrecedenceTABLE[PSA_NOTEQUAL][PSA_MINUS]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_MULT]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_DIVIDE]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_ID]=PT_LESS;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_LEFT]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_LEFT]=PT_LESS;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_RIGHT]=PT_GREATER;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESS]=0;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATER]=0;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_LESSEQ]=0;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_GREATEREQ]=0;
-PrecedenceTABLE[PSA_NOTEQUAL][PSA_DOLAR]=0;
+PrecedenceTABLE[PSA_NOTEQUAL][PSA_DOLAR]=PT_GREATER;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_NOTEQUAL]=0;
 
 }
@@ -257,14 +261,14 @@ int CheckEND(int end,int type)
 
         if(type==ID)
 		{
-			if(ID_ENABLE == 1)
+			ID_ENABLE=1;
 			return 0;
 		}
 	case END:
 	{
 		if(type==ID)
 		{
-			if(ID_ENABLE == 2)
+            ID_ENABLE = 2;
 			return 0;
 		}
 	}
@@ -282,6 +286,10 @@ switch(token)
 case DO:
     return PSA_DOLAR;
 case BODKOCIARKA:
+    ID_ENABLE = 1;
+    return PSA_DOLAR;
+case END:
+    ID_ENABLE = 2;
     return PSA_DOLAR;
 case THEN:
    return PSA_DOLAR;
@@ -309,6 +317,8 @@ case LESSEQUAL:
     return PSA_LESSEQ;
 case GREATEREQUAL:
     return PSA_GREATEREQ;
+case NOTEQUAL:
+    return PSA_NOTEQUAL;
 default:
     return ERRORRET(token);
 }
@@ -414,12 +424,8 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
 }
 
-
-
-
-
 ///Funckia ktora spravy precedencnu analyzu vyrazu alebo podmienky
-int PrecedenceSA(LEX_STRUCT *LEX_STRUCTPTR,int type)
+int PrecedenceSA(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB)
 {
 if(((stackPSA=stack_init())==NULL))
     exit(E_INTERNAL);
@@ -429,21 +435,54 @@ initPrecedenceTABLE();
 
    TOP_Stdin=getnextToken(LEX_STRUCTPTR);
    checklex(TOP_Stdin);
-    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST)
+    if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST && TOP_Stdin!=CONST_STRING)
         return ERRORRET(TOP_Stdin);
 
 
-PrecedentAnal(LEX_STRUCTPTR,type);
+///Bude sa jednat o kokatenaciu retazcov  ++ dodat ked ID je CONST_STRING tak nech tiez konkatenuje +semanticku kontrolu
+if(TOP_Stdin==CONST_STRING && type==ID)
+{
+    concate(LEX_STRUCTPTR,type);
 
+}else
+{
+PrecedentAnal(LEX_STRUCTPTR,type);
+}
 stack_free(stackPSA);
   return SUCCESS;
 }
 
 
 
+///FUNKCIA sa stara o konkatenaciu 2 retazcov ID:='PR'+'D'
+int concate(LEX_STRUCT *LEX_STRUCTPTR,int type)
+{
+    concateT=getnextToken(LEX_STRUCTPTR);
 
 
+    if(concateT == PLUS)
+    {
+       concateT=getnextToken(LEX_STRUCTPTR);
 
+       if(concateT==ID)
+       {
+           return concate(LEX_STRUCTPTR,type);
+       }
+       else if(concateT==CONST_STRING)
+       {
+           return concate(LEX_STRUCTPTR,type);
+
+       }
+            else return ERRORRET(concateT);
+
+    }else if(decodeSA(concateT)==PSA_DOLAR)
+    {
+        CheckEND(concateT,type);
+        return 0;
+    }
+    else
+        return ERRORRET(concateT);
+}
 
 
 

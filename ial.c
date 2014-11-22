@@ -67,7 +67,7 @@ void hashtable_clear (THash_table *table) //funkce, ktera uvolni vsechny zaznamy
 			{
 				free(tmp->params);
 			}
-			if (tmp->id == VARIABLE && tmp->type == STRING && tmp->defined == true) //pokud je zaznam promenna typu string a ma prirazenou hodnotu je treba ji uvolnit
+			if (tmp->id == VARIABLE_hash && tmp->type == STRING_hash && tmp->defined == true_hash) //pokud je zaznam promenna typu string a ma prirazenou hodnotu je treba ji uvolnit
 			{
 				free(tmp->value.str);
 			}
@@ -119,7 +119,7 @@ struct record *hashtable_add(THash_table *table, int id, char *key, int type, ch
 	tmp->key = key;
 	tmp->type = type;
 	tmp->params = params;
-	tmp->defined = false;
+	tmp->defined = false_hash;
 	return tmp;
 }
 

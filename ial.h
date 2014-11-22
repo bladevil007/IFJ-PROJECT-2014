@@ -1,22 +1,22 @@
 
-#define FALSE 0
-#define TRUE 1
-#define false 0
-#define true 1
+#define false_hash 0
+#define true_hash 1
 //slouzi k urceni, zda zaznam je zaznamem funkce ci promenne
-#define VARIABLE 50
-#define FUNCTION 51
+#define VARIABLE_hash 50
+#define FUNCTION_hash 51
 //slouzi k rozeznani datovych/navratovych typu promennych a funkci
-#define INTEGER 100
-#define REAL 101
-#define CHAR 102
-#define STRING 104
+#define INTEGER_hash 105
+#define BOOLEAN_hash 103
+#define REAL_hash 101
+#define CHAR_hash 102
+#define STRING_hash 104
 
 typedef union //unie slouzici k ukladani hodnot jednotlivych promennych v zaznamech
 {
 	int i;
 	double d;
 	char c;
+	int b;
 	char *str;
 } DRtype;
 
