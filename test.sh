@@ -3,29 +3,25 @@ compile=false
 if [ $? -eq 0 ]
 then
   echo ' '
-  echo '...---Preklad vporadku---...'
+  echo -e '\e[32m ...---Preklad v poradku---... \e[39m'
+  echo
   compile=true
 else
   echo '  '
-  echo '...---Chyba prekladu---...'
+  echo -e '\e[31m ...---Chyba prekladu---... \e[39m'
+  echo
 fi
 
 if [ $compile = true ]
 then
-  for file in files/*.f do
-  echo " "
-  echo "===Testuji $file==="
-  ret=$(./project $file | grep -Eo '[0-9]{1,3}')
-  if [[ $ret -eq 1 ]]
-  then 
-    echo '--Lexikalni analyza ---FAIL---'
-  elif [[ $ret -eq 2 ]]
-  then
-    printf "Lexikalni analyza \t--- OK ---\n"
-    printf "Syntakticka analyza \t---FAIL---\n"
-  else
-    echo '--Lexikalni analyza ---OK---'
-    echo '--Syntakticka analyza ---OK---'
-  fi
-done
+  for file in files/*.f 
+  do
+    expected=$(head -n 1 $file | awk '{print $2}')
+    ./project $file 
+    if [ "$?" = "$expected" ]; then
+        echo -e "Test file: $file  	$?	\e[32m OK \e[39m"
+      else
+        echo -e "Test file: $file	$?	\e[31m NOK \e[39m"
+    fi  
+  done
 fi
