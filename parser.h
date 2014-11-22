@@ -13,5 +13,7 @@ void value();
 int fun_params();
 int Libraryfunction(int);
 int funkcia();
-
+int decodederSEM(int);
 int ID_ENABLE;
+
+

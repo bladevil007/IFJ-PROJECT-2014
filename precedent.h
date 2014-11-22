@@ -1,5 +1,4 @@
 
-int PrecedenceSA(LEX_STRUCT*,int);
 int decodeSA(int);
 void initPrecedenceTABLE(); ///vytvori precedencnu tabulku
 

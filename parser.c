@@ -17,11 +17,25 @@
 #include "parser.h"
 #include "string.h"
 #include "err.h"
+#include "ial.h"
 #include "stack.h"
 #include "precedent.h"
 
 LEX_STRUCT *LEX_STRUCTPTR;
-int IF_ENABLE=0;///na pouzitie else v progcondition
+
+int IF_ENABLE=0;                ///na pouzitie else v progcondition
+inf_array *POLE_ID_GLOBAL;   ///nekonecne pole ID pre globalnu
+inf_array *POLE_ID_LOCAL;   ///nekonecne pole ID pre lokalnu
+
+inf_array *SUPPORT_POLE;  /// pomocna
+THash_table *GlobalnaTAB; ///globalna hashovacia tabulka
+THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
+
+int POLE_ID_INDEX=0;  ///Index Dalsieho zaciatku ID
+struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
+
+int IN_FUNCTION=0;    ///nachadzame sa vo funckii budeme naplnat Lokalnu tab symbolov
+
 
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
 int ERRORRET(int value)
@@ -62,9 +76,10 @@ else if(token==BEGIN)
  ///program sa sklada z funkcii a programu
 else if(token == FUNCTION)
     {
-        funkcia();  // pri chybe program skonci sam
+        hashtable_clear(LokalnaTAB);                                 ///pokazde vymaze tabulku symbolov pre kazdu funkciu
+        funkcia();                                                  /// pri chybe program skonci sam
         token=getnextToken(LEX_STRUCTPTR);
-        if(token==FORWARD)    /// len hlavicka funkcie ziadne telo za nou nenasleduje
+        if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
             token=getnextToken(LEX_STRUCTPTR);
                 if(token==BODKOCIARKA)
@@ -80,12 +95,15 @@ else if(token == FUNCTION)
         {
             if(token==VAR)
             {
+            IN_FUNCTION=1;
             declarelist();
+
             }
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
             if(token==E_LEXICAL)exit(E_LEXICAL);
             ///bud ide dalsia funkcia alebo ide uz telo programu
+            IN_FUNCTION=0;
             return program(token);
         }
         else
@@ -110,6 +128,34 @@ if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||
     (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
 exit(E_INTERNAL);
 
+if(((POLE_ID_GLOBAL=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
+    (init_array(POLE_ID_GLOBAL)==-1))                                        ///alokujeme pole ID glob
+exit(E_INTERNAL);
+
+if(((POLE_ID_LOCAL=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
+    (init_array(POLE_ID_LOCAL)==-1))                                        ///alokujeme pole ID loc
+exit(E_INTERNAL);
+
+if(((SUPPORT_POLE=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
+    (init_array(SUPPORT_POLE)==-1))                                        ///alokujeme pole ID
+exit(E_INTERNAL);
+
+if(((GlobalnaTAB=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
+    ((GlobalnaTAB=hashtable_init(100))==0))                                        ///alokujeme hashovaciu tabulku
+exit(E_INTERNAL);
+
+
+if(((LokalnaTAB=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
+    ((LokalnaTAB=hashtable_init(100))==0))                                        ///alokujeme hashovaciu tabulku
+exit(E_INTERNAL);
+
+
+
+
+if((ELEMENT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
+exit(E_INTERNAL);
+
+
 int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
 if(token==E_LEXICAL)exit(E_LEXICAL);///pri chybe v lexikalnej analyze skonci
 if(token==EOFILE) exit(E_SYNTAX);
@@ -117,6 +163,10 @@ int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
 strClear(LEX_STRUCTPTR);
+free_array(POLE_ID_GLOBAL);
+free_array(POLE_ID_LOCAL);
+hashtable_free(GlobalnaTAB);
+hashtable_free(LokalnaTAB);
 free(LEX_STRUCTPTR);
 return 0;
 }/////////////////////////////////////////////********/*/*/*/
@@ -313,7 +363,6 @@ int prog()
 return ERRORRET(token);
 }
 
-
 /** <command>  |  <id>  := <hodnota> v <cykly> v <vstavanafunkcia> v <definovanefunkcie>
 Neterminal/funckia Command , ktora je volana z neterminalov progcondition/prog/progfunction
 Pri chybe sa hned vola exit(cislo chyby)
@@ -335,8 +384,7 @@ int command(int value)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==EQUAL)
             {
-
-				PrecedenceSA(LEX_STRUCTPTR,ID);
+				PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB);
 				return SUCCESS;
             }else return ERRORRET(token);
 
@@ -372,7 +420,9 @@ int command(int value)
 
         ///dopisat
        IF_ENABLE=1;
-       PrecedenceSA(LEX_STRUCTPTR,IF);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+
+
 
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
@@ -382,7 +432,7 @@ int command(int value)
     ///WHILE CYKLUS + VNORENE WHILE CYKLY
     else if(value==WHILE)
     {
-        PrecedenceSA(LEX_STRUCTPTR,WHILE);  //VYHODNOTI SA PODMIENKA + NACITA SA do
+        PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB);  //VYHODNOTI SA PODMIENKA + NACITA SA do
 
             if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
@@ -437,6 +487,19 @@ else if(value==WRITE)
     token=getnextToken(LEX_STRUCTPTR);
             if(token==ID || token==CONST_STRING)
             {
+                if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
               token=getnextToken(LEX_STRUCTPTR);
               if(token==CIARKA)
               {
@@ -450,6 +513,7 @@ else if(value==WRITE)
             }else ERRORRET(token);
 
 }
+
 else if(value==LENGTH)
     {
      token=getnextToken(LEX_STRUCTPTR);
@@ -458,6 +522,20 @@ else if(value==LENGTH)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==CONST_STRING || token==ID)
             {
+                  if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
+
             token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
                     return SUCCESS;
@@ -476,18 +554,60 @@ else if(value==LENGTH)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==CONST_STRING || token==ID)
             {
+                  if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
+
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==CIARKA)
                 {
                   token=getnextToken(LEX_STRUCTPTR);
                   if(token==ID || token== CONST)
                   {
+                        if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su INT
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=INTEGER_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
+
+
                     token=getnextToken(LEX_STRUCTPTR);
                         if(token==CIARKA)
                         {
                          token=getnextToken(LEX_STRUCTPTR);
                                 if(token==ID || token==CONST )
                                 {
+                                            if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su INT
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=INTEGER_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
                                    token=getnextToken(LEX_STRUCTPTR);
                                    if(token==RIGHT_ROUND)
                                         return SUCCESS;
@@ -509,12 +629,40 @@ else if(value==LENGTH)
            token=getnextToken(LEX_STRUCTPTR);
                 if(token==CONST_STRING || token==ID)
                 {
+                       if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
+
                     token=getnextToken(LEX_STRUCTPTR);
                     if(token==CIARKA)
                     {
                          token=getnextToken(LEX_STRUCTPTR);
                          if(token==CONST_STRING || token==ID)
                          {
+                                if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
+
                             token=getnextToken(LEX_STRUCTPTR);
                             if(token==RIGHT_ROUND)
                                 return SUCCESS;
@@ -532,6 +680,19 @@ else if(value==LENGTH)
           token=getnextToken(LEX_STRUCTPTR);
           if(token==CONST_STRING || token==ID)
           {
+                if(token==ID)
+                {
+                    ///Kontrola ze vsetky vstupne hodnoty su String
+                    if(IN_FUNCTION==0)
+                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                    else
+                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        if(ELEMENT==0)
+                        exit(E_SEMANTIC_UNDEF);
+                        else if(ELEMENT->type!=STRING_hash)
+                        exit(E_SEMANTIC_TYPE);
+                }
               token=getnextToken(LEX_STRUCTPTR);
               if(token==RIGHT_ROUND)
                 return SUCCESS;
@@ -554,12 +715,34 @@ Neterminal na kontrolu syntaxe deklaracie premennych
     int token=getnextToken(LEX_STRUCTPTR);
     if(token==ID)
     {
-        ///ULOZIT NAZOV DO TABULKY
+         ///VKLADANIE DO TABULIEK SYMBOLOV
+    if(IN_FUNCTION==0)
+    {
+
+       POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+                                                                                                    ///Zistime ci uz nemame taku polozku
+        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));                    ///Vrati na ukazatel na prvek v hash table
+         if(ELEMENT!=0)
+            exit(E_SEMANTIC_UNDEF);                                                                     ///dva krat definovany ten isty nazov
+
+    }else
+    {
+        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+                                                                                                    ///Zistime ci uz nemame taku polozku
+        ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));                    ///Vrati na ukazatel na prvek v hash table
+         if(ELEMENT!=0)
+            exit(E_SEMANTIC_UNDEF);                                                                     ///dva krat definovany ten isty nazov
+    }
         if((token=getnextToken(LEX_STRUCTPTR))== DVOJBODKA)
            {
                         token=getnextToken(LEX_STRUCTPTR);
                     if(token==REAL || token==INTEGER || token==STRING || token == BOOLEAN)
                     {
+                        if(IN_FUNCTION==0)
+                        hashtable_add(GlobalnaTAB,VARIABLE_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov GLOB
+                         else
+                        hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov    LOC
+
                         token=getnextToken(LEX_STRUCTPTR);
                         ///pridat do tabulky
                         {
@@ -576,6 +759,9 @@ Neterminal na kontrolu syntaxe deklaracie premennych
     }
     else return token;
 }
+
+
+
 
 
 ///DEFINOVANIE FUNKCIE
@@ -656,8 +842,25 @@ int fun_params()
 }
 
 
-
-
+///Funckia dekoduje nase tokeny na hodnoty pre hashovaciu funkciu
+int decodederSEM(int token)
+{
+    switch(token)
+    {
+    case INTEGER :
+        return INTEGER_hash;
+    case BOOLEAN:
+        return BOOLEAN_hash;
+    case STRING:
+        return STRING_hash;
+    case REAL:
+        return REAL_hash;
+    case TRUE:
+        return true_hash;
+    case FALSE:
+        return false_hash;
+    }
+}
 
 
 
