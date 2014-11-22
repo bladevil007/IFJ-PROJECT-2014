@@ -382,9 +382,9 @@ int command(int value)
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
                     ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
-
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
+
 
         token=getnextToken(LEX_STRUCTPTR);
         if(token==DVOJBODKA)
@@ -529,12 +529,13 @@ else if(value==LENGTH)
             {
                   if(token==ID)
                 {
+
                     ///Kontrola ze vsetky vstupne hodnoty su String
                     if(IN_FUNCTION==0)
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
                     ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
-                                                                                            ///Vrati na ukazatel na prvek v hash table
+                                                                              ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
@@ -716,27 +717,34 @@ Neterminal na kontrolu syntaxe deklaracie premennych
 */
  int declarelist()
 {
-
     int token=getnextToken(LEX_STRUCTPTR);
     if(token==ID)
     {
+
+
          ///VKLADANIE DO TABULIEK SYMBOLOV
     if(IN_FUNCTION==0)
     {
 
        POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
                                                                                                     ///Zistime ci uz nemame taku polozku
-        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));                    ///Vrati na ukazatel na prvek v hash table
+        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));
+                                  ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
-            exit(E_SEMANTIC_UNDEF);                                                                     ///dva krat definovany ten isty nazov
+            exit(E_SEMANTIC_UNDEF);
+                                                ///dva krat definovany ten isty nazov
 
     }else
     {
         POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
                                                                                                     ///Zistime ci uz nemame taku polozku
-        ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));                    ///Vrati na ukazatel na prvek v hash table
+        ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
+                         ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
-            exit(E_SEMANTIC_UNDEF);                                                                     ///dva krat definovany ten isty nazov
+         {
+            exit(E_SEMANTIC_UNDEF);
+
+            }                                                                 ///dva krat definovany ten isty nazov
     }
         if((token=getnextToken(LEX_STRUCTPTR))== DVOJBODKA)
            {
