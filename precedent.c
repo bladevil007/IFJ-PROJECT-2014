@@ -295,6 +295,8 @@ case THEN:
    return PSA_DOLAR;
 case CONST:
     return PSA_ID;
+case REALo:
+    return PSA_ID;
 case PLUS:
     return PSA_PLUS;
 case MINUS:
