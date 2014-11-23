@@ -22,6 +22,7 @@ int term ;
 int TOP_Stack;
 int TOP_Stdin;
 int concateT;
+int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
 int PSA_Stalker;
 
 int PrecedenceTABLE[13][13];
@@ -404,7 +405,10 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
               if(TOP_Stdin==ID)                                   ///semanticka analyza podvyrazov
          {
 
+
              ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+             if(PODMIENKA_POD==0)
+             PODMIENKA_POD=ELEMENT->type;
              VysledokID(Vysledok,ELEMENT->type);
              if(ELEMENT->defined!=true_hash)
                 exit(E_SEMANTIC_OTHER);
@@ -582,7 +586,7 @@ int VysledokID(int Vysledok,int id )
             break;
 
     case PODMIENKA:
-         if(id==STRING_hash || id==BOOLEAN_hash)
+         if(id!=PODMIENKA_POD)
             exit(E_SEMANTIC_TYPE);
             break;
     }
@@ -593,9 +597,6 @@ int VysledokID(int Vysledok,int id )
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
 int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-
-
-
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
