@@ -58,12 +58,13 @@ int program(int token)
     ///program zacina var a pokracuje begin bez funkcii
     if(token==VAR)
     {
+
         token=declarelist();
 
     if(token==BEGIN)
     {
-        token=prog();
 
+        token=prog();
     }else
     return ERRORRET(token);
 
@@ -440,7 +441,9 @@ int command(int value)
             if(token==ID)
             {
 
-                        ELEMENT=((hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str)));
+                ELEMENT=((hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str)));
+
+                    ELEMENT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
 
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
@@ -790,28 +793,29 @@ Neterminal na kontrolu syntaxe deklaracie premennych
          ///VKLADANIE DO TABULIEK SYMBOLOV
     if(IN_FUNCTION==0)
     {
+                         ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+                                        ///Zistime ci uz nemame taku polozku
 
-
-       POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
-                                                                                                    ///Zistime ci uz nemame taku polozku
-        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));
+        ELEMENT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
 
                                   ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
             exit(E_SEMANTIC_UNDEF);
-                                                ///dva krat definovany ten isty nazov
-
+           else
+            POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);
     }else
     {
-        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+        ELEMENT=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                   ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
                                                                                                     ///Zistime ci uz nemame taku polozku
-        ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
+
                          ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
          {
             exit(E_SEMANTIC_UNDEF);
-
-            }                                                                 ///dva krat definovany ten isty nazov
+         }
+         else
+        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
+                                                                             ///dva krat definovany ten isty nazov
     }
 
                        ///neni jej priradena hodnota
@@ -825,6 +829,7 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                         hashtable_add(GlobalnaTAB,VARIABLE_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov GLOB
                          else
                         hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov    LOC
+
 
                         token=getnextToken(LEX_STRUCTPTR);
                         ///pridat do tabulky
@@ -857,28 +862,16 @@ int funkcia()
     int token;
     if((token = getnextToken(LEX_STRUCTPTR)) == ID)
     {
-        ELEMENT=((hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str)));
-                                                                                    ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
-                                                                                                    ///Zistime ci uz nemame taku polozku
-        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));
-                                                                                        ///Vrati na ukazatel na prvek v hash table
-         if(ELEMENT!=0)
-         {
+
+         ///nastavime si aktualny ukazatel na nasu funkciu
 
 
-            if(ELEMENT->defined==true_hash)
-            {                                                                              ///ci uz bola definovana
-            exit(E_SEMANTIC_UNDEF);
-            }
+                ///doplnit semanticku kontrolu funkcii
 
-         }else
-         {
-        POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);
-        hashtable_add(GlobalnaTAB,FUNCTION_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
-         }
 
-        ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));     ///nastavime si aktualny ukazatel na nasu funkciu
-        SUPPORT=ELEMENT;///aby sme mohli pri parametroch s nim pracovat
+
+
+
 
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
@@ -916,6 +909,7 @@ int funkcia()
     else return ERRORRET(token); //za function nenasleduje ID
 }
 
+
 /**
 Neterminal ktory je volany neterminalom "funkcia()"
 Tato funkcia kontroluje sytax parametrov vo vnutri zatvorky
@@ -928,7 +922,7 @@ int fun_params()
         return token;
     else if(token == ID)
     {
-        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
+        /*POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
                                                                               ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
                                                                                                     ///Zistime ci uz nemame taku polozku
         ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
@@ -938,7 +932,7 @@ int fun_params()
           hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
           ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
          }else
-           exit(E_SEMANTIC_UNDEF);
+           exit(E_SEMANTIC_UNDEF);*/
 
         token = getnextToken(LEX_STRUCTPTR);
         if(token == DVOJBODKA)
@@ -958,12 +952,12 @@ int fun_params()
                 }
                 else if(token == RIGHT_ROUND)
                 {
-                // if(SUPPORT->defined!=false_hash)                                ///ked hlavicka uz bola deklarovana nealokujeme
+              /*  // if(SUPPORT->defined!=false_hash)                                ///ked hlavicka uz bola deklarovana nealokujeme
                // {
                     int newLength = length(ARRAY_PARAM->str);                           ///pridavame
                     SUPPORT->params=malloc(sizeof(char)*(newLength+1));
                 //}
-                strcpy(SUPPORT->params,ARRAY_PARAM->str);              ///pridat kontrolu ze ze udana hlavicka je tototzna
+                strcpy(SUPPORT->params,ARRAY_PARAM->str);  */            ///pridat kontrolu ze ze udana hlavicka je tototzna
 
                     return token;
                 }

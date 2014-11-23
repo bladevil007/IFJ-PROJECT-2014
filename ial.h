@@ -1,7 +1,6 @@
 
 #define false_hash 0
 #define true_hash 1
-#define double_definition
 //slouzi k urceni, zda zaznam je zaznamem funkce ci promenne
 #define VARIABLE_hash 50
 #define FUNCTION_hash 51
