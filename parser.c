@@ -432,6 +432,8 @@ int command(int value)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==ID)
             {
+                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);           ///readln definuje variable
+                ELEMENT->defined=true_hash;
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
                     return SUCCESS;
