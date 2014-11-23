@@ -21,7 +21,7 @@
 #include "stack.h"
 #include "precedent.h"
 
-LEX_STRUCT *LEX_STRUCTPTR;
+LEX_STRUCT *LEX_STRUCTPTR;          ///sktruktura pre Tokeny
 LEX_STRUCT *ARRAY_PARAM;          ///pole pre parametre funkcie
 int IF_ENABLE=0;                ///na pouzitie else v progcondition
 inf_array *POLE_ID_GLOBAL;   ///nekonecne pole ID pre globalnu
@@ -32,11 +32,9 @@ THash_table *GlobalnaTAB; ///globalna hashovacia tabulka
 THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
 
 
-int POLE_ID_INDEX=0;  ///Index Dalsieho zaciatku ID
+int POLE_ID_INDEX=0;        ///Index Dalsieho zaciatku ID
 struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
 struct record *SUPPORT;   ///zaznam pre hashovaciu funkciu
-
-    ///nachadzame sa vo funckii budeme naplnat Lokalnu tab symbolov
 
 
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
@@ -47,6 +45,7 @@ int ERRORRET(int value)
     else
         exit(E_SYNTAX);
 }
+
 
 ///<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 /**
@@ -78,14 +77,14 @@ else if(token==BEGIN)
  ///program sa sklada z funkcii a programu
 else if(token == FUNCTION)
     {
-        hashtable_clear(LokalnaTAB);
-        free_array(POLE_ID_LOCAL->str);                              ///pokazde vymaze tabulku symbolov pre kazdu funkciu
-        funkcia();                                               /// pri chybe program skonci sam
-        strClear(ARRAY_PARAM);
+        hashtable_clear(LokalnaTAB);                               ///vymazeme aj pole lokalnych identifikatorov
+        free_array(POLE_ID_LOCAL->str);                           ///pokazde vymaze tabulku symbolov pre kazdu funkciu
+        funkcia();                                                /// pri chybe program skonci sam
+        strClear(ARRAY_PARAM);                                     ///vymazeme  pomocne pole pre parametre funkcie
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
-            SUPPORT->defined=false_hash;   ///nebola definova funckia*/
+            SUPPORT->defined=false_hash;            ///nebola definova funckia
             token=getnextToken(LEX_STRUCTPTR);
                 if(token==BODKOCIARKA)
                 {
@@ -99,7 +98,7 @@ else if(token == FUNCTION)
         else if(token==BEGIN || token==VAR)
         {
             SUPPORT->defined=true_hash;
-            IN_FUNCTION=1;///funkcia je definovana
+            IN_FUNCTION=1;                                          ///funkcia je definovana
             if(token==VAR)
             {
             declarelist();
@@ -108,7 +107,7 @@ else if(token == FUNCTION)
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
             if(token==E_LEXICAL)exit(E_LEXICAL);
-            ///bud ide dalsia funkcia alebo ide uz telo programu
+                                                    ///bud ide dalsia funkcia alebo ide uz telo programu
             IN_FUNCTION=0;
             return program(token);
         }
@@ -529,8 +528,6 @@ else if(value==WRITE)
                                                                                             ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
-                        else if(ELEMENT->type!=STRING_hash)
-                        exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
                             exit(E_SEMANTIC_OTHER);
 
