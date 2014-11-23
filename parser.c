@@ -22,7 +22,7 @@
 #include "precedent.h"
 
 LEX_STRUCT *LEX_STRUCTPTR;
-
+LEX_STRUCT *ARRAY_PARAM;          ///pole pre parametre funkcie
 int IF_ENABLE=0;                ///na pouzitie else v progcondition
 inf_array *POLE_ID_GLOBAL;   ///nekonecne pole ID pre globalnu
 inf_array *POLE_ID_LOCAL;   ///nekonecne pole ID pre lokalnu
@@ -31,10 +31,12 @@ inf_array *SUPPORT_POLE;  /// pomocna
 THash_table *GlobalnaTAB; ///globalna hashovacia tabulka
 THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
 
+
 int POLE_ID_INDEX=0;  ///Index Dalsieho zaciatku ID
 struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
+struct record *SUPPORT;   ///zaznam pre hashovaciu funkciu
 
-int IN_FUNCTION=0;    ///nachadzame sa vo funckii budeme naplnat Lokalnu tab symbolov
+    ///nachadzame sa vo funckii budeme naplnat Lokalnu tab symbolov
 
 
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
@@ -76,12 +78,14 @@ else if(token==BEGIN)
  ///program sa sklada z funkcii a programu
 else if(token == FUNCTION)
     {
-        hashtable_clear(LokalnaTAB);                                 ///pokazde vymaze tabulku symbolov pre kazdu funkciu
-        funkcia();                                                  /// pri chybe program skonci sam
+        hashtable_clear(LokalnaTAB);
+        free_array(POLE_ID_LOCAL->str);                              ///pokazde vymaze tabulku symbolov pre kazdu funkciu
+        funkcia();                                               /// pri chybe program skonci sam
+        strClear(ARRAY_PARAM);
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
-            ELEMENT->defined=false_hash;   ///nebola definova funckia*/
+            SUPPORT->defined=false_hash;   ///nebola definova funckia*/
             token=getnextToken(LEX_STRUCTPTR);
                 if(token==BODKOCIARKA)
                 {
@@ -94,11 +98,12 @@ else if(token == FUNCTION)
         }
         else if(token==BEGIN || token==VAR)
         {
-            ELEMENT->defined=true_hash;   ///funkcia je definovana
+            SUPPORT->defined=true_hash;
+            IN_FUNCTION=1;///funkcia je definovana
             if(token==VAR)
             {
-            IN_FUNCTION=1;
             declarelist();
+
             }
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
@@ -151,10 +156,19 @@ if(((LokalnaTAB=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
 exit(E_INTERNAL);
 
 
+if(((ARRAY_PARAM =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||      ///alkokujeme pole pre parametre funkcii
+    (Init_str(ARRAY_PARAM)==E_INTERNAL))
+exit(E_INTERNAL);
+
+
 
 if((ELEMENT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
 exit(E_INTERNAL);
 
+if((SUPPORT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
+exit(E_INTERNAL);
+
+IN_FUNCTION=0;
 
 int token=getnextToken(LEX_STRUCTPTR); ///nacitame prvy token
 if(token==E_LEXICAL)exit(E_LEXICAL);///pri chybe v lexikalnej analyze skonci
@@ -388,7 +402,9 @@ int command(int value)
               ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
-
+                        if(ELEMENT->id==FUNCTION_hash)
+                        exit(E_SEMANTIC_TYPE);
+                        Vysledok=ELEMENT->type;///V COM MAME OCAKAVAT VYSLEDOK
 
         token=getnextToken(LEX_STRUCTPTR);
         if(token==DVOJBODKA)
@@ -396,7 +412,9 @@ int command(int value)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==EQUAL)
             {
-				PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB);
+
+				PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB,ELEMENT);  ///Precedencna analyza
+				ELEMENT->defined=true_hash;
 				return SUCCESS;
             }else return ERRORRET(token);
 
@@ -433,7 +451,8 @@ int command(int value)
 
         ///dopisat
        IF_ENABLE=1;
-       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+       Vysledok=PODMIENKA;
+       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
 
 
 
@@ -445,7 +464,8 @@ int command(int value)
     ///WHILE CYKLUS + VNORENE WHILE CYKLY
     else if(value==WHILE)
     {
-        PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB);  //VYHODNOTI SA PODMIENKA + NACITA SA do
+        Vysledok=PODMIENKA;
+        PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB,ELEMENT);  //VYHODNOTI SA PODMIENKA + NACITA SA do
 
             if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
@@ -509,6 +529,9 @@ else if(value==WRITE)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
+
                 }
               token=getnextToken(LEX_STRUCTPTR);
               if(token==CIARKA)
@@ -540,11 +563,17 @@ else if(value==LENGTH)
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
                     ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+
                                                                               ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
+
+
+
                 }
 
             token=getnextToken(LEX_STRUCTPTR);
@@ -577,6 +606,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
 
                 token=getnextToken(LEX_STRUCTPTR);
@@ -597,6 +628,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=INTEGER_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
 
 
@@ -618,6 +651,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=INTEGER_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
                                    token=getnextToken(LEX_STRUCTPTR);
                                    if(token==RIGHT_ROUND)
@@ -652,6 +687,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
 
                     token=getnextToken(LEX_STRUCTPTR);
@@ -672,6 +709,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
 
                             token=getnextToken(LEX_STRUCTPTR);
@@ -703,6 +742,8 @@ else if(value==LENGTH)
                         exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                         exit(E_SEMANTIC_TYPE);
+                        else if(ELEMENT->defined!=true_hash)
+                            exit(E_SEMANTIC_OTHER);
                 }
               token=getnextToken(LEX_STRUCTPTR);
               if(token==RIGHT_ROUND)
@@ -751,6 +792,8 @@ Neterminal na kontrolu syntaxe deklaracie premennych
 
             }                                                                 ///dva krat definovany ten isty nazov
     }
+
+                       ///neni jej priradena hodnota
         if((token=getnextToken(LEX_STRUCTPTR))== DVOJBODKA)
            {
                         token=getnextToken(LEX_STRUCTPTR);
@@ -805,9 +848,9 @@ int funkcia()
             }
 
          }else
-        hashtable_add(GlobalnaTAB,FUNCTION,POLE_ID_GLOBAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
+        hashtable_add(GlobalnaTAB,FUNCTION_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
         ELEMENT=((hashtable_search(GlobalnaTAB,POLE_ID_GLOBAL->str+POLE_ID_INDEX)));     ///nastavime si aktualny ukazatel na nasu funkciu
-
+        SUPPORT=ELEMENT;///aby sme mohli pri parametroch s nim pracovat
 
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
@@ -823,13 +866,14 @@ int funkcia()
                      token = getnextToken(LEX_STRUCTPTR);
                         if (token == INTEGER || token  == BOOLEAN || token == STRING || token == REAL)
                         {
-                            ELEMENT->type=decodederSEM(token);   ///navratovy typ
+
+                        SUPPORT->type=decodederSEM(token);   ///navratovy typ
 
                          token = getnextToken(LEX_STRUCTPTR);
                             if(token==BODKOCIARKA)
                             {
-
-                                return SUCCESS;               ///hlavicka je OK
+                                return SUCCESS;
+                                                 ///hlavicka je OK
                             }else return ERRORRET(token);
 
                         }else return ERRORRET(token);
@@ -855,12 +899,29 @@ int fun_params()
         return token;
     else if(token == ID)
     {
+        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
+                                                                              ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+                                                                                                    ///Zistime ci uz nemame taku polozku
+        ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
+                                                                                        ///Vrati na ukazatel na prvek v hash table
+         if(ELEMENT==0)
+         {
+          hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
+          ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
+         }else
+           exit(E_SEMANTIC_UNDEF);
+
         token = getnextToken(LEX_STRUCTPTR);
         if(token == DVOJBODKA)
         {
             token = getnextToken(LEX_STRUCTPTR);
             if (token == INTEGER || token  == BOOLEAN || token == STRING || token == REAL)
             {
+                ELEMENT->type=decodederSEM(token);
+                addparam(token);
+
+                 ///Support je ukazatel na ID funkcie
+
                 token = getnextToken(LEX_STRUCTPTR);
                 if(token == BODKOCIARKA)
                 {
@@ -868,6 +929,13 @@ int fun_params()
                 }
                 else if(token == RIGHT_ROUND)
                 {
+                // if(SUPPORT->defined!=false_hash)                                ///ked hlavicka uz bola deklarovana nealokujeme
+               // {
+                    int newLength = length(ARRAY_PARAM->str);                           ///pridavame
+                    SUPPORT->params=malloc(sizeof(char)*(newLength+1));
+                //}
+                strcpy(SUPPORT->params,ARRAY_PARAM->str);              ///pridat kontrolu ze ze udana hlavicka je tototzna
+
                     return token;
                 }
                 else return ERRORRET(token); // po DTYPE nenasleduje ani zatvorka ani bodkociarka
@@ -895,6 +963,10 @@ int decodederSEM(int token)
         return STRING_hash;
     case REAL:
         return REAL_hash;
+    case REALo:
+        return REAL_hash;
+    case CONST:
+        return INTEGER_hash;
     case TRUE:
         return true_hash;
     case FALSE:
@@ -902,6 +974,26 @@ int decodederSEM(int token)
     }
 }
 
+///ulozenie parametrov do tabulky symbolov
+void addparam(token)
+{
+     switch(token)
+    {
+    case INTEGER :
+        AddChar_str(ARRAY_PARAM,'i');
+        return;
+    case BOOLEAN:
+        AddChar_str(ARRAY_PARAM,'b');
+        return;
+    case STRING:
+        AddChar_str(ARRAY_PARAM,'s');
+        return;
+    case REAL:
+        AddChar_str(ARRAY_PARAM,'r');
+        return;
+    }
+
+}
 
 
 

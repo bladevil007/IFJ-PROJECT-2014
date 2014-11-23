@@ -1,6 +1,9 @@
 
 int decodeSA(int);
 void initPrecedenceTABLE(); ///vytvori precedencnu tabulku
+int reduce(LEX_STRUCT*);
+int VysledokID(int,int);
+
 
 #define PT_LESS 80
 #define PT_GREATER 81

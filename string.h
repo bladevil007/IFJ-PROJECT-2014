@@ -22,7 +22,6 @@ int length;
 int mallocsize;
 }LEX_STRUCT;
 
-
 int Init_str(LEX_STRUCT *LEX_STRUCTPTR);
 
 void Free_str(LEX_STRUCT *LEX_STRUCTPTR);
