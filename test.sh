@@ -1,4 +1,3 @@
-#!/bin/bash
 make
 compile=false
 if [ $? -eq 0 ]
