@@ -431,8 +431,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
          }
                                                                                   ///jedna sa o konstantu overime ci jej hodnota moze byt prirade
          TOP_Stdin=getnextToken(LEX_STRUCTPTR);
-        checklex(TOP_Stdin);
-
+            checklex(TOP_Stdin);
           if(PODMIENKA_POD==BOOLEAN_hash)
           {
              if(TOP_Stdin ==PLUS || TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
@@ -457,6 +456,17 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
            stack_top(stackPSA,&TOP_Stack);
            TOP_Stdin=getnextToken(LEX_STRUCTPTR);
            checklex(TOP_Stdin);
+           if(PODMIENKA_POD==BOOLEAN_hash)
+          {
+             if(TOP_Stdin ==PLUS || TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
+               return ERRORRET(TOP_Stdin);
+          }
+          else
+          if(PODMIENKA_POD==STRING_hash)
+          {
+             if(TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
+               return ERRORRET(TOP_Stdin);
+          }
 
            return PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
      }
@@ -680,9 +690,9 @@ int VysledokID(int Vysledok,int id )
     case PODMIENKA:
          if(id!=PODMIENKA_POD)
          {
-             if((id==REAL_hash || id==INTEGER_hash) && (PODMIENKA_POD==REAL_hash || PODMIENKA_POD==INTEGER_hash))
+             /*if((id==REAL_hash || id==INTEGER_hash) && (PODMIENKA_POD==REAL_hash || PODMIENKA_POD==INTEGER_hash))
                 PODMIENKA_POD=REAL_hash;
-             else
+             else*/
                 exit(E_SEMANTIC_TYPE);
          }
     }
