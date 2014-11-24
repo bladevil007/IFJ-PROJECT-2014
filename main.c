@@ -43,8 +43,6 @@ SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
 
 
 
-
-
 fclose(source);
 return 0;
 }

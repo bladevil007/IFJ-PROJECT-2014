@@ -39,6 +39,7 @@ typedef struct
 } THash_table;
 
 //prototypy funkci:
+
 void stringtolower (char *key);
 THash_table *hashtable_init (unsigned size);
 unsigned int hash_function (const char *str, unsigned hashtable_size);
@@ -51,7 +52,7 @@ int length(char *s);
 
 
 
-
+/*
 char *copy(char *s, int i, int n);
 
 void failKMP(char *p, int pl, int *fail);
@@ -65,4 +66,4 @@ void siftDown(char *s, int left, int right);
 void heapSort(char *s, int n);
 
 char *sort(char *s);
-
+*/

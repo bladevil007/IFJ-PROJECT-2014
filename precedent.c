@@ -13,20 +13,23 @@
 int PrecedenceSA(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
 int PrecedentAnal(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
 int lookforElement(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
+int concate(LEX_STRUCT*,int ,THash_table *,THash_table*,struct record *);
+int lookforElement(LEX_STRUCT *,int ,THash_table *,THash_table*,struct record *);
 int recorderSEM(char);
 
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
 TStack *Helper;  ///na expresion
-int term ;
-int TOP_Stack;
-int TOP_Stdin;
-int concateT;
+int term ;        ///token
+int TOP_Stack;    ///vrchol zasobnika
+int TOP_Stdin;    ///vrchol vstupneho retazca
+int concateT;    ///token
 int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
-int PSA_Stalker;
+int PSA_Stalker;    ///polozka v PSA Table
 
 int PrecedenceTABLE[13][13];
 
+///Pravidla PSA
 static int rule0[3]={EXPRESION,PSA_PLUS,EXPRESION};/// pravidlo E->E+E
 static int rule1[3]={EXPRESION,PSA_MINUS,EXPRESION};///pravidlo E->E-E
 static int rule2[3]={EXPRESION,PSA_MULT,EXPRESION};///pravidlo E->E*E
@@ -58,7 +61,7 @@ int checklex(int token)
  return ((token==E_LEXICAL) ? ERRORRET(token) : E_LEXICAL);
 }
 
-
+///Inicializacia PSA
 void initPrecedenceTABLE()
 {
 PrecedenceTABLE[PSA_PLUS][PSA_PLUS]=PT_GREATER;
@@ -142,7 +145,7 @@ PrecedenceTABLE[PSA_LEFT][PSA_LESS]=PT_LESS;
 PrecedenceTABLE[PSA_LEFT][PSA_GREATER]=PT_LESS;
 PrecedenceTABLE[PSA_LEFT][PSA_LESSEQ]=PT_LESS;
 PrecedenceTABLE[PSA_LEFT][PSA_GREATEREQ]=PT_LESS;
-PrecedenceTABLE[PSA_LEFT][PSA_DOLAR]=NULL;
+PrecedenceTABLE[PSA_LEFT][PSA_DOLAR]=0;
 PrecedenceTABLE[PSA_LEFT][PSA_NOTEQUAL]=PT_LESS;
 
 PrecedenceTABLE[PSA_RIGHT][PSA_PLUS]=PT_GREATER;
@@ -244,7 +247,10 @@ PrecedenceTABLE[PSA_NOTEQUAL][PSA_DOLAR]=PT_GREATER;
 PrecedenceTABLE[PSA_NOTEQUAL][PSA_NOTEQUAL]=0;
 
 }
+
+///Kontroluje  koniec prikazu
 int CheckEND(int end,int type)
+
 {
  switch (end)
  {
@@ -258,16 +264,14 @@ int CheckEND(int end,int type)
         if(type==WHILE)
         return 0;
        }
-
    case BODKOCIARKA:
        {
-
-
         if(type==ID)
 		{
 			ID_ENABLE=1;
 			return 0;
 		}
+       }
 	case END:
 	{
 		if(type==ID)
@@ -278,10 +282,11 @@ int CheckEND(int end,int type)
 	}
 
 
-       }
+
  }
        return ERRORRET(end);
 }
+
 ///Funkcia dekoduje jednotlive tokeny na indexy do PSA tabulky
 int decodeSA(int token)
 {
@@ -298,6 +303,8 @@ case END:
 case THEN:
    return PSA_DOLAR;
 case CONST:
+    return PSA_ID;
+case CONST_STRING:
     return PSA_ID;
 case REALo:
     return PSA_ID;
@@ -330,12 +337,10 @@ default:
 }
 }
 
+///Rekurzivna funkcia redukuje vyraz pomocou rekurze
 int reduce(LEX_STRUCT *LEX_STRUCTPTR)
 {
 	int i = 0;
-
-
-
 
 	while(term != ZARAZKA && term != PSA_DOLAR)
 	{
@@ -360,32 +365,30 @@ int reduce(LEX_STRUCT *LEX_STRUCTPTR)
 		scan[2] = 0;
 	}
 
-
-
 	if(Comparerule(scan) != 0){
 
 		return ERRORRET(TOP_Stdin);
 	}
 
 	PSA_Stalker = PrecedenceTABLE[term][decodeSA(TOP_Stdin)];
-
-
-
-	if(PSA_Stalker == NULL)
+	if(PSA_Stalker == 0)
 		exit(E_SYNTAX);
 	else if(PSA_Stalker == PT_GREATER)
 		return reduce(LEX_STRUCTPTR);
 	else if(PSA_Stalker == PT_LESS)
-        return;
+        return 0;
     else if (PSA_Stalker==PT_OK)
         return SUCCESS;
 }
 
 
+/** \brief Funckia prevadza  PSA
 
+ * \return Succcess ked je top_stdin $ a top_stack $
+ *
+ */
 int PrecedentAnal(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-
 if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
 {
     CheckEND(TOP_Stdin,type);
@@ -395,7 +398,7 @@ if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
 PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
 
-    if(PSA_Stalker!=NULL)
+    if(PSA_Stalker!=0)
     {
      if(PSA_Stalker==PT_LESS)
      {
@@ -403,20 +406,18 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
          stack_push(stackPSA,ZARAZKA);
          stack_push(stackPSA,decodeSA(TOP_Stdin));
          stack_top(stackPSA,&TOP_Stack);
-              if(TOP_Stdin==ID)                                   ///semanticka analyza podvyrazov
+              if(TOP_Stdin==ID)
          {
-
-
              ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
              if(PODMIENKA_POD==0)
              PODMIENKA_POD=ELEMENT->type;
              VysledokID(Vysledok,ELEMENT->type);
              if(ELEMENT->defined!=true_hash)
                 exit(E_SEMANTIC_OTHER);
-
          }
          else
          {
+
             if(PODMIENKA_POD==0)
              PODMIENKA_POD=decodederSEM(TOP_Stdin);
              VysledokID(Vysledok,decodederSEM(TOP_Stdin));
@@ -444,10 +445,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
      }
     }else
 
-
     return ERRORRET(TOP_Stdin);
-
-
 }
 
 
@@ -464,9 +462,6 @@ initPrecedenceTABLE();
    checklex(TOP_Stdin);
     if(TOP_Stdin!=ID && TOP_Stdin!=LEFT_ROUND && TOP_Stdin!=CONST && TOP_Stdin!=CONST_STRING && TOP_Stdin!=TRUE && TOP_Stdin!=FALSE && TOP_Stdin!=REALo)
         return ERRORRET(TOP_Stdin);
-
-
-
 ///KONKATENACIA STRINGOV
 ///********************
 ///Kontrolujeme ci sa nejedna o priradenie funkcie alebo CONST_string
@@ -477,7 +472,8 @@ if(TOP_Stdin==ID && type==ID)
                     ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 
-                    if(ELEMENT->id==FUNCTION_hash){
+                    if(ELEMENT->id==FUNCTION_hash)
+                    {
 
 
                             if(ELEMENT->defined==true_hash)
@@ -491,7 +487,8 @@ if(TOP_Stdin==ID && type==ID)
                                     int i=0;
                                     while( i< length(SUPP->params))
                                     {
-                                        if(i>0){
+                                        if(i>0)
+                                        {
                                              TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                                if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin!=CIARKA)
                                                exit(E_SEMANTIC_TYPE);
@@ -501,12 +498,13 @@ if(TOP_Stdin==ID && type==ID)
                                         checklex(TOP_Stdin);
 
 
-                                        if(TOP_Stdin==ID){
-                                        ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                                        if(TOP_Stdin==ID)
+                                        {
+                                            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
-                                          if(ELEMENT->type != SUPP->params[i])
-                                            exit(E_SEMANTIC_TYPE);
-                                         if(ELEMENT->defined!=true_hash)
+                                            if(ELEMENT->type != SUPP->params[i])
+                                                exit(E_SEMANTIC_TYPE);
+                                            if(ELEMENT->defined!=true_hash)
                                                 exit(E_SEMANTIC_OTHER);
                                         }
 
@@ -516,8 +514,6 @@ if(TOP_Stdin==ID && type==ID)
                                             {
                                                 TOP_Stdin=BOOLEAN;
                                             }
-
-
                                             if(TOP_Stdin!=recorderSEM(SUPP->params[i]))
                                             {
                                                 exit(E_SEMANTIC_TYPE);
@@ -531,11 +527,12 @@ if(TOP_Stdin==ID && type==ID)
                                     TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                     if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin==CIARKA)
                                     {
+                                        VysledokID(Vysledok,ELEMENT->type);            ///SKONTROLUJ NAVRATOVY TYP FUNKCIE
+
                                         if(TOP_Stdin==CIARKA)
                                         {
                                             exit(E_SEMANTIC_TYPE);
                                         }
-
 
                                         TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                         if(decodeSA(TOP_Stdin)==PSA_DOLAR)
@@ -553,8 +550,7 @@ if(TOP_Stdin==ID && type==ID)
                     else if(ELEMENT->type==STRING_hash)                 ///semanticka kontrola pri konkatenaci
                     {
                       VysledokID(Vysledok,ELEMENT->type);
-
-                      concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                      concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);   ///zavolaj konkatenaciu retazcov
 
                     }
                     else if(ELEMENT->type==BOOLEAN_hash)
@@ -576,19 +572,18 @@ if(TOP_Stdin==ID && type==ID)
 else if(TOP_Stdin==CONST_STRING && type==ID)
 {
     VysledokID(Vysledok,STRING_hash);
-    concate(LEX_STRUCTPTR,type);
+    concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 }
 else if (TOP_Stdin==TRUE || TOP_Stdin==FALSE)
 {
    VysledokID(Vysledok,BOOLEAN_hash);
-                      int token=getnextToken(LEX_STRUCTPTR);
-                      if(decodeSA(token)==PSA_DOLAR)
-                       {
-                           CheckEND(token,type);
-                            return SUCCESS;
-                       }
-
+   int token=getnextToken(LEX_STRUCTPTR);
+   if(decodeSA(token)==PSA_DOLAR)
+   {
+        CheckEND(token,type);
+        return SUCCESS;
+   }
 }
 ///***********************
 else
@@ -619,12 +614,12 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
            VysledokID(Vysledok,ELEMENT->type);
            if(ELEMENT->defined!=true_hash)
                     exit(E_SEMANTIC_OTHER);
-
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
        {
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+
 
        }
             else return ERRORRET(concateT);
@@ -637,7 +632,6 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
     else
         return ERRORRET(concateT);
 }
-
 
 ////KONTROLA PRE PRIRADENIE HODNOT
 int VysledokID(int Vysledok,int id )
@@ -669,32 +663,32 @@ int VysledokID(int Vysledok,int id )
 
    return 0;
 }
-
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
-int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
+ int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
 
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
-                    ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                        ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
                     {
-                    ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
+                        ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
                     }
                     if(ELEMENT==0)
                     {
-                       ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                        ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                         if(ELEMENT!=0)
                         {
                             if(ELEMENT->id==FUNCTION_hash)
                                 return ELEMENT;
                              else exit(E_SEMANTIC_UNDEF);
                         }else
-                        exit(E_SEMANTIC_UNDEF);
+                            exit(E_SEMANTIC_UNDEF);
 
                     }
 return ELEMENT;
 }
 
+///ZISTUJEME Z POLA PARAMETROV FUNCKIE JEDNOTLIVE TYPY
 int recorderSEM(char c)
 {
     switch(c){
@@ -710,7 +704,7 @@ case 's':
 default:
     exit(E_SEMANTIC_TYPE);
     }
-    return;
+    return 0;
 }
 
 

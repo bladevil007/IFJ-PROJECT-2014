@@ -132,7 +132,7 @@ int length(char *s) {
 }
 
 /* substring copy */
-char *copy(char *s, int i, int n) {
+/*char *copy(char *s, int i, int n) {
 
     char *r;
     r = (char) malloc((n+1)*sizeof(char));
@@ -146,7 +146,7 @@ char *copy(char *s, int i, int n) {
 }
 
 /* FAIL vector for KMP algorithm */
-void failKMP(char *p, int pl, int *fail) {
+/*void failKMP(char *p, int pl, int *fail) {
 
 	int k, r;
 
@@ -209,7 +209,7 @@ void failKMP(char *p, int pl, int *fail) {
 }
 */
 /* sift down procedure for heap sort algorithm */
-void siftDown(char *s, int left, int right) {
+/*void siftDown(char *s, int left, int right) {
 
 	int i, j;
 	char tmp;
@@ -239,13 +239,13 @@ void siftDown(char *s, int left, int right) {
 }
 
 /* HeapSort algorithm */
-void heapSort(char *s, int n) {
+/*void heapSort(char *s, int n) {
 
 	int left, right;
 	char tmp;
 
 	/* heapify */
-	for (left = (n - 2)/2; left >= 0; left--) {
+	/*for (left = (n - 2)/2; left >= 0; left--) {
 
 		siftDown(s, left, n);
 	}
@@ -261,7 +261,7 @@ void heapSort(char *s, int n) {
 }
 
 /* string sort */
-char *sort(char *s) {
+/*char *sort(char *s) {
 
 	int sl = length(s);
 	char *result;
@@ -272,4 +272,4 @@ char *sort(char *s) {
 
 	return result;
 }
-
+*/
