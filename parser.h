@@ -1,4 +1,5 @@
 
+#define PODMIENKA 110
 
 int SyntacticAnalys ();
 int ERRORRET(int);
@@ -15,5 +16,8 @@ int Libraryfunction(int);
 int funkcia();
 int decodederSEM(int);
 int ID_ENABLE;
+int Vysledok;  ///aky vysledok ma cakat pri priradeni do ID
+int IN_FUNCTION; ///nachadzame sa vo funckii budeme naplnat Lokalnu tab symbolov
+void addparam(int);
 
 

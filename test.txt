@@ -33,7 +33,7 @@ vysl := vysl*a;
 a := a - 1
 
 end;
-write('Vysledekje:'vysl,''#10'')
+write('Vysledekje:',vysl,''#10'')
 
 end
 
