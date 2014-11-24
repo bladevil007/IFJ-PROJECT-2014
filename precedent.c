@@ -563,7 +563,7 @@ if(TOP_Stdin==ID && type==ID)
                        {
                            CheckEND(token,type);
                             return SUCCESS;
-                       }
+                       }else return ERRORRET(token);
                     }
                     else
                     PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);               ///jedna sa o normalne priradenie
@@ -583,20 +583,17 @@ else if (TOP_Stdin==TRUE || TOP_Stdin==FALSE)
    {
         CheckEND(token,type);
         return SUCCESS;
-   }
+   }else return ERRORRET(token);
 }
 ///***********************
 else
 {
 PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
 }
 PODMIENKA_POD=0;
 stack_free(stackPSA);
   return SUCCESS;
 }
-
-
 
 ///FUNKCIA sa stara o konkatenaciu 2 retazcov ID:='PR'+'D'
 int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)

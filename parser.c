@@ -676,8 +676,10 @@ else if(value==COPY)
                         if(token==CIARKA)
                         {
                             token=getnextToken(LEX_STRUCTPTR);
-                            if(token==ID || token== CONST)
+                            if(token==ID || token== CONST || token==REALo || token==BOOLEAN)
                             {
+                                if(token==REALo || token==BOOLEAN)
+                                exit(E_SEMANTIC_TYPE);
                                 if(token==ID)
                                 {
                                 ///Kontrola ze vsetky vstupne hodnoty su INT
@@ -694,8 +696,10 @@ else if(value==COPY)
                                 if(token==CIARKA)
                                 {
                                     token=getnextToken(LEX_STRUCTPTR);
-                                    if(token==ID || token==CONST )
+                                    if(token==ID || token==CONST || token==REALo || token==BOOLEAN )
                                     {
+                                            if(token==REALo || token==BOOLEAN)
+                                                exit(E_SEMANTIC_TYPE);
                                             if(token==ID)
                                             {
                                             ///Kontrola ze vsetky vstupne hodnoty su INT
