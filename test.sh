@@ -14,14 +14,15 @@ fi
 
 if [ $compile = true ]
 then
-  for file in files/*.f 
+  for file in files/*
   do
     expected=$(head -n 1 $file | awk '{print $2}')
     ./project $file 
-    if [ "$?" = "$expected" ]; then
-        echo -e "Test file: $file  	$?	\e[32m OK \e[39m"
+    ret=$?
+    if [ "$ret" = "$expected" ]; then
+        echo -e "Test file: $file  	$ret	\e[32m OK \e[39m"
       else
-        echo -e "Test file: $file	$?	\e[31m NOK \e[39m"
+        echo -e "Test file: $file	$ret	\e[31m NOK \e[39m"
     fi  
   done
 fi
