@@ -83,6 +83,9 @@ int program(int token)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            if(SUPPORT->defined==true_hash)
+                exit(E_SEMANTIC_UNDEF);
+
             IN_FUNCTION=0;
             if(SUPPORT->doubledefinition==1)                        ///flag aby neboli definovane dve hlavicky
                 exit(E_SEMANTIC_UNDEF);
@@ -149,6 +152,8 @@ int program(int token)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            if(SUPPORT->defined==true_hash)
+                exit(E_SEMANTIC_UNDEF);
             IN_FUNCTION=0;
                if(SUPPORT->doubledefinition==1)                         ///REDEFINICIA HLAVICKY
                     exit(E_SEMANTIC_UNDEF);
