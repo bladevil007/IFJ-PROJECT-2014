@@ -394,6 +394,10 @@ int reduce(LEX_STRUCT *LEX_STRUCTPTR)
  */
 int PrecedentAnal(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
+   if(TOP_Stdin==LESS || TOP_Stdin==GREATER || TOP_Stdin==LESSEQUAL || TOP_Stdin==GREATEREQUAL || TOP_Stdin==NOTEQUAL)
+    {
+
+    }
 
 if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
 {
@@ -680,10 +684,13 @@ int VysledokID(int Vysledok,int id )
 
     case PODMIENKA:
          if(id!=PODMIENKA_POD)
-            exit(E_SEMANTIC_TYPE);
-            break;
+         {
+             if((id==REAL_hash || id==INTEGER_hash) && (PODMIENKA_POD==REAL_hash || PODMIENKA_POD==INTEGER_hash))
+                PODMIENKA_POD=REAL_hash;
+             else
+                exit(E_SEMANTIC_TYPE);
+         }
     }
-
    return 0;
 }
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
