@@ -492,9 +492,7 @@ if(TOP_Stdin==ID && type==ID)
 
                     if(ELEMENT->id==FUNCTION_hash)
                     {
-
-
-                            if(ELEMENT->defined==true_hash)
+                            if(ELEMENT->defined!=3)
                             {
 
                                 struct record *SUPP=ELEMENT;
@@ -502,15 +500,23 @@ if(TOP_Stdin==ID && type==ID)
                                 TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                 if(TOP_Stdin==LEFT_ROUND)
                                 {
+
+
                                     int i=0;
-                                    while( i< length(SUPP->params))
+
+                                    if(SUPP->params!=NULL)
                                     {
+                                        while( i< length(SUPP->params))
+                                    {
+
                                         if(i>0)
                                         {
                                              TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                                if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin!=CIARKA)
                                                exit(E_SEMANTIC_TYPE);
                                         }
+
+
 
                                         TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                         checklex(TOP_Stdin);
@@ -540,6 +546,7 @@ if(TOP_Stdin==ID && type==ID)
                                         }else return ERRORRET(TOP_Stdin);
 
                                         i++;
+                                    }
                                     }
 
                                     TOP_Stdin=getnextToken(LEX_STRUCTPTR);
