@@ -1016,8 +1016,7 @@ int fun_params()
          }else
            exit(E_SEMANTIC_UNDEF);
 
-
-
+         ELEMENT->defined=true_hash;             ///premenna pride jej zavolanim
 
         token = getnextToken(LEX_STRUCTPTR);
         if(token == DVOJBODKA)
