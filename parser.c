@@ -37,6 +37,7 @@ int FUNCTION_ENABLE=0;        ///Moze nasledovat telo funkcie
 int POLE_ID_INDEX=0;        ///Index Dalsieho zaciatku ID
 struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
 struct record *SUPPORT;   ///zaznam pre hashovaciu funkciu
+int CHECK_FUN=0;
 
 
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
@@ -83,6 +84,8 @@ int program(int token)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            CHECK_FUN++;
+
             if(SUPPORT->defined==true_hash)
                 exit(E_SEMANTIC_UNDEF);
 
@@ -135,6 +138,8 @@ int program(int token)
 ///program obsahuje len telo hlavneho programu
     else if(token==BEGIN)
     {
+        if(CHECK_FUN!=0)                                                ///POCET HLAVICIEK SA ROVNA POCTU FUNKCII
+            exit(E_SEMANTIC_UNDEF);
         FUNCTION_ENABLE=1;
         token=prog();
     }
@@ -152,6 +157,7 @@ int program(int token)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            CHECK_FUN++;
             if(SUPPORT->defined==true_hash)
                 exit(E_SEMANTIC_UNDEF);
             IN_FUNCTION=0;
@@ -175,7 +181,6 @@ int program(int token)
         }
         else if(token==BEGIN || token==VAR)
         {
-
                 if(SUPPORT->defined==true_hash)
                     exit(E_SEMANTIC_UNDEF);
 
@@ -913,6 +918,9 @@ int funkcia()
                 ELEMENT->doubledefinition=0;
                 ELEMENT->defined=3;
             }
+            else
+                CHECK_FUN--;
+
             ELEMENT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
             SUPPORT=ELEMENT;
 

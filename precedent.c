@@ -27,6 +27,7 @@ int concateT;    ///token
 int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
 int PSA_Stalker;    ///polozka v PSA Table
 
+
 int PrecedenceTABLE[13][13];
 
 ///Pravidla PSA
