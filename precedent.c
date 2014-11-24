@@ -269,16 +269,16 @@ int CheckEND(int end,int type)
        {
         if(type==ID)
 		{
-			ID_ENABLE=1;
-			return 0;
+		ID_ENABLE=1;
+		return 0;
 		}
        }
 	case END:
 	{
 		if(type==ID)
 		{
-            ID_ENABLE = 2;
-			return 0;
+            	ID_ENABLE = 2;
+		return 0;
 		}
 	}
 
@@ -394,11 +394,6 @@ int reduce(LEX_STRUCT *LEX_STRUCTPTR)
  */
 int PrecedentAnal(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-   if(TOP_Stdin==LESS || TOP_Stdin==GREATER || TOP_Stdin==LESSEQUAL || TOP_Stdin==GREATEREQUAL || TOP_Stdin==NOTEQUAL)
-    {
-
-    }
-
 if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
 {
     CheckEND(TOP_Stdin,type);
