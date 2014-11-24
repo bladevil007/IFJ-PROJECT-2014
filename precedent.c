@@ -13,7 +13,7 @@
 int PrecedenceSA(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
 int PrecedentAnal(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
 int lookforElement(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
-
+int recorderSEM(char);
 
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
@@ -399,6 +399,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
     {
      if(PSA_Stalker==PT_LESS)
      {
+
          stack_push(stackPSA,ZARAZKA);
          stack_push(stackPSA,decodeSA(TOP_Stdin));
          stack_top(stackPSA,&TOP_Stack);
@@ -412,9 +413,16 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              VysledokID(Vysledok,ELEMENT->type);
              if(ELEMENT->defined!=true_hash)
                 exit(E_SEMANTIC_OTHER);
+
          }
          else
-            VysledokID(Vysledok,decodederSEM(TOP_Stdin));                ///jedna sa o konstantu overime ci jej hodnota moze byt priradena
+         {
+            if(PODMIENKA_POD==0)
+             PODMIENKA_POD=decodederSEM(TOP_Stdin);
+             VysledokID(Vysledok,decodederSEM(TOP_Stdin));
+         }
+
+                           ///jedna sa o konstantu overime ci jej hodnota moze byt priraden
 
          TOP_Stdin=getnextToken(LEX_STRUCTPTR);
         checklex(TOP_Stdin);
@@ -467,11 +475,72 @@ if(TOP_Stdin==ID && type==ID)
 
                     if(ELEMENT->id==FUNCTION_hash){
 
+
                             if(ELEMENT->defined==true_hash)
                             {
-                                //printf("TU SOM %s ",ELEMENT->params);
-                                                                                                                 ///Priradenie funkci
-                                  exit(8);                                                                  ///dorobit priradovanie funkcie
+                                struct record *SUPP=ELEMENT;
+
+                                TOP_Stdin=getnextToken(LEX_STRUCTPTR);
+                                if(TOP_Stdin==LEFT_ROUND)
+                                {
+                                    int i=0;
+                                    while( i< length(SUPP->params))
+                                    {
+                                        if(i>0){
+                                             TOP_Stdin=getnextToken(LEX_STRUCTPTR);
+                                               if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin!=CIARKA)
+                                               exit(E_SEMANTIC_TYPE);
+                                        }
+
+                                        TOP_Stdin=getnextToken(LEX_STRUCTPTR);
+                                        checklex(TOP_Stdin);
+
+
+                                        if(TOP_Stdin==ID){
+                                        ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+
+                                          if(ELEMENT->type != SUPP->params[i])
+                                            exit(E_SEMANTIC_TYPE);
+                                         if(ELEMENT->defined!=true_hash)
+                                                exit(E_SEMANTIC_OTHER);
+                                        }
+
+                                        else if(TOP_Stdin == CONST || TOP_Stdin==REALo || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING)
+                                        {
+                                            if(TOP_Stdin==TRUE || TOP_Stdin==FALSE)
+                                            {
+                                                TOP_Stdin=BOOLEAN;
+                                            }
+
+
+                                            if(TOP_Stdin!=recorderSEM(SUPP->params[i]))
+                                            {
+                                                exit(E_SEMANTIC_TYPE);
+                                            }
+
+                                        }else return ERRORRET(TOP_Stdin);
+
+                                        i++;
+                                    }
+
+                                    TOP_Stdin=getnextToken(LEX_STRUCTPTR);
+                                    if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin==CIARKA)
+                                    {
+                                        if(TOP_Stdin==CIARKA)
+                                        {
+                                            exit(E_SEMANTIC_TYPE);
+                                        }
+
+
+                                        TOP_Stdin=getnextToken(LEX_STRUCTPTR);
+                                        if(decodeSA(TOP_Stdin)==PSA_DOLAR)
+                                            return SUCCESS;
+                                        else return ERRORRET(TOP_Stdin);
+
+                                    }else return ERRORRET(TOP_Stdin);
+
+
+                                }else return ERRORRET(TOP_Stdin);                                                                ///dorobit priradovanie funkcie
 
                             }
                             else exit(E_SEMANTIC_UNDEF);
@@ -504,22 +573,13 @@ else if(TOP_Stdin==CONST_STRING && type==ID)
     VysledokID(Vysledok,STRING_hash);
     concate(LEX_STRUCTPTR,type);
 
-}else if(TOP_Stdin==TRUE || TOP_Stdin==FALSE)
-{
-   VysledokID(Vysledok,ELEMENT->type);
-                      int token=getnextToken(LEX_STRUCTPTR);
-                      if(decodeSA(token)==PSA_DOLAR)
-                       {
-                           CheckEND(token,type);
-                            return SUCCESS;
-                       }
 }
 ///***********************
 else
 {
 PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-}
 
+}
 
 stack_free(stackPSA);
   return SUCCESS;
@@ -608,7 +668,23 @@ int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,T
 return ELEMENT;
 }
 
+int recorderSEM(char c)
+{
+    switch(c){
 
+case 'i':
+    return CONST;
+case 'b':
+    return BOOLEAN;
+case 'r':
+    return REALo;
+case 's':
+    return CONST_STRING;
+default:
+    exit(E_SEMANTIC_TYPE);
+    }
+    return;
+}
 
 
 

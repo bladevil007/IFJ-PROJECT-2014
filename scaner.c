@@ -122,7 +122,7 @@ else
 
 
 ///ODSTRANENIE KOMENTOV
-if(c=='{' )                 //komenta  printf("tu som ");r zacina zlozenou zatvorkou
+if(c=='{' && state==0)                 //komenta  printf("tu som ");r zacina zlozenou zatvorkou
     state=KOMENT;
 if ((state==KOMENT) && (c=='}'))
     state=0;
@@ -344,11 +344,11 @@ else
 if((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))&& (state==0))
 {
 state=STRING;
+
 }
 if(state==STRING)
 {
 if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c <='9')))
-
     AddChar_str(LEX_STRUCTPTR,c);
 
     else
@@ -387,12 +387,13 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
          }
      }
     }
+
     if (c==EOF)
     {
     return ID;
     }
     else{
-   fseek(source,ftell(source)-1,SEEK_SET);
+    fseek(source,ftell(source)-1,SEEK_SET);
     return ID;}
     }
 
