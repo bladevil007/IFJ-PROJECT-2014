@@ -422,7 +422,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              if(ELEMENT->defined!=true_hash)
                 exit(E_SEMANTIC_TYPE);
          }
-         else
+         else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo )
          {
             if(PODMIENKA_POD==0){
              PODMIENKA_POD=decodederSEM(TOP_Stdin);
