@@ -278,6 +278,11 @@ token = getnextToken(LEX_STRUCTPTR);
 ///vstavane funkcie copy,length,find,sort + ostatne mozne prikazy
     switch(token)
     {
+        case BEGIN:
+        {
+          token=progcondition();
+          break;
+        }
         case ID:
         case WHILE:
         case IF:
@@ -340,6 +345,11 @@ token = getnextToken(LEX_STRUCTPTR);
   ///vstavane funkcie copy,length,find,sort + ostatne mozne prikazy
     switch(token)
     {
+        case BEGIN:
+        {
+          token=progcondition();
+          break;
+        }
         case ID:
         case WHILE:
         case IF:
@@ -393,6 +403,11 @@ token = getnextToken(LEX_STRUCTPTR);
 ///vstavane funkcie copy,length,find,sort+dalsie
     switch(token)
     {
+        case BEGIN:
+        {
+          token=progcondition();
+          break;
+        }
         case ID:
         case WHILE:
         case IF:
@@ -516,6 +531,7 @@ int command(int value)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==ID)
             {
+
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                         ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
@@ -602,7 +618,7 @@ if(value==WRITE)
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_OTHER);
+                            exit(E_SEMANTIC_TYPE);
 
                         }
               token=getnextToken(LEX_STRUCTPTR);
@@ -638,7 +654,7 @@ else if(value==LENGTH)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_OTHER);
+                            exit(E_SEMANTIC_TYPE);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -669,7 +685,7 @@ else if(value==COPY)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_OTHER);
+                            exit(E_SEMANTIC_TYPE);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -690,7 +706,7 @@ else if(value==COPY)
                                 else if(ELEMENT->type!=INTEGER_hash)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
-                                    exit(E_SEMANTIC_OTHER);
+                                    exit(E_SEMANTIC_TYPE);
                                 }
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==CIARKA)
@@ -710,7 +726,7 @@ else if(value==COPY)
                                             else if(ELEMENT->type!=INTEGER_hash)
                                                 exit(E_SEMANTIC_TYPE);
                                             else if(ELEMENT->defined!=true_hash)
-                                                exit(E_SEMANTIC_OTHER);
+                                                exit(E_SEMANTIC_TYPE);
                                             }
                                             token=getnextToken(LEX_STRUCTPTR);
                                             if(token==RIGHT_ROUND)
@@ -743,7 +759,7 @@ else if(value==FIND)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_OTHER);
+                            exit(E_SEMANTIC_TYPE);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -762,7 +778,7 @@ else if(value==FIND)
                                 else if(ELEMENT->type!=STRING_hash)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
-                                    exit(E_SEMANTIC_OTHER);
+                                    exit(E_SEMANTIC_TYPE);
                                 }
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==RIGHT_ROUND)
@@ -791,7 +807,7 @@ else if(value==SORT)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_OTHER);
+                            exit(E_SEMANTIC_TYPE);
                 }
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
@@ -918,7 +934,7 @@ int funkcia()
                         else if(SUPPORT->defined==false_hash)
                         {
                             if(SUPPORT->type!=decodederSEM(token))
-                                exit(E_SEMANTIC_OTHER);
+                                exit(E_SEMANTIC_TYPE);
                         }
                         SUPPORT->type=decodederSEM(token);
 
@@ -997,7 +1013,7 @@ int fun_params()
                 {
                     int ok=strcmp(SUPPORT->params,ARRAY_PARAM->str);
                     if(ok!=0)
-                        exit(E_SEMANTIC_OTHER);
+                        exit(E_SEMANTIC_TYPE);
                     ///ROZNE POLIA
                 }
                     ///pridat kontrolu ze ze udana hlavicka je tototzna
@@ -1034,9 +1050,11 @@ int decodederSEM(int token)
     case CONST:
         return INTEGER_hash;
     case TRUE:
-        return true_hash;
+        return BOOLEAN_hash;
     case FALSE:
-        return false_hash;
+        return BOOLEAN_hash;
+    case CONST_STRING:
+        return STRING_hash;
     }
 }
 

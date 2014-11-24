@@ -285,7 +285,9 @@ if(state==CONST){
  }
 
 else if(c=='.')
+{
 state=DOT;
+}
 
 else if((c=='e') || (c=='E'))
 state=REAL;
