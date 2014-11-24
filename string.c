@@ -109,6 +109,11 @@ void free_array(inf_array *a)
 }
 
 
+
+
+
+
+
 /** \brief  Funkcia pridava string do nekonecneho pola
             Navratova hodnota je index v poli, na ktorom zacina pridany string
 */

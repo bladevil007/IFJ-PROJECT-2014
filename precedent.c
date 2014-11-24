@@ -422,7 +422,7 @@ PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              VysledokID(Vysledok,decodederSEM(TOP_Stdin));
          }
 
-                           ///jedna sa o konstantu overime ci jej hodnota moze byt priraden
+                                                                                    ///jedna sa o konstantu overime ci jej hodnota moze byt priraden
 
          TOP_Stdin=getnextToken(LEX_STRUCTPTR);
         checklex(TOP_Stdin);
@@ -466,18 +466,23 @@ initPrecedenceTABLE();
         return ERRORRET(TOP_Stdin);
 
 
+
 ///KONKATENACIA STRINGOV
 ///********************
 ///Kontrolujeme ci sa nejedna o priradenie funkcie alebo CONST_string
 if(TOP_Stdin==ID && type==ID)
 {
+
+
                     ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+
 
                     if(ELEMENT->id==FUNCTION_hash){
 
 
                             if(ELEMENT->defined==true_hash)
                             {
+
                                 struct record *SUPP=ELEMENT;
 
                                 TOP_Stdin=getnextToken(LEX_STRUCTPTR);
@@ -580,7 +585,7 @@ else
 PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 }
-
+PODMIENKA_POD=0;
 stack_free(stackPSA);
   return SUCCESS;
 }
@@ -657,6 +662,7 @@ int VysledokID(int Vysledok,int id )
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
 int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
+
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
@@ -664,7 +670,17 @@ int lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,T
                     ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
                     }
                     if(ELEMENT==0)
+                    {
+                       ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                        if(ELEMENT!=0)
+                        {
+                            if(ELEMENT->id==FUNCTION_hash)
+                                return ELEMENT;
+                             else exit(E_SEMANTIC_UNDEF);
+                        }else
                         exit(E_SEMANTIC_UNDEF);
+
+                    }
 return ELEMENT;
 }
 

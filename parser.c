@@ -71,7 +71,8 @@ int program(int token)
     {
         FUNCTION_ENABLE=1;
         hashtable_clear(LokalnaTAB);                               ///vymazeme aj pole lokalnych identifikatorov
-        free_array(POLE_ID_LOCAL->str);
+        POLE_ID_LOCAL->length=0;
+
         IN_FUNCTION=1;                      ///pokazde vymaze tabulku symbolov pre kazdu funkciu
         funkcia();                                                                    /// pri chybe program skonci sam
         strClear(ARRAY_PARAM);                                     ///vymazeme  pomocne pole pre parametre funkcie
@@ -139,7 +140,7 @@ else if(token == FUNCTION)
     {
         FUNCTION_ENABLE=1;
         hashtable_clear(LokalnaTAB);                               ///vymazeme aj pole lokalnych identifikatorov
-        free_array(POLE_ID_LOCAL->str);
+        POLE_ID_LOCAL->length=0;
         IN_FUNCTION=1;                      ///pokazde vymaze tabulku symbolov pre kazdu funkciu
         funkcia();
                                                         /// pri chybe program skonci sam
@@ -172,8 +173,9 @@ else if(token == FUNCTION)
                 if(SUPPORT->defined==true_hash)
                 exit(E_SEMANTIC_UNDEF);
 
+                SUPPORT->defined=true_hash;              ///podpora rekurzivneho volania bez hlavicky funkcie
 
-            SUPPORT->defined=true_hash;
+
 
                                                             ///funkcia je definovana
             if(token==VAR)
@@ -220,10 +222,6 @@ exit(E_INTERNAL);
 
 if(((POLE_ID_LOCAL=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
     (init_array(POLE_ID_LOCAL)==-1))                                        ///alokujeme pole ID loc
-exit(E_INTERNAL);
-
-if(((SUPPORT_POLE=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
-    (init_array(SUPPORT_POLE)==-1))                                        ///alokujeme pole ID
 exit(E_INTERNAL);
 
 if(((GlobalnaTAB=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
@@ -543,13 +541,11 @@ int command(int value)
     ///IF podmienka sa vyhodnocuje zvlast v precendencnej analyze
     else if(value==IF)
     {
-
-
         ///dopisat
        IF_ENABLE=1;
        Vysledok=PODMIENKA;
-       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
 
+       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
 
 
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
@@ -932,7 +928,6 @@ Neterminal volany z neterminalu "program" ktory kontroluje syntax funckie
 */ ///zo semantickej do tejto funckie uz neni co dodat asi
 int funkcia()
 {
-
     int token;
     if((token = getnextToken(LEX_STRUCTPTR)) == ID)
     {
@@ -964,13 +959,18 @@ SUPPORT=ELEMENT;
                      token = getnextToken(LEX_STRUCTPTR);
                         if (token == INTEGER || token  == BOOLEAN || token == STRING || token == REAL)
                         {
-                        if(ELEMENT->defined==false_hash)
+                         if(SUPPORT->defined==3)             ///neexistuje hlavicka ani telo
+                         {
+
+                            SUPPORT->type=decodederSEM(token);
+
+                         }
+                        else if(SUPPORT->defined==false_hash)
                         {
-                            if(ELEMENT->type!=decodederSEM(token))
+                            if(SUPPORT->type!=decodederSEM(token))
                                 exit(E_SEMANTIC_OTHER);
                         }
-
-                        ELEMENT->type=decodederSEM(token);   ///navratovy typ
+                            SUPPORT->type=decodederSEM(token);
 
                          token = getnextToken(LEX_STRUCTPTR);
                             if(token==BODKOCIARKA)
