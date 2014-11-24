@@ -579,6 +579,17 @@ else if(TOP_Stdin==CONST_STRING && type==ID)
     concate(LEX_STRUCTPTR,type);
 
 }
+else if (TOP_Stdin==TRUE || TOP_Stdin==FALSE)
+{
+   VysledokID(Vysledok,BOOLEAN_hash);
+                      int token=getnextToken(LEX_STRUCTPTR);
+                      if(decodeSA(token)==PSA_DOLAR)
+                       {
+                           CheckEND(token,type);
+                            return SUCCESS;
+                       }
+
+}
 ///***********************
 else
 {
