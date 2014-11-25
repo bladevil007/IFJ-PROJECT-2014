@@ -3,13 +3,13 @@ var
 a:boolean;
 b123:real;{ahoj}
 in25t:integer;
-int2:integer{komentar};
+int2:integer{komenta6&*()^%{}r};
 bool:boolean; 
 str:string;
 
 
 
-Begin
+{komentar}Begin
 
 Length('ah ok')
 
