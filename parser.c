@@ -870,7 +870,6 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                                                                              ///dva krat definovany ten isty nazov
     }
 
-
                        ///neni jej priradena hodnota
                     if((token=getnextToken(LEX_STRUCTPTR))== DVOJBODKA)
                     {
@@ -898,9 +897,12 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                     else return ERRORRET(token);
     }
     else  if(Declar==0)           ///neboli zadane ziadne premenne
-    ERRORRET(token);
+     return  ERRORRET(token);
     else
+    {
+        Declar=0;
         return token;
+    }
 }
 
 
