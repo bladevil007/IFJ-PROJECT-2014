@@ -1,0 +1,16 @@
+{	0	}
+var
+a:boolean;
+b123:real;{ahoj}
+in25t:integer;
+int2:integer{komentar};
+bool:boolean; 
+str:string;
+
+
+
+Begin
+
+Length('ah ok')
+
+End.

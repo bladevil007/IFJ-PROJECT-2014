@@ -1,0 +1,7 @@
+{	2	}
+var
+cislo:integer;
+begin
+cislo:=2;
+begin
+end.

@@ -1,0 +1,19 @@
+{	2	}
+
+function(a:integer):boolean;forward;
+
+var
+a:boolean;
+b123:real;
+int:integer;
+int2:integer;
+bool:boolean; 
+str:string;
+
+
+
+Begin
+
+Length('ah ok')
+
+End.
