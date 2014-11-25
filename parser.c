@@ -21,6 +21,8 @@
 #include "ial.h"
 #include "stack.h"
 #include "precedent.h"
+int PrecedenceSA(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
+int lookforElement(LEX_STRUCT *,int ,THash_table *,THash_table*);
 
 LEX_STRUCT *LEX_STRUCTPTR;          ///sktruktura pre Tokeny
 LEX_STRUCT *ARRAY_PARAM;          ///pole pre parametre funkcie
@@ -32,10 +34,9 @@ inf_array *POLE_ID_GLOBALFUN;   ///nekonecne pole ID pre globalnu
 inf_array *SUPPORT_POLE;  /// pomocna
 THash_table *GlobalnaTAB; ///globalna hashovacia tabulka
 THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
-
 int FUNCTION_ENABLE=0;        ///Moze nasledovat telo funkcie
 int POLE_ID_INDEX=0;        ///Index Dalsieho zaciatku ID
-struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
+  ///zaznam pre hashovaciu funkciu
 struct record *SUPPORT;   ///zaznam pre hashovaciu funkciu
 int CHECK_FUN=0;
 int Declar=0;
@@ -491,7 +492,7 @@ return ERRORRET(token);
 }
 
 
-/** \brief /** <command>  |  <id>  := <hodnota> v <cykly> v <vstavanafunkcia> v <definovanefunkcie>
+/** \brief  <command>  |  <id>  := <hodnota> v <cykly> v <vstavanafunkcia> v <definovanefunkcie>
 Neterminal/funckia Command , ktora je volana z neterminalov progcondition/prog/progfunction
 Pri chybe sa hned vola exit(cislo chyby)
  *
@@ -508,7 +509,7 @@ int command(int value)
 
     else if(value==ID)
     {
-                      ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);                                     ///Kontrola ci je definovana
+                     lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);                                     ///Kontrola ci je definovana
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         if(ELEMENT->id==FUNCTION_hash)
@@ -624,7 +625,7 @@ if(value==WRITE)
                         if(token==ID)
                         {
                     ///Kontrola ze vsetky vstupne hodnoty su String
-                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                       lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
@@ -657,7 +658,7 @@ else if(value==LENGTH)
                         if(token==ID)
                         {
                     ///Kontrola ze vsetky vstupne hodnoty su String
-                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                        lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
 
                                                                 ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
@@ -689,7 +690,7 @@ else if(value==COPY)
                         if(token==ID)
                         {
                     ///Kontrola ze vsetky vstupne hodnoty su String
-                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                       lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
@@ -710,7 +711,7 @@ else if(value==COPY)
                                 if(token==ID)
                                 {
                                 ///Kontrola ze vsetky vstupne hodnoty su INT
-                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                               lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
                                     exit(E_SEMANTIC_UNDEF);
@@ -730,7 +731,7 @@ else if(value==COPY)
                                             if(token==ID)
                                             {
                                             ///Kontrola ze vsetky vstupne hodnoty su INT
-                                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                                                lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                                             if(ELEMENT==0)
                                                 exit(E_SEMANTIC_UNDEF);
@@ -763,7 +764,7 @@ else if(value==FIND)
                        if(token==ID)
                         {
                     ///Kontrola ze vsetky vstupne hodnoty su String
-                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                       lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
@@ -782,7 +783,7 @@ else if(value==FIND)
                                 if(token==ID)
                                 {
                                 ///Kontrola ze vsetky vstupne hodnoty su String
-                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                               lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                             ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
                                     exit(E_SEMANTIC_UNDEF);
@@ -811,7 +812,7 @@ else if(value==SORT)
                 if(token==ID)
                 {
                     ///Kontrola ze vsetky vstupne hodnoty su String
-                    ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                   lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB);
                                                                                     ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
@@ -996,7 +997,7 @@ int fun_params()
                                                                                         ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT==0)
          {
-            hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,NULL,NULL);  ///PRIDA DEFINICIU funkcie
+            hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,0,NULL);  ///PRIDA DEFINICIU funkcie
             ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
          }else
            exit(E_SEMANTIC_UNDEF);
@@ -1076,10 +1077,11 @@ int decodederSEM(int token)
     case CONST_STRING:
         return STRING_hash;
     }
+ return 0;
 }
 
 ///ulozenie parametrov do tabulky symbolov
-void addparam(token)
+void addparam(int token)
 {
      switch(token)
     {
@@ -1096,7 +1098,7 @@ void addparam(token)
         AddChar_str(ARRAY_PARAM,'r');
         return;
     }
-
+return;
 }
 
 

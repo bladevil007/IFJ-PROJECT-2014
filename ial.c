@@ -144,7 +144,7 @@ int length(char *s) {
 
 	return r;
 }
-
+*/
 /* FAIL vector for KMP algorithm */
 /*void failKMP(char *p, int pl, int *fail) {
 
@@ -161,7 +161,7 @@ int length(char *s) {
 		fail[k] = r+1;
 	}
 }
-
+*/
 /* KMP algorithm */
 /*int matchKMP(char *search, char *txt, int pl, int tl, int *fail) {
 
@@ -237,13 +237,13 @@ int length(char *s) {
 			return;
 	}
 }
-
+*/
 /* HeapSort algorithm */
 /*void heapSort(char *s, int n) {
 
 	int left, right;
 	char tmp;
-
+*/
 	/* heapify */
 	/*for (left = (n - 2)/2; left >= 0; left--) {
 
@@ -259,7 +259,7 @@ int length(char *s) {
 		siftDown(s, 0, right);
 	}
 }
-
+*/
 /* string sort */
 /*char *sort(char *s) {
 

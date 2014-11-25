@@ -4,7 +4,7 @@
 int SyntacticAnalys ();
 int ERRORRET(int);
 int program(int);
-
+struct record *ELEMENT;
 int progcondition();
 int progfunction();
 int prog();
