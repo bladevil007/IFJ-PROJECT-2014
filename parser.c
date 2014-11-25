@@ -38,6 +38,7 @@ int POLE_ID_INDEX=0;        ///Index Dalsieho zaciatku ID
 struct record *ELEMENT;   ///zaznam pre hashovaciu funkciu
 struct record *SUPPORT;   ///zaznam pre hashovaciu funkciu
 int CHECK_FUN=0;
+int Declar=0;
 
 
 ///funckia na overenie LEXIKALNA vs SYNTAKTICKA CHYBA
@@ -840,6 +841,7 @@ Neterminal na kontrolu syntaxe deklaracie premennych
     int token=getnextToken(LEX_STRUCTPTR);
     if(token==ID)
     {
+     Declar=1;
 
          ///VKLADANIE DO TABULIEK SYMBOLOV
     if(IN_FUNCTION==0)
@@ -895,7 +897,10 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                     }
                     else return ERRORRET(token);
     }
-    else return token;
+    else  if(Declar==0)           ///neboli zadane ziadne premenne
+    ERRORRET(token);
+    else
+        return token;
 }
 
 
