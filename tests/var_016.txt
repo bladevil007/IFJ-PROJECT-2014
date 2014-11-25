@@ -1,0 +1,11 @@
+{	0	}
+
+
+
+Begin
+
+Length('ah ok');
+length('schei56sse')
+
+
+End.

@@ -1,0 +1,9 @@
+{	0	}
+
+
+
+Begin
+
+Length('ah ok')
+
+End.

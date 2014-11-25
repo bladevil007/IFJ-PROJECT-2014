@@ -1,0 +1,5 @@
+{	3	}
+begin
+{trololo}
+x:=1;
+eNd.
