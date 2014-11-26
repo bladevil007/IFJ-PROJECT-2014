@@ -233,8 +233,6 @@ case ',' :
     return CIARKA;
 case '=' :
     return EQUAL;
-case '.':
-    return DOT;
 case ':' :
      return DVOJBODKA;
 case ';' :
@@ -292,7 +290,7 @@ state=DOT;
 else if((c=='e') || (c=='E'))
 state=REAL;
 
-else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':' || c=='+' ||c== '-')
+else if ((c==';')|| (c=='*') || (c=='/')||(c==')') || c==']' || c==','|| c== '<'|| c=='>' || c=='=' ||c==':' || c=='+' ||c== '-' || c=='(')
 {
     if(isreal==1)
     {
@@ -365,7 +363,15 @@ if(((((c>=65)&&(c<=90))||  ((c>=97)&&(c<=122))||(c=='_'))) || ((c >= '0') && (c 
          switch(i)
          {
              case 0:return BEGIN;
-             case 1:return END;
+             case 1:
+                  c=getc(source);
+                  if(c=='.')
+                    return END_DOT;
+                  else
+                  {
+                   fseek(source,ftell(source)-1,SEEK_SET);
+                   return END;
+                  }
              case 2:return BOOLEAN;
              case 3:return DO;
              case 4:return ELSE;

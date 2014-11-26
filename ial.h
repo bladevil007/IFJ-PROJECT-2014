@@ -29,6 +29,7 @@ struct record
 	char *params; //u funkce slouzi k ulozeni informace o typech jejich parametru, u promennych ma hodnotu NULL
 	int defined; //nabyva hodnot true a false - u promenne urcuje, zda je v promenne prirazena nejaka hodnota, u funkce urcuje, zda jiz bylo definovano jeji telo
 	int doubledefinition;  //nabyva hodnot 0,1,2 ked mame len hlavicku je 1 ked  aj telo tak ma hodnotu 2
+	char *POLE_ID_LOCAL_VOLANE;
 	struct record *next;
 };
 

@@ -10,6 +10,7 @@ int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
 #define DO 13
 #define ELSE 14
 #define END 15
+#define END_DOT 62
 #define FIND 17
 #define FORWARD 18
 #define FUNCTION 19

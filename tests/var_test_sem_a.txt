@@ -1,0 +1,27 @@
+{ 0 }
+
+
+
+var
+a:integer;
+
+
+function f(a:integer):integer;forward;
+function f(a:integer):integer;
+var 
+x:boolean;
+begin
+a:=10;      {priradujem lokalnej}
+a:=a*a
+end;
+
+
+
+Begin
+if  (((true < false)))  then
+begin
+a:=10+20*20-30       
+end
+
+
+End.

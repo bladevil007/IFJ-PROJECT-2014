@@ -15,6 +15,7 @@ int concate(LEX_STRUCT*,int ,THash_table *,THash_table*,struct record *);
 struct record* lookforElement(LEX_STRUCT *,int ,THash_table *,THash_table*,struct record*);
 int recorderSEM(char);
 struct record *SUPPORT2;
+int operator=0;
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
 TStack *Helper;  ///na expresion
@@ -23,6 +24,11 @@ int TOP_Stack;    ///vrchol zasobnika
 int TOP_Stdin;    ///vrchol vstupneho retazca
 int concateT;    ///token
 int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
+int PODMIENKA_POD1=0;
+int LAST=0;
+int LLAST=0;
+int LASTindex=0;
+int switch_control=0;
 int PSA_Stalker;    ///polozka v PSA Table
 
 
@@ -51,7 +57,15 @@ int i=0;
 while(i<11)
 {
   if(rules[i][0]==scan[0] &&  rules[i][1]==scan[1] &&  rules[i][2]==scan[2])
+  {
+      if((LASTindex %2)==0)
+        LAST=i;
+      else
+        LLAST=i;
+      LASTindex++;
     return 0;
+
+  }
         i++;
 }
 return 1;
@@ -273,6 +287,7 @@ int CheckEND(int end,int type)
 		}
        }
 	case END:
+    case END_DOT:
 	{
 		if(type==ID)
 		{
@@ -296,6 +311,9 @@ case DO:
     return PSA_DOLAR;
 case BODKOCIARKA:
     ID_ENABLE = 1;
+    return PSA_DOLAR;
+case  END_DOT:
+    ID_ENABLE = 2;
     return PSA_DOLAR;
 case END:
     ID_ENABLE = 2;
@@ -393,81 +411,113 @@ return 0;
  */
 int PrecedentAnal(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-if(TOP_Stdin==PSA_DOLAR && decodeSA(TOP_Stack)==PSA_DOLAR )
+
+
+if ( TOP_Stdin==LESS || TOP_Stdin==GREATER|| TOP_Stdin==LESSEQUAL || TOP_Stdin==GREATEREQUAL|| TOP_Stdin==NOTEQUAL)
 {
-    CheckEND(TOP_Stdin,type);
-    return 0;
+   switch_control=1;
+   if(operator==0)
+        operator=1;
+   else if(operator==1)
+       exit(E_SYNTAX);
 }
 
-
-PSA_Stalker= PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
-
+PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
     if(PSA_Stalker!=0)
     {
      if(PSA_Stalker==PT_LESS)
      {
-
          stack_push(stackPSA,ZARAZKA);
          stack_push(stackPSA,decodeSA(TOP_Stdin));
          stack_top(stackPSA,&TOP_Stack);
               if(TOP_Stdin==ID)
          {
 
+
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
              if(ELEMENT->defined!=true_hash)
                 exit(E_SEMANTIC_TYPE);
+             if (switch_control==0)
+             {
+                if(PODMIENKA_POD==0)
+                PODMIENKA_POD=ELEMENT->type;
+             }
+             else
+             {
+               if(PODMIENKA_POD1==0)
+                PODMIENKA_POD1=ELEMENT->type;
+             }
 
-             if(PODMIENKA_POD==0)
-             PODMIENKA_POD=ELEMENT->type;
+
              VysledokID(Vysledok,ELEMENT->type);
+
          }
+
          else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo)
          {
-            if(PODMIENKA_POD==0){
-             PODMIENKA_POD=decodederSEM(TOP_Stdin);
-            }
+             if (switch_control==0)
+             {
+                if(PODMIENKA_POD==0)
+                PODMIENKA_POD=decodederSEM(TOP_Stdin);
+
+             }
+             else
+             {
+               if(PODMIENKA_POD1==0)
+                PODMIENKA_POD1=decodederSEM(TOP_Stdin);
+             }
              VysledokID(Vysledok,decodederSEM(TOP_Stdin));
          }
-                                                                                  ///jedna sa o konstantu overime ci jej hodnota moze byt prirade
+                                                                                ///jedna sa o konstantu overime ci jej hodnota moze byt prirade
          TOP_Stdin=getnextToken(LEX_STRUCTPTR);
             checklex(TOP_Stdin);
           if(PODMIENKA_POD==BOOLEAN_hash)
           {
              if(TOP_Stdin ==PLUS || TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
-               return ERRORRET(TOP_Stdin);
-          }
-          else
-          if(PODMIENKA_POD==STRING_hash)
-          {
-             if(TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
-               return ERRORRET(TOP_Stdin);
+                exit(E_SEMANTIC_TYPE);
           }
 
+          else if(PODMIENKA_POD==STRING_hash)
+          {
+             if(TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
+                exit(E_SEMANTIC_TYPE);
+          }
+
+          else if(TOP_Stdin==DIVIDE)
+          {
+              if (switch_control==0)
+                PODMIENKA_POD=REAL_hash;
+              else
+                PODMIENKA_POD1=REAL_hash;
+          }
         return PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
      }
      else if (PSA_Stalker==PT_GREATER)
      {
 
-            term= TOP_Stack;
+           term= TOP_Stack;
+
            if((reduce(LEX_STRUCTPTR))==SUCCESS)
-            return 0;
+                return 0;
+
            stack_push(stackPSA,decodeSA(TOP_Stdin));
            stack_top(stackPSA,&TOP_Stack);
+
            TOP_Stdin=getnextToken(LEX_STRUCTPTR);
            checklex(TOP_Stdin);
+
            if(PODMIENKA_POD==BOOLEAN_hash)
           {
              if(TOP_Stdin ==PLUS || TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
-               return ERRORRET(TOP_Stdin);
+                exit(E_SEMANTIC_TYPE);
           }
           else
           if(PODMIENKA_POD==STRING_hash)
           {
              if(TOP_Stdin==MULTIPLY || TOP_Stdin==DIVIDE || TOP_Stdin==MINUS)
-               return ERRORRET(TOP_Stdin);
+                exit(E_SEMANTIC_TYPE);
           }
-
            return PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
      }
     }else
@@ -577,7 +627,6 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                             }
 
                                         }else return ERRORRET(TOP_Stdin);
-
                                         i++;
                                     }
                                     }
@@ -648,8 +697,28 @@ else
 {
 PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 }
+if(switch_control==0 && PODMIENKA_POD==BOOLEAN_hash)         ///VYRAZ BEZ <>= a je typu boolean
+    PODMIENKA_POD1=BOOLEAN_hash;
+
+if(PODMIENKA_POD!=PODMIENKA_POD1 && Vysledok==PODMIENKA)
+    exit(E_SEMANTIC_TYPE);
+
+if(type==ID && Vysledok!=PODMIENKA_POD)
+exit(E_SEMANTIC_TYPE);
+
+///cely vyraz sa vyhodnoti ako boolean a nic sa k nemu nesmie pricitat
+if(Vysledok==PODMIENKA && PODMIENKA_POD!=BOOLEAN_hash   && (LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7 && LLAST!=6 && LLAST!=4 && LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7&& LLAST!=6 && LLAST!=4))
+exit(E_SEMANTIC_TYPE);
+
+
 PODMIENKA_POD=0;
+PODMIENKA_POD1=0;
+switch_control=0;
+LAST=0;
+LLAST=0;
+LASTindex=0;
 stack_free(stackPSA);
+operator=0;
   return SUCCESS;
 }
 
@@ -711,19 +780,33 @@ int VysledokID(int Vysledok,int id )
             break;
 
     case PODMIENKA:
-         if(id!=PODMIENKA_POD)
-         {
-             /*if((id==REAL_hash || id==INTEGER_hash) && (PODMIENKA_POD==REAL_hash || PODMIENKA_POD==INTEGER_hash))   ///Opravit na spravne vyhodnocovanie
-                PODMIENKA_POD=REAL_hash;
-             else*/
-                exit(E_SEMANTIC_TYPE);
-         }
+    {
+             if(switch_control==0)
+             {
+                 if((id==INTEGER_hash && PODMIENKA_POD==0) || (id==INTEGER_hash && PODMIENKA_POD==INTEGER_hash))
+                    PODMIENKA_POD=INTEGER_hash;
+                 else if(id==INTEGER_hash || id==REAL_hash)
+                    PODMIENKA_POD=REAL_hash;
+                  else  if(id!=PODMIENKA_POD)
+                     exit(E_SEMANTIC_TYPE);
+             }
+             else if (switch_control==1)
+             {
+                 if((id==INTEGER_hash && PODMIENKA_POD1==0) || (id==INTEGER_hash && PODMIENKA_POD1==INTEGER_hash))
+                    PODMIENKA_POD1=INTEGER_hash;
+                 else if(id==INTEGER_hash || id==REAL_hash)
+                    PODMIENKA_POD1=REAL_hash;
+                 else  if(id!=PODMIENKA_POD)
+                     exit(E_SEMANTIC_TYPE);
+             }
+      }
     }
    return 0;
 }
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
  struct record* lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
+
 
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                      ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));

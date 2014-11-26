@@ -41,6 +41,8 @@ void free_array(inf_array *a);
 
 int init_array(inf_array *a);
 
+int add_str_param(inf_array *, char* );
+
 #endif
 
 

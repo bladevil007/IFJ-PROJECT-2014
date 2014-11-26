@@ -109,7 +109,35 @@ void free_array(inf_array *a)
 }
 
 
+/** \brief  Funkcia pridava string do nekonecneho pola
+            Navratova hodnota je index v poli, na ktorom zacina pridany string
+*/
+int add_str_param(inf_array *a, char* strin)
+{
+    if((a->allocSize - a->length) <= (strlen(strin) + 1))       //ak je nedostatok volneho miesta v poli tak realokuj
+    {
+        if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC + strlen(strin))) == NULL)
+            return -1;
 
+        a->allocSize = a->allocSize + ARR_INC + strlen(strin);                  //aktualizacia premennej
+    }
+
+
+    int i;
+    int ret_val = a->act_pos;                                   //navratova hodnota
+
+    for (i=0; i<strlen(strin); i++)                             //pridavanie retazca po znakoch
+    {
+        a->str[a->act_pos + i] = strin[i];
+    }
+
+    a->str[a->act_pos + strlen(strin)] = '$';                  //ukoncit nulovym znakom
+
+    a->act_pos = a->act_pos + (strlen(strin) + 1);              //aktualizovat premenne v strkture
+    a->length = a->length + strlen(strin);
+
+    return ret_val;
+}
 
 
 

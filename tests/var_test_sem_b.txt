@@ -1,0 +1,28 @@
+{ 4  }
+
+
+
+var
+a:integer;
+
+
+function f(b:integer):integer;forward;
+function f(b:integer):integer;
+var 
+x:boolean;
+begin
+a:=10      {priradujem hodnotu ale v maine je tato premenna stale nedefinovana}
+end;
+
+
+
+
+Begin
+if  (((true < false)))  then
+begin
+
+a:=a*a
+end
+
+
+End.
