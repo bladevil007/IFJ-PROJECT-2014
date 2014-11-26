@@ -680,7 +680,7 @@ else if(TOP_Stdin==CONST_STRING && type==ID)
 {
     VysledokID(Vysledok,STRING_hash);
     concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
+    return SUCCESS;
 }
 else if ((TOP_Stdin==TRUE || TOP_Stdin==FALSE)&& type==ID)
 {
@@ -697,17 +697,19 @@ else
 {
 PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 }
+
+if(type==IF || type==WHILE )
+{
 if(switch_control==0 && PODMIENKA_POD==BOOLEAN_hash)         ///VYRAZ BEZ <>= a je typu boolean
     PODMIENKA_POD1=BOOLEAN_hash;
 
-if(PODMIENKA_POD!=PODMIENKA_POD1 && Vysledok==PODMIENKA)
+else if(PODMIENKA_POD!=PODMIENKA_POD1 && Vysledok==PODMIENKA)
     exit(E_SEMANTIC_TYPE);
-
-if(type==ID && Vysledok!=PODMIENKA_POD)
+    ///cely vyraz sa vyhodnoti ako boolean a nic sa k nemu nesmie pricitat
+if((Vysledok==PODMIENKA && PODMIENKA_POD!=BOOLEAN_hash )  && (LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7 && LLAST!=6 && LLAST!=4 && LAST!=10 && LAST!=9 && LAST!=8 && LAST!=7&& LAST!=6 && LAST!=4))
 exit(E_SEMANTIC_TYPE);
-
-///cely vyraz sa vyhodnoti ako boolean a nic sa k nemu nesmie pricitat
-if(Vysledok==PODMIENKA && PODMIENKA_POD!=BOOLEAN_hash   && (LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7 && LLAST!=6 && LLAST!=4 && LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7&& LLAST!=6 && LLAST!=4))
+}
+if(type==ID && Vysledok!=PODMIENKA_POD)
 exit(E_SEMANTIC_TYPE);
 
 
