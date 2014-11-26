@@ -673,7 +673,8 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                        }else return ERRORRET(token);
                     }
                     else
-                    PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);               ///jedna sa o normalne priradenie
+                    PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                    return SUCCESS;                                                 ///jedna sa o normalne priradenie
 }
 ///Bude sa jednat o kokatenaciu retazcov  ++ dodat ked ID je CONST_STRING tak nech tiez konkatenuje +semanticku kontrolu
 else if(TOP_Stdin==CONST_STRING && type==ID)
