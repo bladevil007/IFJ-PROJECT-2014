@@ -157,7 +157,7 @@ fseek(source,ftell(source)-1,SEEK_SET);   //mame nacita napr 12+e a za "e" neni 
 return E_LEXICAL;
 }
 
-else if((isspace(c)!=0) || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';' || c==')'|| c==']' || c==','|| c== '<'|| c=='>' || c=='='||c==':' ) //tieto znaky nasleduju za cislom
+else if((isspace(c)!=0) || c=='+'|| c=='-'|| c=='*'|| c=='/'|| c==';' || c==')'|| c==']' || c==','|| c== '<'|| c=='>' || c=='='||c==':' || c=='(') //tieto znaky nasleduju za cislom
 {
 
 if(plus_s==1)
