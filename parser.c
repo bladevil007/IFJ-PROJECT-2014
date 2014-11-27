@@ -643,7 +643,7 @@ if(value==WRITE)
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                            exit(E_UNINITIALIZED_VAR);
 
                         }
               token=getnextToken(LEX_STRUCTPTR);
@@ -678,7 +678,7 @@ else if(value==LENGTH)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                           exit(E_UNINITIALIZED_VAR); 
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -709,7 +709,7 @@ else if(value==COPY)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                            exit(E_UNINITIALIZED_VAR);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -730,7 +730,7 @@ else if(value==COPY)
                                 else if(ELEMENT->type!=INTEGER_hash)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
-                                    exit(E_SEMANTIC_TYPE);
+                                    exit(E_UNINITIALIZED_VAR);
                                 }
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==CIARKA)
@@ -750,7 +750,7 @@ else if(value==COPY)
                                             else if(ELEMENT->type!=INTEGER_hash)
                                                 exit(E_SEMANTIC_TYPE);
                                             else if(ELEMENT->defined!=true_hash)
-                                                exit(E_SEMANTIC_TYPE);
+                                                exit(E_UNINITIALIZED_VAR);
                                             }
                                             token=getnextToken(LEX_STRUCTPTR);
                                             if(token==RIGHT_ROUND)
@@ -783,7 +783,7 @@ else if(value==FIND)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                            exit(E_UNINITIALIZED_VAR);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -802,7 +802,7 @@ else if(value==FIND)
                                 else if(ELEMENT->type!=STRING_hash)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
-                                    exit(E_SEMANTIC_TYPE);
+                                  exit(E_UNINITIALIZED_VAR);  
                                 }
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==RIGHT_ROUND)
@@ -831,7 +831,7 @@ else if(value==SORT)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                          exit(E_UNINITIALIZED_VAR);  
                 }
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
@@ -1127,7 +1127,6 @@ void addparam(int token)
     }
 return;
 }
-
 
 
 
