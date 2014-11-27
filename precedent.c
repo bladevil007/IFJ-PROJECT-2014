@@ -528,6 +528,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 if(decodeSA(TOP_Stdin)!=term)
     exit(E_SYNTAX);
 
+return 0;
 }
 
 
