@@ -52,7 +52,6 @@ static int scan[3];///bude sa naplnat hodnotami zo zasobnika a nasledne porovnav
 ///Funckia nam porovna so vsetkymi pravidlami ak najde
 int Comparerule(int *scan)
 {
-
 int i=0;
 while(i<11)
 {
@@ -422,6 +421,7 @@ if ( TOP_Stdin==LESS || TOP_Stdin==GREATER|| TOP_Stdin==LESSEQUAL || TOP_Stdin==
        exit(E_SYNTAX);
 }
 
+
 PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
     if(PSA_Stalker!=0)
@@ -499,8 +499,9 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
            term= TOP_Stack;
 
            if((reduce(LEX_STRUCTPTR))==SUCCESS)
+           {
                 return 0;
-
+           }
            stack_push(stackPSA,decodeSA(TOP_Stdin));
            stack_top(stackPSA,&TOP_Stack);
 
@@ -523,7 +524,10 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
     }else
     return ERRORRET(TOP_Stdin);
 
-return 0;
+///PRAZDNA ZATVORKA vo vyraze
+if(decodeSA(TOP_Stdin)!=term)
+    exit(E_SYNTAX);
+
 }
 
 
