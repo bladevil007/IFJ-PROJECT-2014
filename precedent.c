@@ -437,7 +437,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
              if(ELEMENT->defined!=true_hash)
-                exit(E_SEMANTIC_TYPE);
+                exit(E_UNINITIALIZED_VAR);
              if (switch_control==0)
              {
                 if(PODMIENKA_POD==0)
@@ -615,7 +615,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                             if(ELEMENT->type != SUPP->params[i])
                                                 exit(E_SEMANTIC_TYPE);
                                             if(ELEMENT->defined!=true_hash)
-                                                exit(E_SEMANTIC_TYPE);
+                                                exit(E_UNINITIALIZED_VAR);
                                         }
 
                                         else if(TOP_Stdin == CONST || TOP_Stdin==REALo || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING)
@@ -659,8 +659,8 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                     }
                     else if(ELEMENT->type==STRING_hash)                 ///semanticka kontrola pri konkatenaci
                     {
-                        if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                        if(ELEMENT->defined!=true_hash)                        
+                          exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                        ///zavolaj konkatenaciu retazcov
@@ -671,7 +671,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                       VysledokID(Vysledok,ELEMENT->type);
                       int token=getnextToken(LEX_STRUCTPTR);
                       if(ELEMENT->defined!=true_hash)
-                            exit(E_SEMANTIC_TYPE);
+                            exit(E_UNINITIALIZED_VAR);
                       if(decodeSA(token)==PSA_DOLAR)
                        {
                            CheckEND(token,type);
@@ -754,7 +754,7 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);   ///zistime ci existuje v tabulke
            VysledokID(Vysledok,ELEMENT->type);
            if(ELEMENT->defined!=true_hash)
-                    exit(E_SEMANTIC_TYPE);
+                exit(E_UNINITIALIZED_VAR);   
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
@@ -867,7 +867,6 @@ default:
     }
     return 0;
 }
-
 
 
 
