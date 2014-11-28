@@ -351,6 +351,7 @@ case LESSEQUAL:
     return PSA_LESSEQ;
 case GREATEREQUAL:
     return PSA_GREATEREQ;
+
 case NOTEQUAL:
     return PSA_NOTEQUAL;
 default:
@@ -435,7 +436,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
          {
 
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-            THash_table *SUPPORT2=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
+            struct record *SUPPORT2=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
              if((ELEMENT->defined!=true_hash && IN_FUNCTION==0 )|| (IN_FUNCTION==1 && ELEMENT->valuedef!=true_hash && SUPPORT2!=0))
                exit(E_UNINITIALIZED_VAR);
 

@@ -520,7 +520,7 @@ int command(int value)
     {
             ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
             SUPPORT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
-            THash_table *SUPPORT2=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
+            struct record  *SUPPORT2=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                                         ///Kontrola ci je definovana
             if(ELEMENT==0)
                 exit(E_SEMANTIC_UNDEF);
@@ -792,6 +792,7 @@ else if(value==FIND)
 
                         token=getnextToken(LEX_STRUCTPTR);
                         if(token==CIARKA)
+
                         {
                             token=getnextToken(LEX_STRUCTPTR);
                             if(token==CONST_STRING || token==ID)
@@ -1103,6 +1104,7 @@ int decodederSEM(int token)
         return INTEGER_hash;
     case TRUE:
         return BOOLEAN_hash;
+
     case FALSE:
         return BOOLEAN_hash;
     case CONST_STRING:
