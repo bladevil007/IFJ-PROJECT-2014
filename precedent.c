@@ -436,8 +436,10 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
          {
 
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+            struct record *SUPPORT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
+            struct record *SUPPORT1=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
 
-             if((ELEMENT->defined!=true_hash))
+             if((ELEMENT->defined!=true_hash && IN_FUNCTION==0 ) || (IN_FUNCTION==1 &&  SUPPORT==0 && SUPPORT1!=0 && ELEMENT->defined!=true_hash) || (IN_FUNCTION==1 &&  SUPPORT!=0 && SUPPORT1!=0 && ELEMENT->defined!=true_hash))
                exit(E_UNINITIALIZED_VAR);
 
 

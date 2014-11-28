@@ -537,10 +537,8 @@ int command(int value)
 
 
                     if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0)
-                    {
                         ELEMENT->defined=false_hash;
-                        ELEMENT->valuedef=true_hash;
-                    }  ///hodnota vo funkcii mu bola pridana
+                      ///hodnota vo funkcii mu bola pridana
                     else
                     ELEMENT->defined=true_hash;
 
