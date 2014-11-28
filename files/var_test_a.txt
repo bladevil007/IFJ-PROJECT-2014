@@ -6,4 +6,4 @@ Begin
 
 Length('ah ok')
 
-End.
+End.{komentar}

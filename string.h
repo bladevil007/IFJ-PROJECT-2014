@@ -43,6 +43,7 @@ int init_array(inf_array *a);
 
 int add_str_param(inf_array *, char* );
 
+char *concatenate(const char *s1, const char *s2);
 #endif
 
 
