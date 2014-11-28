@@ -527,6 +527,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 if(decodeSA(TOP_Stdin)!=term)
     exit(E_SYNTAX);
 
+return 0;
 }
 
 
@@ -659,7 +660,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                     }
                     else if(ELEMENT->type==STRING_hash)                 ///semanticka kontrola pri konkatenaci
                     {
-                        if(ELEMENT->defined!=true_hash)                        
+                        if(ELEMENT->defined!=true_hash)
                           exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
@@ -754,7 +755,7 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);   ///zistime ci existuje v tabulke
            VysledokID(Vysledok,ELEMENT->type);
            if(ELEMENT->defined!=true_hash)
-                exit(E_UNINITIALIZED_VAR);   
+                exit(E_UNINITIALIZED_VAR);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
