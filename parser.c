@@ -536,7 +536,7 @@ int command(int value)
                     PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB,ELEMENT);  ///Precedencna analyza
 
 
-                    if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0)
+                    if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0 && ELEMENT->id!=FUNCTION_hash)
                         ELEMENT->defined=false_hash;
                       ///hodnota vo funkcii mu bola pridana
                     else
