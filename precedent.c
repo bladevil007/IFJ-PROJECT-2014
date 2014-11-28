@@ -434,10 +434,11 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
               if(TOP_Stdin==ID)
          {
 
-
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-             if(ELEMENT->defined!=true_hash)
-                exit(E_UNINITIALIZED_VAR);
+            THash_table *SUPPORT2=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
+             if((ELEMENT->defined!=true_hash && IN_FUNCTION==0 )|| (IN_FUNCTION==1 && ELEMENT->valuedef!=true_hash && SUPPORT2!=0))
+               exit(E_UNINITIALIZED_VAR);
+
              if (switch_control==0)
              {
                 if(PODMIENKA_POD==0)
@@ -448,7 +449,6 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                if(PODMIENKA_POD1==0)
                 PODMIENKA_POD1=ELEMENT->type;
              }
-
 
              VysledokID(Vysledok,ELEMENT->type);
 
@@ -614,6 +614,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                         {
                                            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                             if(ELEMENT->type != SUPP->params[i])
+
                                                 exit(E_SEMANTIC_TYPE);
                                             if(ELEMENT->defined!=true_hash)
                                                 exit(E_UNINITIALIZED_VAR);

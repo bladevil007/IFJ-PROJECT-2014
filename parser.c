@@ -520,6 +520,7 @@ int command(int value)
     {
             ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
             SUPPORT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
+            THash_table *SUPPORT2=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                                         ///Kontrola ci je definovana
             if(ELEMENT==0)
                 exit(E_SEMANTIC_UNDEF);
@@ -535,8 +536,11 @@ int command(int value)
                     PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB,ELEMENT);  ///Precedencna analyza
 
 
-                    if(IN_FUNCTION==1 && SUPPORT!=0)                    ///GLOBALNA PREMENNA NEMOZE BYT DEFINOVANA KED SA OBJAVUJE VO FUNKCII
+                    if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0)
+                    {
                         SUPPORT->defined=false_hash;
+                        SUPPORT->valuedef=true_hash;
+                    }  ///hodnota vo funkcii mu bola pridana
                     else
                     ELEMENT->defined=true_hash;
                     return SUCCESS;
@@ -678,7 +682,7 @@ else if(value==LENGTH)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                           exit(E_UNINITIALIZED_VAR); 
+                           exit(E_UNINITIALIZED_VAR);
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -802,7 +806,7 @@ else if(value==FIND)
                                 else if(ELEMENT->type!=STRING_hash)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
-                                  exit(E_UNINITIALIZED_VAR);  
+                                  exit(E_UNINITIALIZED_VAR);
                                 }
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==RIGHT_ROUND)
@@ -831,7 +835,7 @@ else if(value==SORT)
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
-                          exit(E_UNINITIALIZED_VAR);  
+                          exit(E_UNINITIALIZED_VAR);
                 }
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
