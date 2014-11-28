@@ -538,11 +538,12 @@ int command(int value)
 
                     if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0)
                     {
-                        SUPPORT->defined=false_hash;
-                        SUPPORT->valuedef=true_hash;
+                        ELEMENT->defined=false_hash;
+                        ELEMENT->valuedef=true_hash;
                     }  ///hodnota vo funkcii mu bola pridana
                     else
                     ELEMENT->defined=true_hash;
+
                     return SUCCESS;
                 }else return ERRORRET(token);
 
