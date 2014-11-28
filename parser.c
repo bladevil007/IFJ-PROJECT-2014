@@ -541,6 +541,9 @@ int command(int value)
                       ///hodnota vo funkcii mu bola pridana
                     else
                     ELEMENT->defined=true_hash;
+                    if(ELEMENT->id==FUNCTION_hash)
+                       ELEMENT->valuedef=true_hash;
+
 
                     return SUCCESS;
                 }else return ERRORRET(token);
@@ -874,9 +877,15 @@ Neterminal na kontrolu syntaxe deklaracie premennych
             POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);
     }else
     {
-        ELEMENT=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                   ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
-                                                                                                    ///Zistime ci uz nemame taku polozku
-
+        ELEMENT=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
+                                                   ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
+         struct record* SUPPORT1=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
+         if(SUPPORT1!=0)
+         {
+             if(SUPPORT1->id==FUNCTION_hash)  ///alokuje sa rovnako premenna ako je nazov funkcie vo funkcii
+                   exit(E_SEMANTIC_UNDEF);
+         }
+             ///Zistime ci uz nemame taku polozku
                          ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
          {
@@ -947,6 +956,8 @@ int funkcia()
 
             ELEMENT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
             SUPPORT=ELEMENT;
+            if(SUPPORT->id==VARIABLE_hash)                        ///NAJDE SA PREMENNA ALE V GLOBALNYCH AKO HODNOTA
+                exit(E_SEMANTIC_UNDEF);
 
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
@@ -1059,13 +1070,18 @@ int fun_params()
                 }
                 else
                 {
+                    if(SUPPORT->params==0)
+                        exit(E_SEMANTIC_TYPE);
                     int ok=strcmp(SUPPORT->params,ARRAY_PARAM->str);                           ///porovnanie ze si typy odpovedaju
                     if(ok!=0)
                         exit(E_SEMANTIC_TYPE);
 
+
                     ok=strcmp(SUPPORT->POLE_ID_LOCAL_VOLANE,POLE_ID_LOCAL_VOLANE->str);       ///porovnanie ze si identifikatory odpovedaju
                     if(ok!=0)
                         exit(E_SEMANTIC_TYPE);
+
+
                     ///ROZNE POLIA
                 }
                     ///pridat kontrolu ze ze udana hlavicka je tototzna
