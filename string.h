@@ -4,6 +4,17 @@
 #define STRLEN 8
 
 #define ARR_INC 8
+typedef struct
+{
+  int *pole;		// samotne pole
+  int volny_index;		// prvni volny index v poli
+  int velikost_pole;	//velikost alokovaneho pole (nasobky 20)
+} Tpole_int;
+
+Tpole_int *IntArrayInit(); //inicializuje pole
+int IntArrayAddItem(Tpole_int *p, int i); //prida prvek do pole
+void IntArrayFree(Tpole_int *p); //uvolni pole
+void IntArrayStructFree(Tpole_int *p); //uvolni celou strukturu
 
 
 typedef struct

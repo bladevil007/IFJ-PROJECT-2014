@@ -14,7 +14,7 @@
 typedef union //unie slouzici k ukladani hodnot jednotlivych promennych v zaznamech
 {
 	int i;
-	double d;
+	float d;
 	char c;
 	int b;
 	char *str;
@@ -41,6 +41,7 @@ typedef struct
 } THash_table;
 
 //prototypy funkci:
+THash_table *GlobalnaTAB;
 
 void stringtolower (char *key);
 THash_table *hashtable_init (unsigned size);

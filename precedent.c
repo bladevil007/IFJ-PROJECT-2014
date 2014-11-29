@@ -5,6 +5,8 @@
 #include "parser.h"
 #include "string.h"
 #include "precedent.h"
+#include "codegenerate.h"
+#include "interpreter.h"
 #include "err.h"
 #include "stack.h"
 #include "ial.h"
@@ -565,11 +567,11 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
             VysledokID(Vysledok,INTEGER_hash);
              break;
         case FIND:
-            break;
             VysledokID(Vysledok,INTEGER_hash);
-        case SORT:
             break;
+        case SORT:
             VysledokID(Vysledok,STRING_hash);
+            break;
         }
         Libraryfunction(TOP_Stdin);
         TOP_Stdin=getnextToken(LEX_STRUCTPTR);
@@ -673,6 +675,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                         if(ELEMENT->defined!=true_hash)
                           exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
+                      generate_inst(LEX_STRUCTPTR->str,0,0,CONCATEID,0);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                        ///zavolaj konkatenaciu retazcov
                       return 0;
@@ -700,11 +703,13 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
 else if(TOP_Stdin==CONST_STRING && type==ID)
 {
     VysledokID(Vysledok,STRING_hash);
+    generate_inst(LEX_STRUCTPTR->str,0,0,CONCATESTRING,0);
     concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
     return SUCCESS;
 }
 else if ((TOP_Stdin==TRUE || TOP_Stdin==FALSE)&& type==ID)
 {
+
    VysledokID(Vysledok,BOOLEAN_hash);
    int token=getnextToken(LEX_STRUCTPTR);
    if(decodeSA(token)==PSA_DOLAR)
@@ -766,10 +771,13 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
            VysledokID(Vysledok,ELEMENT->type);
            if(ELEMENT->defined!=true_hash)
                 exit(E_UNINITIALIZED_VAR);
+                generate_inst(LEX_STRUCTPTR->str,0,0,CONCATEID,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
        {
+
+           generate_inst(LEX_STRUCTPTR->str,0,0,CONCATESTRING,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 
@@ -836,7 +844,6 @@ int VysledokID(int Vysledok,int id )
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
  struct record* lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-
 
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
                      ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));

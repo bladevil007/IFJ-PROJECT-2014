@@ -23,6 +23,52 @@
 #include "scaner.h"
 #include "err.h"
 
+#define INIT_SIZE 20 //Velikost inicializovaneho pole, pri reallocu budeme pole zvetsovat o tuto hodnotu
+
+//VSECHNY FUNKCE PRI NEUSPECHU VRACI HODNOTU 1, PRI USPECHU HODNOTU 0
+
+Tpole_int *IntArrayInit() //inicializace pole
+{
+   Tpole_int *p;
+   if ((p = malloc(sizeof(Tpole_int))) == NULL) //inicializace struktury
+	  return NULL;
+   if ((p->pole = malloc(sizeof(int)*INIT_SIZE)) == NULL) //inicializace pole
+   {
+      free(p);
+      return NULL;
+   }
+   p->volny_index = 0;
+   p->velikost_pole = INIT_SIZE;
+   return p;
+}
+
+int IntArrayAddItem(Tpole_int *p, int i) //prida hodnotu do pole
+{
+   if (p->volny_index == p->velikost_pole) //pokud uz neni misto
+   {
+      if ((p->pole = realloc(p->pole, (p->velikost_pole + INIT_SIZE)*sizeof(int))) == NULL) //realokace, v pripade chyby se automaticky uvolni cela struktura i s polem
+      {
+         IntArrayStructFree(p);
+         return 1;
+      }
+      p->velikost_pole = p->velikost_pole + INIT_SIZE;
+   }
+   p->pole[p->volny_index] = i; //vlozeni prvku
+   p->volny_index++;
+   return 0;
+}
+
+void IntArrayFree(Tpole_int *p) //uvolneni pole, POUZIVA SE POUZE POKUD CHCEME POLE ZRUSIT A ZNOVU INICIALIZOVAT, SAMOTNE UVOLNENI CELE STRUKTURY MA NA STAROST NALSEDUJICI FUNKCE
+{
+   free(p->pole);
+}
+
+void IntArrayStructFree(Tpole_int *p) //uvolneni pole a nasledne cele struktury
+{
+	IntArrayFree(p);
+	free(p);
+}
+
 
 /** \brief Funkcia inicializuje pole
 */
@@ -177,11 +223,11 @@ char *concatenate(const char *s1, const char *s2)
 	int length_s1 = strlen(s1); //delka prvniho retezce
 	int length = length_s1 + strlen(s2) + 1; //delka pro alokovani retezce (+1 kvuli nulovemu znaku)
 	char *concatenated; //ukazatel na konkatenovany retezec
-	
+
 	if ((concatenated = malloc(sizeof(char)*length)) == NULL)
 		return NULL;
 	strcpy(concatenated, s1);//zkopirovani prvni casti retezce
 	strcpy(concatenated + length_s1, s2); //zkopirovani druhe casti retezce
-	return concatenated;	
+	return concatenated;
 }
 

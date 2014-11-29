@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include "scaner.h"
 #include "parser.h"
+#include "interpreter.h"
+#include "codegenerate.h"
+
 int main(int argc, char *argv[])
 {
 
@@ -36,11 +39,12 @@ FILE *source;
       return 0;
    }
 
+
 /* Inicializcia zdrojoveho suboru pre Lexikalnu analyzu */
 
 SourceInitialize(source);
 SyntacticAnalys(); /// SYNTAKTICKY ANALYZATOR BUDE VOLAT GET NEXT TOKEN
-
+searchrecord(InstructionTape);
 
 
 fclose(source);
