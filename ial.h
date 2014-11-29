@@ -52,20 +52,16 @@ struct record *hashtable_add(THash_table *table, int id, char *key, int type, ch
 int length(char *s);
 
 
+char *copy(char *s, unsigned i, unsigned n);
 
+int *KMPFail (char *vzorek, int delka_vzorku);
 
-/*
-char *copy(char *s, int i, int n);
+int matchKMP(char *text, char *vzorek, int delka_textu, int delka_vzorku);
 
-void failKMP(char *p, int pl, int *fail);
-
-int matchKMP(char *search, char *txt, int pl, int tl, int *fail);
-
-int find(char *s, char *search);
+int find (char *text, char *vzorek);
 
 void siftDown(char *s, int left, int right);
 
 void heapSort(char *s, int n);
 
 char *sort(char *s);
-*/
