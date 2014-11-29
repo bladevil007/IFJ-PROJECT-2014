@@ -312,10 +312,6 @@ token = getnextToken(LEX_STRUCTPTR);
         case ID:
         case WHILE:
         case IF:
-        case  LENGTH:
-        case  COPY:
-        case  FIND:
-        case  SORT:
         case  WRITE:
         case  READLN:
         {
@@ -379,10 +375,6 @@ token = getnextToken(LEX_STRUCTPTR);
         case ID:
         case WHILE:
         case IF:
-        case  LENGTH:
-        case  COPY:
-        case  FIND:
-        case  SORT:
         case  WRITE:
         case  READLN:
         {
@@ -437,10 +429,6 @@ token = getnextToken(LEX_STRUCTPTR);
         case ID:
         case WHILE:
         case IF:
-        case  LENGTH:
-        case  COPY:
-        case  FIND:
-        case  SORT:
         case  WRITE:
         case  READLN:
         {
@@ -539,6 +527,13 @@ int command(int value)
                         ELEMENT->defined=false_hash;
                       ///hodnota vo funkcii mu bola pridana
                     else
+                    { 
+                    if(IN_FUNCTION==0)
+                    SUPPORT->defined=true_hash;
+                    else if(IN_FUNCTION==1)
+                    SUPPORT2->defined=true_hash;
+                    }
+                    
                     ELEMENT->defined=true_hash;
                     if(ELEMENT->id==FUNCTION_hash)
                        ELEMENT->valuedef=true_hash;
@@ -638,7 +633,7 @@ if(value==WRITE)
 {
 
     token=getnextToken(LEX_STRUCTPTR);
-            if(token==ID || token==CONST_STRING)
+            if(token==ID || token==CONST_STRING || token==REALo || token==CONST || token==TRUE || token==FALSE)
             {
                         if(token==ID)
                         {
