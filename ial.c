@@ -125,91 +125,117 @@ struct record *hashtable_add(THash_table *table, int id, char *key, int type, ch
 
 ///Nataly funkcie
 
-/* calculation of string length */
 int length(char *s) {
 
 	return strlen(s);
 }
 
 /* substring copy */
-/*char *copy(char *s, int i, int n) {
+char *copy(char *s, unsigned i, unsigned n) { //funkce vraci ukazatel na podretezec, v pripade neuspechu volani malloc vraci NULL
 
-    char *r;
-    r = (char) malloc((n+1)*sizeof(char));
+    if (s != NULL) //pokud byl predan retezec
+    {
+		unsigned delka = strlen(s);
+		char *r; //vysledny podretezec
+		if (i >= 1 && i <= delka) //pokud je povoleny rozsah (nehleda se mimo retezec)
+		{
+			if ((r = malloc((n+1)*sizeof(char))) == NULL)
+				return NULL;
+			strncpy(r, s+i-1, n);
 
-    strncpy(r, s+i-1, n);
-
-    if (n > 0)
-    	r[n]= '\0';
-
-	return r;
-}
-*/
-/* FAIL vector for KMP algorithm */
-/*void failKMP(char *p, int pl, int *fail) {
-
-	int k, r;
-
-	fail[0] = -1;
-
-	for (k = 1; k < pl; k++) {
-		r = fail[k-1];
-
-		while (r > -1 && p[r+1] != p[k])
-			r = fail[r];
-
-		fail[k] = r+1;
+			if (n > 0)
+				r[n]= '\0';
+		}
+		else //v tomto pripade se vraci prazdny retezec
+		{
+			if ((r = malloc(sizeof(char))) == NULL)
+					return NULL;
+			r[0] = '\0'; //v pripade, ze zacatek hledani retezce je az za retezcem, vraci se prazdny retezec
+		}
+		return r;
 	}
+	else //pokud predany retezec mel hodnotu NULL
+	{
+		return NULL;
+	}
+		
 }
-*/
-/* KMP algorithm */
-/*int matchKMP(char *search, char *txt, int pl, int tl, int *fail) {
 
-	int pi, ti;
+int *KMPFail (char *vzorek, int delka_vzorku) //funkce na vytvoreni vektoru FAIL ze vzorku - pouzivana u funkce FIND
+{
+	int j; //pomocne promenne
+	int *fail; //vektor FAIL
+	
+	if((fail = malloc(sizeof(int)*delka_vzorku)) == NULL)
+		return NULL;
+	
+	fail[0] = -1; //zacatek vektoru
+	for (int i = 1; i < delka_vzorku; i++) //vytvareni vektoru
+	{
+		j = fail[i-1];
+		while ((j > -1) && (vzorek[j] != vzorek[i-1]))
+		{
+			j = fail[j];
+		}
+		fail[i] = j+1;
+	}
+	return fail; 	
+}
 
-	pi = 0;
-	ti = 0;
 
-	while (ti < tl && pi < pl) {
-
-		if (pi == -1 || txt[ti] == search[pi]) {
-			pi++;
-			ti++;
+int matchKMP(char *text, char *vzorek, int delka_textu, int delka_vzorku) //funkce vraci pozici shody, v pripade chyby vraci -1, Funkce pouzita ve funkci find
+{
+	int *fail; //vektor fail
+	int index_vzorku = 0;
+	int index_textu = 0;
+	
+	if((fail = KMPFail(vzorek, delka_vzorku)) == NULL)
+		return -1;
+	
+	while((index_vzorku < delka_vzorku) && (index_textu < delka_textu))
+	{
+		if((index_vzorku == -1) || (text[index_textu] == vzorek[index_vzorku]))
+		{
+			index_textu++;
+			index_vzorku++;
 		}
 		else
-			pi = fail[pi];
-
-		if (pi >= pl)
-			matchKMP = ti - pl + 1;
-		else
-			matchKMP = ti;
+		{
+			index_vzorku = fail[index_vzorku];
+		}
 	}
-}*/
-
-/* substring search */
-/*int find(char *s, char *search) {
-
-	int pl, tl, result;
-
-	pl = length(search);
-	tl = length(s);
-
-	int *fail;
-    fail = (int) malloc(pl*sizeof(int));
-
-	result = matchKMP(search, s, pl, tl, fail);
-
-	free (fail);
-
-	if (result == tl)
-		return 0;
-
+	free(fail); //uvolneni vektoru fail
+	if(index_vzorku >=delka_vzorku)
+		return index_textu - delka_vzorku;
 	else
-		return result;
+		return index_textu;
 }
-*/
+
+int find (char *text, char *vzorek) //funkce pro vyhledani podretezce v retezci vraci -1 pri chybe
+{
+	int vysledek; 
+	if(text != NULL && vzorek != NULL)
+	{
+		if(strcmp(vzorek, "") != 0) //pokud hledany vzorek neni prazdny retezec		
+		{
+			int delka_textu = strlen(text);
+			int delka_vzorku = strlen(vzorek);
+			if ((vysledek = matchKMP(text, vzorek, delka_textu, delka_vzorku)) == -1) //pokud doslo k chybe
+			return -1;
+			if (vysledek == delka_textu)
+				return 0;
+			else
+				return vysledek +1;
+		}
+		else //pokud je hledany podretezec prazdny retezec - nachazi se na pozici 1
+			return 1;
+	}
+	else
+		return -1;
+}
+
 /* sift down procedure for heap sort algorithm */
-/*void siftDown(char *s, int left, int right) {
+void siftDown(char *s, int left, int right) {
 
 	int i, j;
 	char tmp;
@@ -237,15 +263,14 @@ int length(char *s) {
 			return;
 	}
 }
-*/
+
 /* HeapSort algorithm */
-/*void heapSort(char *s, int n) {
+void heapSort(char *s, int n) {
 
 	int left, right;
 	char tmp;
-*/
 	/* heapify */
-	/*for (left = (n - 2)/2; left >= 0; left--) {
+	for (left = (n - 2)/2; left >= 0; left--) {
 
 		siftDown(s, left, n);
 	}
@@ -259,17 +284,22 @@ int length(char *s) {
 		siftDown(s, 0, right);
 	}
 }
-*/
 /* string sort */
-/*char *sort(char *s) {
+char *sort(char *s) {
 
-	int sl = length(s);
-	char *result;
+	if (s != NULL)
+	{
+		int sl = length(s); //zjisteni delky retezce
+		char *result;
 
-    result = copy(s, 1, sl);
+		result = copy(s, 1, sl); //zkopirovani retezce do nove promenne
 
-	heapSort(result, sl);
+		heapSort(result, sl); //serazeni
 
-	return result;
+		return result;
+	}
+	else //pokud byl jako parametr predan NULL
+	{
+		return NULL;
+	}
 }
-*/
