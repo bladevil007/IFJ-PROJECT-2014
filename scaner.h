@@ -3,7 +3,7 @@
 #include "string.h"
 void SourceInitialize(FILE *f);
 int getnextToken (LEX_STRUCT *LEX_STRUCTPTR);
-
+FILE *source;
 #define ID  10            // IDENTIFICATOR
 #define BEGIN 11
 #define BOOLEAN 12

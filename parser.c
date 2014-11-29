@@ -64,7 +64,6 @@ int ERRORRET(int value)
  */
 int program(int token)
 {
-
     ///program zacina var a pokracuje begin bez funkcii
     if(token==VAR && FUNCTION_ENABLE==0)  ///nebola definovana ziadna funkcia moze ist var
     {

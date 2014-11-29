@@ -577,8 +577,6 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
             return SUCCESS;
         else return ERRORRET(TOP_Stdin);
     }
-
-
                   ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 
@@ -588,7 +586,10 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                             {
 
                                 struct record *SUPP=ELEMENT;
-
+                                 char hack=getc(source);
+                                 if(hack=='(')
+                                 {
+                                fseek(source,ftell(source)-1,SEEK_SET);
                                 TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                 if(TOP_Stdin==LEFT_ROUND)
                                 {
@@ -657,7 +658,12 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                     }else return ERRORRET(TOP_Stdin);
 
 
-                                }else return ERRORRET(TOP_Stdin);                                                                ///dorobit priradovanie funkcie
+                                }else return ERRORRET(TOP_Stdin);
+                                }
+                                    else{
+                                    fseek(source,ftell(source)-1,SEEK_SET);
+                                    PrecedentAnal(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                                        }                                                               ///dorobit priradovanie funkcie
 
                             }
                             else exit(E_SEMANTIC_UNDEF);
@@ -772,9 +778,6 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
 
     }else if(decodeSA(concateT)==PSA_DOLAR)
     {
-
-
-
         CheckEND(concateT,type);
         return SUCCESS;
     }
@@ -784,7 +787,6 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
     else
         return ERRORRET(concateT);
 }
-
 ////KONTROLA PRE PRIRADENIE HODNOT
 int VysledokID(int Vysledok,int id )
 {
