@@ -218,16 +218,37 @@ int add_str(inf_array *a, char* strin)
     return ret_val;
 }
 
-char *concatenate(const char *s1, const char *s2)
+char *concatenate(const char *s1, const char *s2) //funkce na konkatenaci dvou retezcu, vraci NULL v pripade chyby
 {
-	int length_s1 = strlen(s1); //delka prvniho retezce
-	int length = length_s1 + strlen(s2) + 1; //delka pro alokovani retezce (+1 kvuli nulovemu znaku)
 	char *concatenated; //ukazatel na konkatenovany retezec
-
-	if ((concatenated = malloc(sizeof(char)*length)) == NULL)
+	if (s1 != NULL && s2 != NULL) //pokud ani jeden z retezcu neni NULL
+	{
+		if (strcmp(s1, "") == 0) //pokud je s1 prazdny retezec vysledkem konkatenace je pouze retezec s2
+		{
+			if ((concatenated = malloc(sizeof(char)*(strlen(s2)+1))) == NULL) //alokace mista pro zkopirovani retezce s2
+				return NULL;
+			strcpy(concatenated, s2);
+			return concatenated;
+		}
+		if (strcmp(s2, "") == 0) //pokud je s2 prazdny retezec, vysledkem konkatenace je pouze retezec s1
+		{
+			if ((concatenated = malloc(sizeof(char)*(strlen(s1)+1))) == NULL)
+				return NULL;
+			strcpy(concatenated, s1);
+			return concatenated;
+		}
+		//pokud ani jeden z retezcu neni prazdny:
+		int length_s1 = strlen(s1); //delka prvniho retezce
+		int length = length_s1 + strlen(s2) + 1; //delka pro alokovani retezce (+1 kvuli nulovemu znaku)
+		if ((concatenated = malloc(sizeof(char)*length)) == NULL)
+			return NULL;
+		strcpy(concatenated, s1);//zkopirovani prvni casti retezce
+		strcpy(concatenated + length_s1, s2); //zkopirovani druhe casti retezce
+		return concatenated;	
+	}
+	else //pokud je jeden z ukazatelu NULL
+	{
 		return NULL;
-	strcpy(concatenated, s1);//zkopirovani prvni casti retezce
-	strcpy(concatenated + length_s1, s2); //zkopirovani druhe casti retezce
-	return concatenated;
+	}
 }
 
