@@ -1,9 +1,11 @@
-int generate_inst(char*,float,float,int,int);
+
 
 
 
 typedef struct {
 char *a;
+char *a2;
+char *a3;
 float b;
 float c;
 int specialcode;
@@ -26,7 +28,7 @@ int init_pointer_array(inf_pointer_array *a);
 void free_pointer_array(inf_pointer_array *a);
 
 int add_new_pointer(inf_pointer_array *a, INSTape* pointer);
-int generate_inst(char *A,float B,float C,int CODE,int what);
+int generate_inst(char *,char *,float ,float ,int ,int );
 int init_generate();
 int foo(INSTape *INSTR);
 int searchrecord(inf_pointer_array* beh_programu);
@@ -48,3 +50,13 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define LENGTHID 214
 #define ADD 215
 #define ADDH 216
+#define COPYSTRINGID_ 217
+#define COPYSTRINGIDID 218
+#define COPYSTRING_ID 219
+#define COPYIDID_ 220
+#define COPYID_ID 221
+#define COPYIDIDID 226
+#define FINDSTRSTR 222
+#define FINDIDSTR 223
+#define FINDSTRID 224
+#define FINDIDID 225

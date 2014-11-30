@@ -158,17 +158,17 @@ char *copy(char *s, unsigned i, unsigned n) { //funkce vraci ukazatel na podrete
 	{
 		return NULL;
 	}
-		
+
 }
 
 int *KMPFail (char *vzorek, int delka_vzorku) //funkce na vytvoreni vektoru FAIL ze vzorku - pouzivana u funkce FIND
 {
 	int j; //pomocne promenne
 	int *fail; //vektor FAIL
-	
+
 	if((fail = malloc(sizeof(int)*delka_vzorku)) == NULL)
 		return NULL;
-	
+
 	fail[0] = -1; //zacatek vektoru
 	for (int i = 1; i < delka_vzorku; i++) //vytvareni vektoru
 	{
@@ -179,7 +179,7 @@ int *KMPFail (char *vzorek, int delka_vzorku) //funkce na vytvoreni vektoru FAIL
 		}
 		fail[i] = j+1;
 	}
-	return fail; 	
+	return fail;
 }
 
 
@@ -188,10 +188,10 @@ int matchKMP(char *text, char *vzorek, int delka_textu, int delka_vzorku) //funk
 	int *fail; //vektor fail
 	int index_vzorku = 0;
 	int index_textu = 0;
-	
+
 	if((fail = KMPFail(vzorek, delka_vzorku)) == NULL)
 		return -1;
-	
+
 	while((index_vzorku < delka_vzorku) && (index_textu < delka_textu))
 	{
 		if((index_vzorku == -1) || (text[index_textu] == vzorek[index_vzorku]))
@@ -213,10 +213,10 @@ int matchKMP(char *text, char *vzorek, int delka_textu, int delka_vzorku) //funk
 
 int find (char *text, char *vzorek) //funkce pro vyhledani podretezce v retezci vraci -1 pri chybe
 {
-	int vysledek; 
+	int vysledek;
 	if(text != NULL && vzorek != NULL)
 	{
-		if(strcmp(vzorek, "") != 0) //pokud hledany vzorek neni prazdny retezec		
+		if(strcmp(vzorek, "") != 0) //pokud hledany vzorek neni prazdny retezec
 		{
 			int delka_textu = strlen(text);
 			int delka_vzorku = strlen(vzorek);

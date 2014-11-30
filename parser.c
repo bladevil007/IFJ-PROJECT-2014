@@ -77,7 +77,7 @@ int program(int token)
 
             if(token==BEGIN)
             {
-                generate_inst(NULL,0,0,BEGIN_MAIN,0);
+                generate_inst(NULL,0,0,0,BEGIN_MAIN,0);
                 FUNCTION_ENABLE=1;            ///ked nasleduje begin tak uz ziadna funkcia nebude moct ist
                 token=prog();
             }
@@ -152,7 +152,7 @@ int program(int token)
 ///program obsahuje len telo hlavneho programu
     else if(token==BEGIN)
     {
-        generate_inst(NULL,0,0,BEGIN_MAIN,0);
+        generate_inst(NULL,0,0,0,BEGIN_MAIN,0);
         if(CHECK_FUN!=0)                                                ///POCET HLAVICIEK SA ROVNA POCTU FUNKCII
             exit(E_SEMANTIC_UNDEF);
         FUNCTION_ENABLE=1;
@@ -220,7 +220,7 @@ int program(int token)
         else
             return ERRORRET(token);
     }
-generate_inst(NULL,0,0,END_MAIN,0);
+generate_inst(NULL,0,0,0,END_MAIN,0);
 if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE) /// za end. nesmie nasledovat nic ine
     return SUCCESS;
 else
@@ -542,21 +542,26 @@ int command(int value)
                     PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB,ELEMENT);
                       ///Precedencna analyza
 
-                    generate_inst(pole,0,0,MOV,0);
-                    free(pole);
+                    generate_inst(pole,0,0,0,MOV,0);
+                    generate_inst(NULL,0,0,0,EQUAL,0);
 
+
+                    free(pole);
 
                     if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0 && ELEMENT->id!=FUNCTION_hash)
                      {
                         ELEMENT->defined=false_hash;
+                        ELEMENT->valuedef=true_hash;/// pre globalne premenne
                      }
                       ///hodnota vo funkcii mu bola pridana
                     else
                     {
+
                     if(IN_FUNCTION==0)
                     SUPPORT->defined=true_hash;
-                    else if(IN_FUNCTION==1)
+                    else if(IN_FUNCTION==1 && SUPPORT2!=0)
                     SUPPORT2->defined=true_hash;
+                    ELEMENT->valuedef=true_hash;
                     }
 
                     if(ELEMENT->id==FUNCTION_hash)
@@ -579,7 +584,7 @@ int command(int value)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==ID)
             {
-                generate_inst(LEX_STRUCTPTR->str,0,0,READLN,0);
+                generate_inst(LEX_STRUCTPTR->str,0,0,0,READLN,0);
 
 
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
@@ -663,7 +668,7 @@ if(value==WRITE)
 
                         if(token==ID)
                         {
-                        generate_inst(LEX_STRUCTPTR->str,0,0,WRITEID,0);
+                        generate_inst(LEX_STRUCTPTR->str,0,0,0,WRITEID,0);
 
                       ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                                                                       ///Vrati na ukazatel na prvek v hash table
@@ -676,17 +681,17 @@ if(value==WRITE)
               switch(token)
               {
               case CONST_STRING:
-              generate_inst(LEX_STRUCTPTR->str,0,0,WRITESTRING,0);
+              generate_inst(LEX_STRUCTPTR->str,0,0,0,WRITESTRING,0);
               break;
               case CONST:
-              generate_inst(LEX_STRUCTPTR->str,LEX_STRUCTPTR->value,0,WRITEINT,0);
+              generate_inst(LEX_STRUCTPTR->str,0,LEX_STRUCTPTR->value,0,WRITEINT,0);
               break;
               case TRUE:
               case FALSE:
-              generate_inst(LEX_STRUCTPTR->str,token,0,WRITEBOOL,0);
+              generate_inst(LEX_STRUCTPTR->str,0,token,0,WRITEBOOL,0);
               break;
               case REALo:
-              generate_inst(LEX_STRUCTPTR->str,LEX_STRUCTPTR->value,0,WRITEREAL,0);
+              generate_inst(LEX_STRUCTPTR->str,0,LEX_STRUCTPTR->value,0,WRITEREAL,0);
               break;
               }
 
@@ -725,10 +730,10 @@ else if(value==LENGTH)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
                            exit(E_UNINITIALIZED_VAR);
-                        generate_inst(LEX_STRUCTPTR->str,0,0,LENGTHID,0);
+                        generate_inst(LEX_STRUCTPTR->str,0,0,0,LENGTHID,0);
 
                         }else
-                        generate_inst(LEX_STRUCTPTR->str,0,0,LENGTH,0);
+                        generate_inst(LEX_STRUCTPTR->str,0,0,0,LENGTH,0);
 
                         token=getnextToken(LEX_STRUCTPTR);
                         if(token==RIGHT_ROUND)
@@ -824,9 +829,9 @@ else if(value==COPY)
 
                                             }
                                             if(what==0)
-                                           generate_inst(pole,E1,E2,COPYSTRING,0);
+                                           generate_inst(pole,0,E1,E2,COPYSTRING,0);
                                            else
-                                            generate_inst(pole,E1,E2,COPYID,0);
+                                            generate_inst(pole,0,E1,E2,COPYID,0);
 
                                            free(pole);
                                             token=getnextToken(LEX_STRUCTPTR);
@@ -844,6 +849,8 @@ else if(value==COPY)
     ///funkcia find
 else if(value==FIND)
 {
+    char* pole;
+    int id=0;
         token=getnextToken(LEX_STRUCTPTR);
         if(token==LEFT_ROUND)
         {
@@ -852,6 +859,9 @@ else if(value==FIND)
                 {
                        if(token==ID)
                         {
+                         pole=(char*)malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
+                            strcpy(pole,LEX_STRUCTPTR->str);
+                            id=1;
                     ///Kontrola ze vsetky vstupne hodnoty su String
                       ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                                                                             ///Vrati na ukazatel na prvek v hash table
@@ -861,6 +871,12 @@ else if(value==FIND)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
                             exit(E_UNINITIALIZED_VAR);
+                        }else
+                        {
+
+                          pole=(char*)malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
+                            strcpy(pole,LEX_STRUCTPTR->str);
+
                         }
 
                         token=getnextToken(LEX_STRUCTPTR);
@@ -881,7 +897,20 @@ else if(value==FIND)
                                     exit(E_SEMANTIC_TYPE);
                                 else if(ELEMENT->defined!=true_hash)
                                   exit(E_UNINITIALIZED_VAR);
+                                   if(id==1)
+                                   generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDIDID,0);
+                                   else
+                                    generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDSTRID,0);
+
+                                }else
+                                {
+                                    if(id==1)
+                                    generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDIDSTR,0);
+                                    else
+                                    generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDSTRSTR,0);
                                 }
+                                    free(pole);
+
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==RIGHT_ROUND)
                                     return SUCCESS;
@@ -910,10 +939,10 @@ else if(value==SORT)
                             exit(E_SEMANTIC_TYPE);
                         else if(ELEMENT->defined!=true_hash)
                           exit(E_UNINITIALIZED_VAR);
-                     generate_inst(LEX_STRUCTPTR->str,0,0,SORTID,0);
+                     generate_inst(LEX_STRUCTPTR->str,0,0,0,SORTID,0);
 
                 }else
-                generate_inst(LEX_STRUCTPTR->str,0,0,SORTSTRING,0);
+                generate_inst(LEX_STRUCTPTR->str,0,0,0,SORTSTRING,0);
 
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)

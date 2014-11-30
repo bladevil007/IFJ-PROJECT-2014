@@ -21,6 +21,7 @@ int operator=0;
 float E1=0;
 float E2=0;
 float E3=0;
+int ZEROIN=0;
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
 TStack *Helper;  ///na expresion
@@ -32,10 +33,12 @@ int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
 int PODMIENKA_POD1=0;
 int LAST=0;
 int LLAST=0;
+int RULE=0;
 int LASTindex=0;
 int CONTROL=0;
 int switch_control=0;
 int PSA_Stalker;    ///polozka v PSA Table
+int ZERO=0;
 
 
 int PrecedenceTABLE[13][13];
@@ -63,90 +66,154 @@ while(i<11)
 {
   if(rules[i][0]==scan[0] &&  rules[i][1]==scan[1] &&  rules[i][2]==scan[2])
   {
-    if(i==0)
-    {
-        if(E3==0 && E2!=0)         ///scitanie
-        {
-            generate_inst(NULL,E1,E2,ADD,1);
-            E2=0;
-            E1=0;
-        }else if(E3==0 && E2==0)
-          {
-            generate_inst(NULL,E1,0,ADD,1);
-            E1=0;
-          }
-          else if(E3!=0 && E2!=0)
-          {
-            generate_inst(NULL,E2,E3,ADD,1);
-            E2=0;
-            E3=0;
-          }else if(E1==0)
-          {
-            generate_inst(NULL,0,0,ADDH,1);
-            E2=0;
-            E3=0;
-          }
-    }
-    else
-         if(i==2)       ///nasobenie
-    {
-        if(E3==0 && E2!=0)
-        {
-            generate_inst(NULL,E1,E2,MULTIPLY,0);
-            E2=0;
-        }else if(E3==0 && E2==0)
-          {
-            generate_inst(NULL,E1,0,MULTIPLY,1);
-            E1=0;
-          }
-           else if(E3!=0 && E2!=0)
-          {
-            generate_inst(NULL,E2,E3,MULTIPLY,0);
-            E2=0;
-            E3=0;
-          }
-    }
-    else
-         if(i==3)       ///delenie
-    {
-        if(E3==0 && E2!=0)
-        {
-            generate_inst(NULL,E1,E2,DIVIDE,0);
-            E2=0;
-            E1=0;
-        }else if(E3==0 && E2==0)
-          {
-            generate_inst(NULL,E1,0,DIVIDE,1);
-            E1=0;
-          }
-            else if(E3!=0 && E2!=0)
-          {
-            CONTROL=1;
-            generate_inst(NULL,E2,E3,DIVIDE,0);
-            E2=0;
-            E3=0;
-          }
-    }
-    else
-         if(i==1)       ///minus
-    {
-        if(E3==0 && E2!=0)
-        {
-            generate_inst(NULL,E1,E2,MINUS,1);
-            E2=0;
-            E1=0;
-        }else if(E3==0 && E2==0)
-          {
-            generate_inst(NULL,E1,0,MINUS,1);
-            E1=0;
-          }
-              else if(E3!=0 && E2!=0)
-          {
-            generate_inst(NULL,E2,E3,MINUS,1);
-            E2=0;
-            E3=0;
-          }
-    }
+     if(i==0)
+     {
+         RULE=1;
+
+         if((E2!=0 && E1!=0 && E3==0) || ZERO==1)
+         {
+
+             if(CONTROL==0)
+             {
+                 generate_inst(NULL,0,E1,E2,ADD,0);
+                 CONTROL=1;
+                 E2=0;
+             }
+             else if(CONTROL==1)
+             {
+               generate_inst(NULL,0,E2,0,ADD,1);
+               E2=0;
+             }
+             else if(CONTROL==3)
+             {
+               generate_inst(NULL,0,E1,0,ADD,3);
+               E2=0;
+               CONTROL=1;
+             }
+             else if(CONTROL==4)
+             {
+               generate_inst(NULL,0,E1,0,ADD,4);
+               E2=0;
+               CONTROL=1;
+             }
+     }}
+
+         else if (i==2)
+         {
+             RULE=1;
+            if((E1!=0 && E2!=0 && E3==0)|| ZERO==1)
+            {
+                if(CONTROL==0)
+             {
+                 generate_inst(NULL,0,E1,E2,MULTIPLY,0);
+                 CONTROL=1;
+                 E2=0;
+             }
+             else if(CONTROL==1)
+             {
+
+               generate_inst(NULL,0,E2,0,MULTIPLY,1);
+               E2=0;
+             }
+            }else if ((E1!=0 && E2!=0 && E3!=0 )||ZERO==1)
+            {
+               if(CONTROL==0)
+               {
+                 generate_inst(NULL,0,E3,E2,MULTIPLY,0);
+                 CONTROL=3;
+                 E3=0;
+               }
+               else if(CONTROL==1)
+               {
+                 generate_inst(NULL,0,E3,E2,MULTIPLY,0);
+                 CONTROL=4;
+                 E3=0;
+               }
+               else if(CONTROL==3)
+               {
+                 generate_inst(NULL,0,E3,E2,MULTIPLY,1);
+                 CONTROL=3;
+                 E3=0;
+               }
+               else if(CONTROL==4){
+                generate_inst(NULL,0,E3,E2,MULTIPLY,1);
+                 CONTROL=4;
+                 E3=0;
+               }
+            }
+
+         }
+         else if(i==1)
+         {
+             RULE=1;
+             if((E2!=0 && E1!=0 && E3==0)||ZERO==1)
+         {
+             if(CONTROL==0)
+             {
+                 generate_inst(NULL,0,E1,E2,MINUS,0);
+                 CONTROL=1;
+                 E2=0;
+             }
+             else if(CONTROL==1)
+             {
+               generate_inst(NULL,0,E2,0,MINUS,1);
+               E2=0;
+             }
+             else if(CONTROL==3)
+             {
+               generate_inst(NULL,0,E1,0,MINUS,3);
+               E2=0;
+               CONTROL=1;
+             }
+             else if(CONTROL==4)
+             {
+               generate_inst(NULL,0,E1,0,MINUS,4);
+               E2=0;
+               CONTROL=1;
+             }
+     }  }  else if (i==3)
+         {
+             RULE=1;
+            if((E1!=0 && E2!=0 && E3==0)||ZERO==1)
+            {
+                if(CONTROL==0)
+             {
+                 generate_inst(NULL,0,E1,E2,DIVIDE,0);
+                 CONTROL=1;
+                 E2=0;
+             }
+             else if(CONTROL==1)
+             {
+               generate_inst(NULL,0,E2,0,DIVIDE,1);
+               E2=0;
+             }
+            }else if (E1!=0 && E2!=0 && E3!=0 )
+            {
+               if(CONTROL==0)
+               {
+                 generate_inst(NULL,0,E3,E2,DIVIDE,0);
+                 CONTROL=3;
+                 E3=0;
+               }
+               else if(CONTROL==1)
+               {
+                 generate_inst(NULL,0,E3,E2,DIVIDE,0);
+                 CONTROL=4;
+                 E3=0;
+               }
+               else if(CONTROL==3)
+               {
+                 generate_inst(NULL,0,E3,E2,DIVIDE,1);
+                 CONTROL=3;
+                 E3=0;
+               }
+               else if(CONTROL==4){
+                generate_inst(NULL,0,E3,E2,DIVIDE,1);
+                 CONTROL=4;
+                 E3=0;
+               }
+            }
+         }
 
       if((LASTindex %2)==0)
         LAST=i;
@@ -554,12 +621,13 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
          else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo)
          {
+              if(LEX_STRUCTPTR->value==0)
+               ZERO=1;
 
 
-
-             if(E1==0)
+             if(E1==0 && ZERO!=1)
                  E1=LEX_STRUCTPTR->value;
-             else if(E1!=0 && E2==0)
+             else if((E1!=0 && E2==0 )||ZERO==1)
                  E2=LEX_STRUCTPTR->value;
              else
                  E3=LEX_STRUCTPTR->value;
@@ -685,8 +753,6 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
         else return ERRORRET(TOP_Stdin);
     }
                   ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
-
                     if(ELEMENT->id==FUNCTION_hash)
                     {
                             if(ELEMENT->defined!=3)
@@ -716,8 +782,6 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                                exit(E_SEMANTIC_TYPE);
                                         }
 
-
-
                                         TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                         checklex(TOP_Stdin);
 
@@ -728,7 +792,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                             if(ELEMENT->type != SUPP->params[i])
                                                 exit(E_SEMANTIC_TYPE);
                                             if(ELEMENT->defined!=true_hash)
-                                                exit(E_UNINITIALIZED_VAR);
+                                               exit(E_UNINITIALIZED_VAR);
                                         }
 
                                         else if(TOP_Stdin == CONST || TOP_Stdin==REALo || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING)
@@ -780,7 +844,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                         if(ELEMENT->defined!=true_hash)
                           exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
-                      generate_inst(LEX_STRUCTPTR->str,0,0,CONCATEID,0);
+                      generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                        ///zavolaj konkatenaciu retazcov
                       return 0;
@@ -808,17 +872,17 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
 else if(TOP_Stdin==CONST_STRING && type==ID)
 {
     VysledokID(Vysledok,STRING_hash);
-    generate_inst(LEX_STRUCTPTR->str,0,0,CONCATESTRING,0);
+    generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0);
     concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
     return SUCCESS;
 }
 else if ((TOP_Stdin==TRUE || TOP_Stdin==FALSE)&& type==ID)
 {
-
    VysledokID(Vysledok,BOOLEAN_hash);
    int token=getnextToken(LEX_STRUCTPTR);
    if(decodeSA(token)==PSA_DOLAR)
    {
+       generate_inst(NULL,0,TOP_Stdin,0,ADD,0);    ///OK
         CheckEND(token,type);
         return SUCCESS;
    }else
@@ -848,11 +912,17 @@ if(type==ID && Vysledok!=PODMIENKA_POD)
 exit(E_SEMANTIC_TYPE);
 
 ///Generovat mov pri ziadnych operatoroch
+if(RULE==0)
+{
+generate_inst(NULL,0,E1,0,ADD,0);
+}
 
-
+RULE=0;
+CONTROL=0;
 E1=0;
 E2=0;
 E3=0;
+ZERO=0;
 PODMIENKA_POD=0;
 PODMIENKA_POD1=0;
 switch_control=0;
@@ -878,17 +948,18 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
        if(concateT==ID)
        {
 
-           ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);   ///zistime ci existuje v tabulke
+           ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+  ///zistime ci existuje v tabulke
            VysledokID(Vysledok,ELEMENT->type);
            if(ELEMENT->defined!=true_hash)
                 exit(E_UNINITIALIZED_VAR);
-                generate_inst(LEX_STRUCTPTR->str,0,0,CONCATEID,0);
+                generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
        {
 
-           generate_inst(LEX_STRUCTPTR->str,0,0,CONCATESTRING,0);
+           generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 

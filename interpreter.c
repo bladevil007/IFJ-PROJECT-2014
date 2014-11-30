@@ -12,6 +12,8 @@
 #include "codegenerate.h"
 #include "ial.h"
 struct record *temp;
+struct record *temp2;
+struct record *temp3;
 char *globalne_pole=0;
 
 
@@ -98,7 +100,7 @@ int foo(INSTape *INSTR)
             printf("%i",(int)temp->value.i);
             break;
         case(REAL_hash):
-            printf("%f",temp->value.d);
+            printf("%g",temp->value.d);
             break;
         case(STRING_hash):
             printf("%s",temp->value.str);
@@ -172,96 +174,188 @@ int foo(INSTape *INSTR)
         hodnota = length(temp->value.str);
         break;
 
+
         case ADD:
+            if(INSTR->specialcode==0)
             if(hodnota==0)
             hodnota=INSTR->b+INSTR->c;
-            else if(hodnota2==0)
-            {
-            hodnota2=INSTR->b+INSTR->c;
-            }
             else
+            hodnota2=INSTR->b+INSTR->c;
+            else if(INSTR->specialcode==1)
             {
-              hodnota=hodnota+hodnota2;
-              hodnota2=0;
+                hodnota=hodnota+INSTR->b;
             }
-            if(hodnota2!=0)
+            else if(INSTR->specialcode==3)
+            {
+                hodnota=hodnota+INSTR->b;
+            }
+            else if(INSTR->specialcode==4)
             {
               hodnota=hodnota+hodnota2;
-              hodnota2=0;
             }
             break;
 
         case MULTIPLY:
-            if(hodnota==0)
-            hodnota=INSTR->b*INSTR->c;
-            else if(hodnota2==0)
-            {
-            if(INSTR->specialcode==1)      ///1 NASOBIME cislom nie nulou
-                {
-                hodnota2=INSTR->b;
-                }
+            if(INSTR->specialcode==0)
+            {if(hodnota==0)
+            {hodnota=INSTR->b*INSTR->c;
+             hodnota3=1;
+            }
             else
+            {
             hodnota2=INSTR->b*INSTR->c;
-            }
-            else
+            hodnota3=2;
+            }}
+            else if(INSTR->specialcode==1)
             {
-              hodnota=hodnota*hodnota2;
-              hodnota2=0;
-            }
-            if(hodnota2!=0)
-            {
-              hodnota=hodnota*hodnota2;
-              hodnota2=0;
+                if(hodnota3==1 || hodnota3==0)
+                hodnota=hodnota*INSTR->b;
+                else
+                hodnota2=hodnota2*INSTR->b;
             }
             break;
 
-        case DIVIDE:
 
-            if(hodnota==0)
-            hodnota=INSTR->b/INSTR->c;
-            else if(hodnota2==0)
-            {
-             if(INSTR->specialcode==1)                           ///1 NASOBIME cislom nie nulou
-                {
-                hodnota2=INSTR->b;
-                }
-            else
-            hodnota2=INSTR->b/INSTR->c;                            ///1 Delime cislom nie nulou
-            }
-            else
-            {
-              hodnota=hodnota/hodnota2;
-              hodnota2=0;
-            }
-
-            if(hodnota2!=0)
-            {
-              hodnota=hodnota/hodnota2;
-              hodnota2=0;
-            }
-
-
-
-
-            break;
         case MINUS:
-            if(hodnota==0)
+            if(INSTR->specialcode==0)
+            {if(hodnota==0)
             hodnota=INSTR->b-INSTR->c;
-            else if(hodnota2==0)
+            else
+            hodnota2=INSTR->b-INSTR->c;}
+            else if(INSTR->specialcode==1)
             {
-            hodnota2=INSTR->b-INSTR->c;
+                hodnota=hodnota-INSTR->b;
+            }
+            else if(INSTR->specialcode==3)
+            {
+                hodnota=INSTR->b-hodnota;
+            }
+            else if(INSTR->specialcode==4)
+            {
+              hodnota=hodnota-hodnota2;
+            }
+          break;
+
+       case DIVIDE:
+
+             if(INSTR->specialcode==0)
+             {
+            if(hodnota==0)
+            {hodnota=INSTR->b/INSTR->c;
+             if(INSTR->c==0)
+                exit(E_DIVISION_BY_ZERO);
+             hodnota3=1;
             }
             else
             {
-              hodnota=hodnota-hodnota2;
-              hodnota2=0;
-            }
-             if(hodnota2!=0)
+            hodnota2=INSTR->b/INSTR->c;
+             if(INSTR->c==0)
+                exit(E_DIVISION_BY_ZERO);
+            hodnota3=2;
+            }}
+            else if(INSTR->specialcode==1)
             {
-              hodnota=hodnota-hodnota2;
-              hodnota2=0;
+                if(hodnota3==1 || hodnota3==0)
+                hodnota=hodnota/INSTR->b;
+                else
+                hodnota2=hodnota2/INSTR->b;
+                if(INSTR->b==0)
+                exit(E_DIVISION_BY_ZERO);
             }
             break;
+
+       case EQUAL:
+            hodnota=0;
+            hodnota2=0;
+            break;
+
+
+
+
+            ///retazce
+
+
+
+
+        case COPYSTRINGID_:         //copy('ahoj', i, 52);
+            globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            globalne_pole = copy(INSTR->a, temp->value.i, INSTR->c);
+            break;
+
+        case COPYSTRING_ID:         //copy('ahoj', 52, i);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            globalne_pole = malloc(temp->value.i * sizeof(char) + 1);
+            globalne_pole = copy(INSTR->a, INSTR->b, temp->value.i);
+            break;
+
+        case COPYSTRINGIDID:         //copy('ahoj', 52, i);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
+            globalne_pole = copy(INSTR->a, temp->value.i, temp2->value.i);
+            break;
+
+        case COPYIDID_:             //copy(id,id,52);
+            globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            globalne_pole = copy(temp->value.str, temp2->value.i, INSTR->c);
+            break;
+
+        case COPYID_ID:             //copy(id,52,id);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
+            globalne_pole = copy(temp->value.str, INSTR->b, temp2->value.i);
+            break;
+
+        case COPYIDIDID:             //copy(id,id,id);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            temp3 = hashtable_search(GlobalnaTAB,INSTR->a3);
+            globalne_pole = malloc(temp3->value.i * sizeof(char) + 1);
+            globalne_pole = copy(temp->value.str, temp2->value.i, temp3->value.i);
+            break;
+
+        case FINDSTRSTR:
+            hodnota = find(INSTR->a,INSTR->a2);
+            break;
+
+        case FINDIDSTR:
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            hodnota = find(temp->value.str, INSTR->a2);
+            break;
+
+        case FINDSTRID:
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            hodnota = find(INSTR->a,temp->value.str);
+            break;
+
+        case FINDIDID:
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            hodnota = find(temp->value.str,temp2->value.str);
+            break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ///*-+/ hotovo bez premennych
 

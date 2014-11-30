@@ -35,10 +35,12 @@ return 0;
 }
 
 
-
 ///Hlavicka sa mozno zmeni este
-int generate_inst(char *A,float B,float C,int CODE,int what)
+int generate_inst(char *A,char *A2,float B,float C,int CODE,int what)
 {
+
+
+
 INSTape *Instruction;
 if((Instruction=(INSTape*)malloc(sizeof(INSTape)))==NULL)
         exit(E_INTERNAL);
@@ -183,6 +185,7 @@ case CONCATEID:
     break;
 case ADD:
     Instruction->a=NULL;
+    Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=ADD;
@@ -208,19 +211,118 @@ case DIVIDE:
     break;
 case MINUS:
     Instruction->a=NULL;
+    Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=MINUS;
     add_new_pointer(InstructionTape,Instruction);
     break;
-case ADDH:
+case EQUAL:
     Instruction->a=NULL;
     Instruction->b=B;
     Instruction->c=C;
-    Instruction->CODE=ADDH;
+    Instruction->CODE=EQUAL;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+case FINDSTRSTR:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a,A);
+    strcpy(Instruction->a2,A2);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=FINDSTRSTR;
     add_new_pointer(InstructionTape,Instruction);
     break;
 
+case FINDIDSTR:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a,A);
+    strcpy(Instruction->a2,A2);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=FINDIDSTR;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case FINDSTRID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a,A);
+    strcpy(Instruction->a2,A2);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=FINDSTRID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case FINDIDID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a,A);
+    strcpy(Instruction->a2,A2);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=FINDIDID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+case COPYSTRINGID_:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYSTRINGID_;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case COPYSTRING_ID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYSTRING_ID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case COPYSTRINGIDID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYSTRINGIDID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+case COPYIDID_:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYIDID_;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case COPYID_ID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYID_ID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case COPYIDIDID:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=COPYIDIDID;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 
 
 
