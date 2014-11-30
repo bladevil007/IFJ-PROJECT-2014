@@ -6,6 +6,7 @@ typedef struct {
 char *a;
 float b;
 float c;
+int specialcode;
 int CODE;
 }INSTape;
 
@@ -45,3 +46,5 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define CONCATESTRING 212
 #define CONCATEID 213
 #define LENGTHID 214
+#define ADD 215
+#define ADDH 216

@@ -18,6 +18,9 @@ struct record* lookforElement(LEX_STRUCT *,int ,THash_table *,THash_table*,struc
 int recorderSEM(char);
 struct record *SUPPORT2;
 int operator=0;
+float E1=0;
+float E2=0;
+float E3=0;
 TStack *stackPSA;  /// stack pre tokeny
 TStack *stackSEM;  /// stack pre pravidla
 TStack *Helper;  ///na expresion
@@ -30,6 +33,7 @@ int PODMIENKA_POD1=0;
 int LAST=0;
 int LLAST=0;
 int LASTindex=0;
+int CONTROL=0;
 int switch_control=0;
 int PSA_Stalker;    ///polozka v PSA Table
 
@@ -59,13 +63,97 @@ while(i<11)
 {
   if(rules[i][0]==scan[0] &&  rules[i][1]==scan[1] &&  rules[i][2]==scan[2])
   {
+    if(i==0)
+    {
+        if(E3==0 && E2!=0)         ///scitanie
+        {
+            generate_inst(NULL,E1,E2,ADD,1);
+            E2=0;
+            E1=0;
+        }else if(E3==0 && E2==0)
+          {
+            generate_inst(NULL,E1,0,ADD,1);
+            E1=0;
+          }
+          else if(E3!=0 && E2!=0)
+          {
+            generate_inst(NULL,E2,E3,ADD,1);
+            E2=0;
+            E3=0;
+          }else if(E1==0)
+          {
+            generate_inst(NULL,0,0,ADDH,1);
+            E2=0;
+            E3=0;
+          }
+    }
+    else
+         if(i==2)       ///nasobenie
+    {
+        if(E3==0 && E2!=0)
+        {
+            generate_inst(NULL,E1,E2,MULTIPLY,0);
+            E2=0;
+        }else if(E3==0 && E2==0)
+          {
+            generate_inst(NULL,E1,0,MULTIPLY,1);
+            E1=0;
+          }
+           else if(E3!=0 && E2!=0)
+          {
+            generate_inst(NULL,E2,E3,MULTIPLY,0);
+            E2=0;
+            E3=0;
+          }
+    }
+    else
+         if(i==3)       ///delenie
+    {
+        if(E3==0 && E2!=0)
+        {
+            generate_inst(NULL,E1,E2,DIVIDE,0);
+            E2=0;
+            E1=0;
+        }else if(E3==0 && E2==0)
+          {
+            generate_inst(NULL,E1,0,DIVIDE,1);
+            E1=0;
+          }
+            else if(E3!=0 && E2!=0)
+          {
+            CONTROL=1;
+            generate_inst(NULL,E2,E3,DIVIDE,0);
+            E2=0;
+            E3=0;
+          }
+    }
+    else
+         if(i==1)       ///minus
+    {
+        if(E3==0 && E2!=0)
+        {
+            generate_inst(NULL,E1,E2,MINUS,1);
+            E2=0;
+            E1=0;
+        }else if(E3==0 && E2==0)
+          {
+            generate_inst(NULL,E1,0,MINUS,1);
+            E1=0;
+          }
+              else if(E3!=0 && E2!=0)
+          {
+            generate_inst(NULL,E2,E3,MINUS,1);
+            E2=0;
+            E3=0;
+          }
+    }
+
       if((LASTindex %2)==0)
         LAST=i;
       else
         LLAST=i;
       LASTindex++;
     return 0;
-
   }
         i++;
 }
@@ -417,6 +505,8 @@ int PrecedentAnal(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,TH
 
 if ( TOP_Stdin==LESS || TOP_Stdin==GREATER|| TOP_Stdin==LESSEQUAL || TOP_Stdin==GREATEREQUAL|| TOP_Stdin==NOTEQUAL)
 {
+    if(type==ID)
+        exit(E_SEMANTIC_TYPE);
    switch_control=1;
    if(operator==0)
         operator=1;
@@ -443,6 +533,8 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
              if((ELEMENT->defined!=true_hash && IN_FUNCTION==0 ) || (IN_FUNCTION==1 &&  SUPPORT==0 && SUPPORT1!=0 && ELEMENT->defined!=true_hash) || (IN_FUNCTION==1 &&  SUPPORT!=0 && SUPPORT1!=0 && ELEMENT->defined!=true_hash) || (IN_FUNCTION==1 &&  SUPPORT!=0 && SUPPORT1==0 && ELEMENT->id==FUNCTION_hash && ELEMENT->valuedef!=true_hash))
                exit(E_UNINITIALIZED_VAR);
+              if((IN_FUNCTION==0 && ELEMENT->id==FUNCTION_hash))
+                exit(E_SEMANTIC_TYPE);
 
 
              if (switch_control==0)
@@ -462,6 +554,19 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
          else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo)
          {
+
+
+
+             if(E1==0)
+                 E1=LEX_STRUCTPTR->value;
+             else if(E1!=0 && E2==0)
+                 E2=LEX_STRUCTPTR->value;
+             else
+                 E3=LEX_STRUCTPTR->value;
+
+
+
+
              if (switch_control==0)
              {
                 if(PODMIENKA_POD==0)
@@ -738,10 +843,16 @@ else if(PODMIENKA_POD!=PODMIENKA_POD1 && Vysledok==PODMIENKA)
 if((Vysledok==PODMIENKA && PODMIENKA_POD!=BOOLEAN_hash )  && (LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7 && LLAST!=6 && LLAST!=4 && LAST!=10 && LAST!=9 && LAST!=8 && LAST!=7&& LAST!=6 && LAST!=4))
 exit(E_SEMANTIC_TYPE);
 }
+
 if(type==ID && Vysledok!=PODMIENKA_POD)
 exit(E_SEMANTIC_TYPE);
 
+///Generovat mov pri ziadnych operatoroch
 
+
+E1=0;
+E2=0;
+E3=0;
 PODMIENKA_POD=0;
 PODMIENKA_POD1=0;
 switch_control=0;
@@ -810,8 +921,10 @@ int VysledokID(int Vysledok,int id )
             break;
     case REAL_hash:
         if(id==STRING_hash || id==BOOLEAN_hash)
-            exit(E_SEMANTIC_TYPE);
-            break;
+           exit(E_SEMANTIC_TYPE);
+        else
+           PODMIENKA_POD=REAL_hash;
+           break;
     case BOOLEAN_hash:
            if(id!=BOOLEAN_hash)
             exit(E_SEMANTIC_TYPE);

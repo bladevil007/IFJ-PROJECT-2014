@@ -527,7 +527,11 @@ int command(int value)
             if(ELEMENT==0)
                 exit(E_SEMANTIC_UNDEF);
 
-            Vysledok=ELEMENT->type;                                      ///V COM MAME OCAKAVAT VYSLEDOK
+            Vysledok=ELEMENT->type;
+
+             if(IN_FUNCTION==0 && ELEMENT->id==FUNCTION_hash)
+                exit(E_SEMANTIC_TYPE);
+
 
             token=getnextToken(LEX_STRUCTPTR);
             if(token==DVOJBODKA)
@@ -537,6 +541,7 @@ int command(int value)
                 {
                     PrecedenceSA(LEX_STRUCTPTR,ID,GlobalnaTAB,LokalnaTAB,ELEMENT);
                       ///Precedencna analyza
+
                     generate_inst(pole,0,0,MOV,0);
                     free(pole);
 

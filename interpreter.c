@@ -15,9 +15,6 @@ struct record *temp;
 char *globalne_pole=0;
 
 
-
-
-
 int foo(INSTape *INSTR)
 {
     switch(INSTR->CODE)
@@ -175,11 +172,108 @@ int foo(INSTape *INSTR)
         hodnota = length(temp->value.str);
         break;
 
+        case ADD:
+            if(hodnota==0)
+            hodnota=INSTR->b+INSTR->c;
+            else if(hodnota2==0)
+            {
+            hodnota2=INSTR->b+INSTR->c;
+            }
+            else
+            {
+              hodnota=hodnota+hodnota2;
+              hodnota2=0;
+            }
+            if(hodnota2!=0)
+            {
+              hodnota=hodnota+hodnota2;
+              hodnota2=0;
+            }
+            break;
+
+        case MULTIPLY:
+            if(hodnota==0)
+            hodnota=INSTR->b*INSTR->c;
+            else if(hodnota2==0)
+            {
+            if(INSTR->specialcode==1)      ///1 NASOBIME cislom nie nulou
+                {
+                hodnota2=INSTR->b;
+                }
+            else
+            hodnota2=INSTR->b*INSTR->c;
+            }
+            else
+            {
+              hodnota=hodnota*hodnota2;
+              hodnota2=0;
+            }
+            if(hodnota2!=0)
+            {
+              hodnota=hodnota*hodnota2;
+              hodnota2=0;
+            }
+            break;
+
+        case DIVIDE:
+
+            if(hodnota==0)
+            hodnota=INSTR->b/INSTR->c;
+            else if(hodnota2==0)
+            {
+             if(INSTR->specialcode==1)                           ///1 NASOBIME cislom nie nulou
+                {
+                hodnota2=INSTR->b;
+                }
+            else
+            hodnota2=INSTR->b/INSTR->c;                            ///1 Delime cislom nie nulou
+            }
+            else
+            {
+              hodnota=hodnota/hodnota2;
+              hodnota2=0;
+            }
+
+            if(hodnota2!=0)
+            {
+              hodnota=hodnota/hodnota2;
+              hodnota2=0;
+            }
+
+
+
+
+            break;
+        case MINUS:
+            if(hodnota==0)
+            hodnota=INSTR->b-INSTR->c;
+            else if(hodnota2==0)
+            {
+            hodnota2=INSTR->b-INSTR->c;
+            }
+            else
+            {
+              hodnota=hodnota-hodnota2;
+              hodnota2=0;
+            }
+             if(hodnota2!=0)
+            {
+              hodnota=hodnota-hodnota2;
+              hodnota2=0;
+            }
+            break;
+
+///*-+/ hotovo bez premennych
+
+
     }
 return 0;
 }
 int searchrecord(inf_pointer_array* beh_programu)
 {
+hodnota2=0;
+hodnota=0;
+hodnota3=0;
 
     int i=0;
 

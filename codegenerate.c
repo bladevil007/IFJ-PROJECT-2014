@@ -181,14 +181,54 @@ case CONCATEID:
     Instruction->CODE=CONCATEID;
     add_new_pointer(InstructionTape,Instruction);
     break;
+case ADD:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=ADD;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case MULTIPLY:
+    Instruction->a=NULL;
+    Instruction->specialcode=what;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=MULTIPLY;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case DIVIDE:
+    Instruction->a=NULL;
+    Instruction->specialcode=what;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=DIVIDE;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+case MINUS:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=MINUS;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+case ADDH:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=ADDH;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+
+
+
+
+
+
 }
-
-
-
-
-
-
-
 
     return 0;
 }
