@@ -56,9 +56,6 @@ int ERRORRET(int value)
     else
         exit(E_SYNTAX);
 }
-
-
-
 ///<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 /** \brief Koren derivacneho stromu, neterminal,
  plati pre tokeny < var > or <begin> or  <function>
@@ -671,12 +668,12 @@ if(value==WRITE)
                         generate_inst(LEX_STRUCTPTR->str,0,0,0,WRITEID,0);
 
                       ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                      struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                                       ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
-                        else if(ELEMENT->defined!=true_hash)
+                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
-
                         }
               switch(token)
               {
@@ -722,14 +719,14 @@ else if(value==LENGTH)
                         {
                     ///Kontrola ze vsetky vstupne hodnoty su String
                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
+                       struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                 ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
-                        else if(ELEMENT->defined!=true_hash)
-                           exit(E_UNINITIALIZED_VAR);
+                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
                         generate_inst(LEX_STRUCTPTR->str,0,0,0,LENGTHID,0);
 
                         }else
@@ -761,12 +758,12 @@ else if(value==COPY)
 
                     ///Kontrola ze vsetky vstupne hodnoty su String
                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                            ///Vrati na ukazatel na prvek v hash table
+                        struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                    ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
-                        else if(ELEMENT->defined!=true_hash)
+                       else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
 
                         }
@@ -789,13 +786,13 @@ else if(value==COPY)
 
 
                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                    ///Vrati na ukazatel na prvek v hash table
+                                 struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                      ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
                                     exit(E_SEMANTIC_UNDEF);
                                 else if(ELEMENT->type!=INTEGER_hash)
                                     exit(E_SEMANTIC_TYPE);
-                                else if(ELEMENT->defined!=true_hash)
-                                    exit(E_UNINITIALIZED_VAR);
+                               else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
 
                                 }else
                                 E1=LEX_STRUCTPTR->value;
@@ -815,13 +812,13 @@ else if(value==COPY)
 
 
                                               ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                            ///Vrati na ukazatel na prvek v hash table
+                                               struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                               ///Vrati na ukazatel na prvek v hash table
                                             if(ELEMENT==0)
                                                 exit(E_SEMANTIC_UNDEF);
                                             else if(ELEMENT->type!=INTEGER_hash)
                                                 exit(E_SEMANTIC_TYPE);
-                                            else if(ELEMENT->defined!=true_hash)
-                                                exit(E_UNINITIALIZED_VAR);
+                                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                                            exit(E_UNINITIALIZED_VAR);
 
                                             }else
                                             {
@@ -864,12 +861,12 @@ else if(value==FIND)
                             id=1;
                     ///Kontrola ze vsetky vstupne hodnoty su String
                       ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                            ///Vrati na ukazatel na prvek v hash table
+                       struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                     ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
-                        else if(ELEMENT->defined!=true_hash)
+                       else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
                         }else
                         {
@@ -890,13 +887,13 @@ else if(value==FIND)
                                 {
                                 ///Kontrola ze vsetky vstupne hodnoty su String
                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                            ///Vrati na ukazatel na prvek v hash table
+                              struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                             ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
                                     exit(E_SEMANTIC_UNDEF);
                                 else if(ELEMENT->type!=STRING_hash)
                                     exit(E_SEMANTIC_TYPE);
-                                else if(ELEMENT->defined!=true_hash)
-                                  exit(E_UNINITIALIZED_VAR);
+                               else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
                                    if(id==1)
                                    generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDIDID,0);
                                    else
@@ -932,13 +929,13 @@ else if(value==SORT)
                 {
                     ///Kontrola ze vsetky vstupne hodnoty su String
                  ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-                                                                                    ///Vrati na ukazatel na prvek v hash table
+                 struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                   ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
                             exit(E_SEMANTIC_UNDEF);
                         else if(ELEMENT->type!=STRING_hash)
                             exit(E_SEMANTIC_TYPE);
-                        else if(ELEMENT->defined!=true_hash)
-                          exit(E_UNINITIALIZED_VAR);
+                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
                      generate_inst(LEX_STRUCTPTR->str,0,0,0,SORTID,0);
 
                 }else
@@ -1137,8 +1134,7 @@ int fun_params()
            exit(E_SEMANTIC_UNDEF);
 
             ELEMENT->defined=true_hash;
-
-
+            ELEMENT->valuedef=true_hash;
                       ///premenna pride jej zavolanim
 
     add_str_param(POLE_ID_LOCAL_VOLANE,LEX_STRUCTPTR->str);

@@ -753,6 +753,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
         else return ERRORRET(TOP_Stdin);
     }
                   ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                 struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                     if(ELEMENT->id==FUNCTION_hash)
                     {
                             if(ELEMENT->defined!=3)
@@ -789,10 +790,16 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                         if(TOP_Stdin==ID)
                                         {
                                            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                                           struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                             if(ELEMENT->type != SUPP->params[i])
                                                 exit(E_SEMANTIC_TYPE);
-                                            if(ELEMENT->defined!=true_hash)
-                                               exit(E_UNINITIALIZED_VAR);
+                                           if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                                           {
+                                               printf("tu sme %i",ELEMENT->valuedef);
+
+
+                                            exit(E_UNINITIALIZED_VAR);
+                                           }
                                         }
 
                                         else if(TOP_Stdin == CONST || TOP_Stdin==REALo || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING)
@@ -841,8 +848,8 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                     }
                     else if(ELEMENT->type==STRING_hash)                 ///semanticka kontrola pri konkatenaci
                     {
-                        if(ELEMENT->defined!=true_hash)
-                          exit(E_UNINITIALIZED_VAR);
+                        if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
                       generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
@@ -853,7 +860,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                     {
                       VysledokID(Vysledok,ELEMENT->type);
                       int token=getnextToken(LEX_STRUCTPTR);
-                      if(ELEMENT->defined!=true_hash)
+                      if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
                       if(decodeSA(token)==PSA_DOLAR)
                        {
@@ -949,10 +956,11 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
        {
 
            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+           struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
   ///zistime ci existuje v tabulke
            VysledokID(Vysledok,ELEMENT->type);
-           if(ELEMENT->defined!=true_hash)
-                exit(E_UNINITIALIZED_VAR);
+           if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                            exit(E_UNINITIALIZED_VAR);
                 generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
