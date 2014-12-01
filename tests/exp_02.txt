@@ -1,0 +1,8 @@
+{	0	}
+var
+i:integer;
+x:integer;
+begin
+i:=1;
+x:=i*2
+end.

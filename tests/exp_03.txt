@@ -1,0 +1,8 @@
+{	0	}
+var
+i:integer;
+x:real;
+begin
+i:=1;
+x:=2.3*i
+end.

@@ -1,0 +1,11 @@
+{	4	}
+var
+i:integer;
+x:real;
+z:real;
+begin
+i:=1;
+x:=2.5;
+z:=3;
+x:=i*x*z+(z+y)*i
+end.

@@ -1,11 +1,10 @@
 {	0	}
 var 
 g:integer;
-var
 f:integer;
 begin
 g:=1;
 f:=2;
 g:=g+f;
-write(g);
+write(g)
 end.

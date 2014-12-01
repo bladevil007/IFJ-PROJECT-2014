@@ -3,5 +3,5 @@ var
 l:string;
 begin
 l:='tere';
-write(l);
+write(l)
 end.

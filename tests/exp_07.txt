@@ -1,0 +1,11 @@
+{	4	}
+var
+i:integer;
+x:real;
+y:real;
+begin
+i:=1;
+x:=6.0;
+y:=6.666;
+x:=i*x*y+(x+y)*i
+end.

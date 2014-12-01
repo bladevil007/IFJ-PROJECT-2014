@@ -1,0 +1,8 @@
+function dvakrat(co: integer): integer;
+begin
+ dvakrat := co*2;
+end;
+
+begin
+ write(dvakrat(5))
+end. 
