@@ -244,7 +244,7 @@ char *concatenate(const char *s1, const char *s2) //funkce na konkatenaci dvou r
 			return NULL;
 		strcpy(concatenated, s1);//zkopirovani prvni casti retezce
 		strcpy(concatenated + length_s1, s2); //zkopirovani druhe casti retezce
-		return concatenated;	
+		return concatenated;
 	}
 	else //pokud je jeden z ukazatelu NULL
 	{

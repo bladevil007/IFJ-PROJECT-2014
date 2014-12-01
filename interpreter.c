@@ -14,7 +14,7 @@
 struct record *temp;
 struct record *temp2;
 struct record *temp3;
-char *globalne_pole=0;
+char *globalne_pole=NULL;
 
 
 int foo(INSTape *INSTR)
@@ -146,9 +146,9 @@ int foo(INSTape *INSTR)
              }
            else
             {
-                globalne_pole = (char*)realloc(globalne_pole, length(globalne_pole) + length(INSTR->a)+1);
                 tempstr = concatenate(globalne_pole,INSTR->a);
-                strcpy(globalne_pole, tempstr);
+                globalne_pole = (char*)realloc(globalne_pole, length(globalne_pole) + length(INSTR->a)+1);
+                strcpy(globalne_pole,tempstr);
             }
         break;
 
@@ -174,8 +174,31 @@ int foo(INSTape *INSTR)
         hodnota = length(temp->value.str);
         break;
 
-
         case ADD:
+            if(INSTR->a!=NULL)
+            {temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->b =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->b =temp->value.d;
+            break;
+             }
+            }
+            if(INSTR->a2!=NULL)
+            {
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->c =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->c =temp->value.d;
+            break;
+             }
+            }
+
             if(INSTR->specialcode==0)
             if(hodnota==0)
             hodnota=INSTR->b+INSTR->c;
@@ -196,6 +219,33 @@ int foo(INSTape *INSTR)
             break;
 
         case MULTIPLY:
+            if(INSTR->a!=NULL)
+            {
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->b =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->b =temp->value.d;
+            break;
+             }
+            }
+            if(INSTR->a2!=NULL)
+            {
+
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->c =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->c =temp->value.d;
+            break;
+             }
+            }
+
+
             if(INSTR->specialcode==0)
             {if(hodnota==0)
             {hodnota=INSTR->b*INSTR->c;
@@ -216,7 +266,35 @@ int foo(INSTape *INSTR)
             break;
 
 
+
+
         case MINUS:
+               if(INSTR->a!=NULL)
+            {
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->b =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->b =temp->value.d;
+            break;
+             }
+            }
+            if(INSTR->a2!=NULL)
+            {
+
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->c =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->c =temp->value.d;
+            break;
+             }
+            }
+
             if(INSTR->specialcode==0)
             {if(hodnota==0)
             hodnota=INSTR->b-INSTR->c;
@@ -237,6 +315,31 @@ int foo(INSTape *INSTR)
           break;
 
        case DIVIDE:
+                if(INSTR->a!=NULL)
+            {
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->b =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->b =temp->value.d;
+            break;
+             }
+            }
+            if(INSTR->a2!=NULL)
+            {
+
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            switch(temp->type){
+            case INTEGER_hash:
+            INSTR->c =temp->value.i;
+            break;
+            case REAL_hash:
+            INSTR->c =temp->value.d;
+            break;
+             }
+            }
 
              if(INSTR->specialcode==0)
              {
@@ -264,10 +367,17 @@ int foo(INSTape *INSTR)
             }
             break;
 
+
+
        case EQUAL:
             hodnota=0;
             hodnota2=0;
+            hodnota3=0;
+
             break;
+       case JUMP:
+        if (hodnota>0)
+            exit(0);             ///ma hodnotu lavej strany
 
 
 

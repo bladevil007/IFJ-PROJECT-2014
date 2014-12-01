@@ -25,7 +25,7 @@
 #include "stack.h"
 #include "precedent.h"
 #include "codegenerate.h"
-
+int JUMPL=0;
 
 int init_generate()
 {
@@ -38,8 +38,6 @@ return 0;
 ///Hlavicka sa mozno zmeni este
 int generate_inst(char *A,char *A2,float B,float C,int CODE,int what)
 {
-
-
 
 INSTape *Instruction;
 if((Instruction=(INSTape*)malloc(sizeof(INSTape)))==NULL)
@@ -184,7 +182,8 @@ case CONCATEID:
     add_new_pointer(InstructionTape,Instruction);
     break;
 case ADD:
-    Instruction->a=NULL;
+    Instruction->a=A;
+    Instruction->a2=A2;
     Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
@@ -193,7 +192,8 @@ case ADD:
     break;
 
 case MULTIPLY:
-    Instruction->a=NULL;
+    Instruction->a=A;
+    Instruction->a2=A2;
     Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
@@ -202,7 +202,8 @@ case MULTIPLY:
     break;
 
 case DIVIDE:
-    Instruction->a=NULL;
+    Instruction->a=A;
+    Instruction->a2=A2;
     Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
@@ -210,7 +211,8 @@ case DIVIDE:
     add_new_pointer(InstructionTape,Instruction);
     break;
 case MINUS:
-    Instruction->a=NULL;
+     Instruction->a=A;
+    Instruction->a2=A2;
     Instruction->specialcode=what;
     Instruction->b=B;
     Instruction->c=C;
@@ -324,12 +326,13 @@ case COPYIDIDID:
     add_new_pointer(InstructionTape,Instruction);
     break;
 
-
-
-
-
-
-
+case JUMP:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=JUMP;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 }
 
     return 0;

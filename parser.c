@@ -617,6 +617,8 @@ int command(int value)
        Vysledok=PODMIENKA;
 
        PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+       generate_inst(NULL,NULL,0,0,JUMP,0);
+       generate_inst(NULL,NULL,0,0,EQUAL,0);
 
 
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
