@@ -758,6 +758,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
            }
            if(EVAL==1)
            {
+               generate_inst(X1,0,E1,0,ADD,0,0);
                 E1=0;
                 E2=0;
                 E3=0;
@@ -1005,11 +1006,10 @@ if(type==ID && Vysledok!=PODMIENKA_POD)
 exit(E_SEMANTIC_TYPE);
 
 ///Generovat mov pri ziadnych operatoroch
-if(RULE==0)
+if(RULE==0 && CONTROL!=7 && type==ID)
 {
-generate_inst(NULL,0,E1,0,ADD,0,0);
+generate_inst(X1,0,E1,0,ADD,0,0);
 }
-
 RULE=0;
 CONTROL=0;
 E1=0;

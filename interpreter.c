@@ -175,6 +175,7 @@ int foo(INSTape *INSTR)
         break;
 
         case ADD:
+
             if(INSTR->a!=NULL)
             {temp = hashtable_search(GlobalnaTAB,INSTR->a);
             switch(temp->type){
@@ -216,7 +217,6 @@ int foo(INSTape *INSTR)
             {
               hodnota=hodnota+hodnota2;
             }
-
             break;
 
         case MULTIPLY:
@@ -377,7 +377,6 @@ int foo(INSTape *INSTR)
             break;
 
        case JUMP:
-
        if(hodnota==0)
         {
             LABEL=INSTR->specialcode;
@@ -386,10 +385,6 @@ int foo(INSTape *INSTR)
         else
                 break;
 
-
-
-
-
        case SAVE:
         hodnota4=hodnota;
         hodnota=0;
@@ -397,14 +392,10 @@ int foo(INSTape *INSTR)
         hodnota3=0;
         break;
 
-
-
        case LESS:
         if((hodnota4-hodnota)< 0)
            {
             hodnota=1;
-
-
             }
         else hodnota=0;
         break;
