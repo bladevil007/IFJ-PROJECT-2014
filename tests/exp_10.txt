@@ -1,0 +1,11 @@
+{	0	}
+var
+i:integer;
+x:integer;
+z:real;
+begin
+i:=1;
+x:=5;
+z:=1.0;
+z:=i/x
+end.

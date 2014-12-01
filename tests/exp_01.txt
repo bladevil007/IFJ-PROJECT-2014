@@ -1,6 +1,5 @@
-{	3	}
+{	0	}
 var
-i:integer;
 i:integer;
 begin
 i:=1

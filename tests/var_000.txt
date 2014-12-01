@@ -1,4 +1,4 @@
-{	1	}
+{	7	}
 function hovno():real;
 var
 a:string;

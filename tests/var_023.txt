@@ -1,7 +1,7 @@
-{	0	}
+{	2	}
 var i:integer;
 begin
 i:=2;
 if i<>2 then;
-write('ahoj');
+write('ahoj')
 end.

@@ -1,0 +1,9 @@
+{	0	}
+var
+i:real;
+x:real;
+y:real;
+begin
+i:=1.0;
+x:=i*0.1
+end.

@@ -1,6 +1,6 @@
-{	4	}
+{	2	}
 var 
 int:integer;
 begin
-int=1.3;
+int=1.3
 end.

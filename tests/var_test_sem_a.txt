@@ -18,7 +18,7 @@ end;
 
 
 Begin
-if  25+23+40+50<40+20*50  then
+if  (((true < false)))  then
 begin
 a:=10+20*20-30       
 end
