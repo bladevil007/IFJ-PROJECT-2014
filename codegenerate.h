@@ -28,7 +28,7 @@ int init_pointer_array(inf_pointer_array *a);
 void free_pointer_array(inf_pointer_array *a);
 
 int add_new_pointer(inf_pointer_array *a, INSTape* pointer);
-int generate_inst(char *,char *,float ,float ,int ,int );
+int generate_inst(char *,char *,float ,float ,int ,int,char * );
 int init_generate();
 int foo(INSTape *INSTR);
 int searchrecord(inf_pointer_array* beh_programu);

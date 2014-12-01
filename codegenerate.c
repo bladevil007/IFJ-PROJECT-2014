@@ -11,9 +11,6 @@
 /*                              Jan Jusko               xjusko00              */
 /*                              Jiøí Dostál             xdosta40              */
 /* ****************************************************************************/
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +22,7 @@
 #include "stack.h"
 #include "precedent.h"
 #include "codegenerate.h"
+
 int JUMPL=0;
 
 int init_generate()
@@ -36,7 +34,10 @@ return 0;
 
 
 ///Hlavicka sa mozno zmeni este
-int generate_inst(char *A,char *A2,float B,float C,int CODE,int what)
+int generate_inst(char *A,char *A2,float B,float C,int CODE,int what,char*A3)
+{
+
+if(IN_FUNCTION==0)
 {
 
 INSTape *Instruction;
@@ -148,6 +149,7 @@ case COPYID:
     Instruction->CODE=COPYID;
     add_new_pointer(InstructionTape,Instruction);
     break;
+
 case SORTSTRING:
     Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
@@ -274,6 +276,8 @@ case FINDIDID:
 case COPYSTRINGID_:
     Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYSTRINGID_;
@@ -283,6 +287,8 @@ case COPYSTRINGID_:
 case COPYSTRING_ID:
     Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYSTRING_ID;
@@ -292,6 +298,11 @@ case COPYSTRING_ID:
 case COPYSTRINGIDID:
     Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
+    Instruction->a3=(char*)malloc(sizeof(char)*length(A3));
+    strcpy(Instruction->a3,A3);
+
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYSTRINGIDID;
@@ -302,6 +313,8 @@ case COPYSTRINGIDID:
 case COPYIDID_:
     Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYIDID_;
@@ -309,17 +322,24 @@ case COPYIDID_:
     break;
 
 case COPYID_ID:
-    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+   Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYID_ID;
     add_new_pointer(InstructionTape,Instruction);
     break;
 
+
 case COPYIDIDID:
-    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+ Instruction->a=(char*)malloc(sizeof(char)*length(A));
     strcpy(Instruction->a,A);
+    Instruction->a2=(char*)malloc(sizeof(char)*length(A2));
+    strcpy(Instruction->a2,A2);
+    Instruction->a3=(char*)malloc(sizeof(char)*length(A3));
+    strcpy(Instruction->a3,A3);
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=COPYIDIDID;
@@ -333,6 +353,8 @@ case JUMP:
     Instruction->CODE=JUMP;
     add_new_pointer(InstructionTape,Instruction);
     break;
+
+}
 }
 
     return 0;

@@ -86,7 +86,7 @@ while(i<11)
              if(CONTROL==0)
              {
 
-                 generate_inst(X1,X2,E1,E2,ADD,0);
+                 generate_inst(X1,X2,E1,E2,ADD,0,0);
                     CONTROL=1;
                     X2=NULL;
                     X1=NULL;
@@ -95,13 +95,13 @@ while(i<11)
              else if(CONTROL==1)
              {
 
-               generate_inst(X2,0,E2,0,ADD,1);
+               generate_inst(X2,0,E2,0,ADD,1,0);
                X2=NULL;
                E2=0;
              }
              else if(CONTROL==3)
              {
-               generate_inst(X1,X2,E1,0,ADD,3);
+               generate_inst(X1,X2,E1,0,ADD,3,0);
                X2=NULL;
                X1=NULL;
                E2=0;
@@ -109,7 +109,7 @@ while(i<11)
              }
              else if(CONTROL==4)
              {
-               generate_inst(0,0,E1,0,ADD,4);
+               generate_inst(0,0,E1,0,ADD,4,0);
                E2=0;
                CONTROL=1;
              }
@@ -122,7 +122,7 @@ while(i<11)
             {
                 if(CONTROL==0)
              {
-                 generate_inst(X1,X2,E1,E2,MULTIPLY,0);
+                 generate_inst(X1,X2,E1,E2,MULTIPLY,0,0);
                  X2=NULL;
                  X1=NULL;
                  CONTROL=1;
@@ -131,7 +131,7 @@ while(i<11)
              else if(CONTROL==1)
              {
 
-               generate_inst(X2,0,E2,0,MULTIPLY,1);
+               generate_inst(X2,0,E2,0,MULTIPLY,1,0);
                 X2=NULL;
                E2=0;
              }
@@ -140,7 +140,7 @@ while(i<11)
 
                if(CONTROL==0)
                {
-                 generate_inst(X2,X3,E3,E2,MULTIPLY,0);
+                 generate_inst(X2,X3,E3,E2,MULTIPLY,0,0);
                  X3=NULL;
                  X2=NULL;
                  CONTROL=3;
@@ -149,7 +149,7 @@ while(i<11)
                else if(CONTROL==1)
                {
 
-                 generate_inst(X2,X3,E3,E2,MULTIPLY,0);
+                 generate_inst(X2,X3,E3,E2,MULTIPLY,0,0);
                  CONTROL=4;
                   X3=NULL;
                   X2=NULL;
@@ -157,13 +157,13 @@ while(i<11)
                }
                else if(CONTROL==3)
                {
-                 generate_inst(X3,NULL,E3,E2,MULTIPLY,1);
+                 generate_inst(X3,NULL,E3,E2,MULTIPLY,1,0);
                  CONTROL=3;
                   X3=NULL;
                  E3=0;
                }
                else if(CONTROL==4){
-                generate_inst(X2,X3,E3,E2,MULTIPLY,1);
+                generate_inst(X2,X3,E3,E2,MULTIPLY,1,0);
                  CONTROL=4;
                   X3=NULL;
                   X2=NULL;
@@ -178,7 +178,7 @@ while(i<11)
          {
              if(CONTROL==0)
              {
-                 generate_inst(X1,X2,E1,E2,MINUS,0);
+                 generate_inst(X1,X2,E1,E2,MINUS,0,0);
                  CONTROL=1;
                  X2=NULL;
                  X1=NULL;
@@ -186,13 +186,13 @@ while(i<11)
              }
              else if(CONTROL==1)
              {
-               generate_inst(X2,0,E2,0,MINUS,1);
+               generate_inst(X2,0,E2,0,MINUS,1,0);
                X2=NULL;
                E2=0;
              }
              else if(CONTROL==3)
              {
-               generate_inst(X1,X2,E1,0,MINUS,3);
+               generate_inst(X1,X2,E1,0,MINUS,3,0);
                X2=NULL;
                X1=NULL;
                E2=0;
@@ -200,7 +200,7 @@ while(i<11)
              }
              else if(CONTROL==4)
              {
-               generate_inst(NULL,0,E1,0,MINUS,4);
+               generate_inst(NULL,0,E1,0,MINUS,4,0);
                E2=0;
                CONTROL=1;
              }
@@ -214,7 +214,7 @@ while(i<11)
             {
                 if(CONTROL==0)
              {
-                 generate_inst(X1,X2,E1,E2,DIVIDE,0);
+                 generate_inst(X1,X2,E1,E2,DIVIDE,0,0);
                  X1=NULL;
                  X2=NULL;
                  CONTROL=1;
@@ -222,7 +222,7 @@ while(i<11)
              }
              else if(CONTROL==1)
              {
-               generate_inst(X2,0,E2,0,DIVIDE,1);
+               generate_inst(X2,0,E2,0,DIVIDE,1,0);
                X2=NULL;
                E2=0;
              }
@@ -230,7 +230,7 @@ while(i<11)
             {
                if(CONTROL==0)
                {
-                 generate_inst(X2,X3,E2,E3,DIVIDE,0);
+                 generate_inst(X2,X3,E2,E3,DIVIDE,0,0);
                  CONTROL=3;
                  X2=NULL;
                  X3=NULL;
@@ -238,7 +238,7 @@ while(i<11)
                }
                else if(CONTROL==1)
                {
-                 generate_inst(X2,X3,E2,E3,DIVIDE,0);
+                 generate_inst(X2,X3,E2,E3,DIVIDE,0,0);
                  CONTROL=4;
                   X3=NULL;
                   X2=NULL;
@@ -246,13 +246,13 @@ while(i<11)
                }
                else if(CONTROL==3)
                {
-                 generate_inst(X3,0,E3,E2,DIVIDE,1);
+                 generate_inst(X3,0,E3,E2,DIVIDE,1,0);
                  CONTROL=3;
                  X3=NULL;
                  E3=0;
                }
                else if(CONTROL==4){
-                generate_inst(X2,X3,E3,E2,DIVIDE,1);
+                generate_inst(X2,X3,E3,E2,DIVIDE,1,0);
                  CONTROL=4;
                  X3=NULL;
                  X2=NULL;
@@ -949,7 +949,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                         if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
                       VysledokID(Vysledok,ELEMENT->type);
-                      generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
+                      generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0,0);
                       concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                        ///zavolaj konkatenaciu retazcov
                       return 0;
@@ -977,7 +977,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
 else if(TOP_Stdin==CONST_STRING && type==ID)
 {
     VysledokID(Vysledok,STRING_hash);
-    generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0);
+    generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0,0);
     concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
     return SUCCESS;
 }
@@ -987,7 +987,7 @@ else if ((TOP_Stdin==TRUE || TOP_Stdin==FALSE)&& type==ID)
    int token=getnextToken(LEX_STRUCTPTR);
    if(decodeSA(token)==PSA_DOLAR)
    {
-       generate_inst(NULL,0,TOP_Stdin,0,ADD,0);    ///OK
+       generate_inst(NULL,0,TOP_Stdin,0,ADD,0,0);    ///OK
         CheckEND(token,type);
         return SUCCESS;
    }else
@@ -1019,7 +1019,7 @@ exit(E_SEMANTIC_TYPE);
 ///Generovat mov pri ziadnych operatoroch
 if(RULE==0)
 {
-generate_inst(NULL,0,E1,0,ADD,0);
+generate_inst(NULL,0,E1,0,ADD,0,0);
 }
 
 RULE=0;
@@ -1059,13 +1059,13 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
            VysledokID(Vysledok,ELEMENT->type);
            if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
-                generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0);
+                generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
        }
        else if(concateT==CONST_STRING)
        {
 
-           generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0);
+           generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0,0);
            return concate(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
 
 

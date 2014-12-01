@@ -157,7 +157,7 @@ int foo(INSTape *INSTR)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
 
             if(globalne_pole==0){
-            globalne_pole = (char*)malloc(sizeof(char) * (length(temp->value.str)));
+            globalne_pole = (char*)malloc(sizeof(char) * (length(temp->value.str))+1);
             tempstr = concatenate("",temp->value.str);
             strcpy(globalne_pole, tempstr);
              }
@@ -367,17 +367,47 @@ int foo(INSTape *INSTR)
             }
             break;
 
-
-
        case EQUAL:
             hodnota=0;
             hodnota2=0;
             hodnota3=0;
+            free(globalne_pole);
 
             break;
+
        case JUMP:
-        if (hodnota>0)
-            exit(0);             ///ma hodnotu lavej strany
+            if (hodnota>0)
+                exit(0);
+            break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  ///ma hodnotu lavej strany
 
 
 
@@ -387,38 +417,41 @@ int foo(INSTape *INSTR)
 
 
 
-        case COPYSTRINGID_:         //copy('ahoj', i, 52);
+        case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             globalne_pole = copy(INSTR->a, temp->value.i, INSTR->c);
             break;
 
-        case COPYSTRING_ID:         //copy('ahoj', 52, i);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        case COPYSTRING_ID:         //copy('ahoj', 52, i);                 ///ok
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             globalne_pole = malloc(temp->value.i * sizeof(char) + 1);
             globalne_pole = copy(INSTR->a, INSTR->b, temp->value.i);
             break;
 
-        case COPYSTRINGIDID:         //copy('ahoj', 52, i);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        case COPYSTRINGIDID:         //copy('ahoj', i, i);                //ok
+            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            temp2 = hashtable_search(GlobalnaTAB,INSTR->a3);
             globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
             globalne_pole = copy(INSTR->a, temp->value.i, temp2->value.i);
             break;
 
-        case COPYIDID_:             //copy(id,id,52);
+
+        case COPYIDID_:             //copy(id,id,52);                      ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
             temp = hashtable_search(GlobalnaTAB,INSTR->a);
             temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
             globalne_pole = copy(temp->value.str, temp2->value.i, INSTR->c);
             break;
 
-        case COPYID_ID:             //copy(id,52,id);
+
+        case COPYID_ID:             //copy(id,52,id);                     //ok
             temp = hashtable_search(GlobalnaTAB,INSTR->a);
             temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
             globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
             globalne_pole = copy(temp->value.str, INSTR->b, temp2->value.i);
             break;
+
 
         case COPYIDIDID:             //copy(id,id,id);
             temp = hashtable_search(GlobalnaTAB,INSTR->a);
@@ -427,6 +460,7 @@ int foo(INSTape *INSTR)
             globalne_pole = malloc(temp3->value.i * sizeof(char) + 1);
             globalne_pole = copy(temp->value.str, temp2->value.i, temp3->value.i);
             break;
+
 
         case FINDSTRSTR:
             hodnota = find(INSTR->a,INSTR->a2);
