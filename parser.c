@@ -375,6 +375,7 @@ token = getnextToken(LEX_STRUCTPTR);
     {
         case BEGIN:
         {
+          generate_inst(0,0,0,0,BEGINJUMP,0,0);
           token=progcondition();
           break;
         }
@@ -394,6 +395,7 @@ token = getnextToken(LEX_STRUCTPTR);
         token=getnextToken(LEX_STRUCTPTR);
         if(token==END)
         {
+            generate_inst(0,0,0,0,ENDJUMP,0,0);
             return SUCCESS;
         }
         else if(token==BODKOCIARKA)
@@ -406,6 +408,7 @@ token = getnextToken(LEX_STRUCTPTR);
         return progcondition();
     }else if(token==SUCCESS && ID_ENABLE == 2)   ///za end vo While a IF nenasleduje nic
     {
+        generate_inst(0,0,0,0,ENDJUMP,0,0);
         ID_ENABLE = 0;
         return SUCCESS;
     }
@@ -615,14 +618,15 @@ int command(int value)
         ///dopisat
        IF_ENABLE=1;
        Vysledok=PODMIENKA;
-
-       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+       generate_inst(NULL,NULL,0,0,EQUAL,0,0);
+       PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);
+                                                                              ///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
        generate_inst(NULL,NULL,0,0,JUMP,0,0);
        generate_inst(NULL,NULL,0,0,EQUAL,0,0);
 
-
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
+
           return progcondition();
       }else ERRORRET(token);
     }
@@ -630,7 +634,9 @@ int command(int value)
     else if(value==WHILE)
     {
         Vysledok=PODMIENKA;
+        generate_inst(NULL,NULL,0,0,EQUAL,0,0);
         PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB,ELEMENT);  //VYHODNOTI SA PODMIENKA + NACITA SA do
+         generate_inst(NULL,NULL,0,0,EQUAL,0,0);
 
             if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {

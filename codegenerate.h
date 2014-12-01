@@ -61,3 +61,6 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define FINDSTRID 224
 #define FINDIDID 225
 #define JUMP 227
+#define BEGINJUMP 228
+#define ENDJUMP 229
+#define SAVE 230

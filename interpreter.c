@@ -15,7 +15,7 @@ struct record *temp;
 struct record *temp2;
 struct record *temp3;
 char *globalne_pole=NULL;
-
+int LABEL;
 
 int foo(INSTape *INSTR)
 {
@@ -216,6 +216,7 @@ int foo(INSTape *INSTR)
             {
               hodnota=hodnota+hodnota2;
             }
+
             break;
 
         case MULTIPLY:
@@ -376,43 +377,37 @@ int foo(INSTape *INSTR)
             break;
 
        case JUMP:
-            if (hodnota>0)
-                exit(0);
-            break;
+
+       if(hodnota==0)
+        {
+            LABEL=INSTR->specialcode;
+            return JUMP;
+        }
+        else
+                break;
 
 
 
 
 
+       case SAVE:
+        hodnota4=hodnota;
+        hodnota=0;
+        hodnota2=0;
+        hodnota3=0;
+        break;
 
 
 
+       case LESS:
+        if((hodnota4-hodnota)< 0)
+           {
+            hodnota=1;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                  ///ma hodnotu lavej strany
-
-
-
-
-            ///retazce
+            }
+        else hodnota=0;
+        break;
 
 
 
@@ -483,24 +478,6 @@ int foo(INSTape *INSTR)
             break;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///*-+/ hotovo bez premennych
 
 
@@ -512,6 +489,7 @@ int searchrecord(inf_pointer_array* beh_programu)
 hodnota2=0;
 hodnota=0;
 hodnota3=0;
+hodnota4=0;
 
     int i=0;
 
@@ -520,13 +498,19 @@ hodnota3=0;
     {
         i++;
     }
-
     i++;
 
 
+///prechadzaj cely main program
     while(beh_programu->pole[i]->CODE != END_MAIN)
     {
-        foo(beh_programu->pole[i]);
+        if(foo(beh_programu->pole[i])==JUMP)
+            {
+                i++;
+                while (beh_programu->pole[i]->specialcode!=LABEL && beh_programu->pole[i]->CODE!=ENDJUMP)
+                i++;
+            }
+
         i++;
 
     }

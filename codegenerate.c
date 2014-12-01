@@ -347,12 +347,62 @@ case COPYIDIDID:
     break;
 
 case JUMP:
+    JUMPL++;
     Instruction->a=NULL;
     Instruction->b=B;
+    Instruction->specialcode=JUMPL;
     Instruction->c=C;
     Instruction->CODE=JUMP;
     add_new_pointer(InstructionTape,Instruction);
     break;
+
+case BEGINJUMP:
+     JUMPL++;
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->specialcode=JUMPL;
+    Instruction->c=C;
+    Instruction->CODE=0;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+case ENDJUMP:
+    Instruction->a=NULL;
+    Instruction->specialcode=JUMPL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=ENDJUMP;
+    add_new_pointer(InstructionTape,Instruction);
+    JUMPL--;
+    break;
+
+case SAVE:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=SAVE;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+case LESS:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=LESS;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 }
