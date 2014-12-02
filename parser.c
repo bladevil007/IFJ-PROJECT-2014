@@ -322,6 +322,7 @@ token = getnextToken(LEX_STRUCTPTR);
     {
         case BEGIN:
         {
+          generate_inst(0,0,0,0,BEGINJUMP,0,0);
           token=progcondition();
           break;
         }
@@ -360,8 +361,8 @@ token = getnextToken(LEX_STRUCTPTR);
 
         else if(token==ELSE && IF_ENABLE==1)
         {
-
-
+             generate_inst(0,0,0,0,ENDJUMP,0,0);
+            generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
              if(token==BEGIN)
@@ -439,6 +440,7 @@ token = getnextToken(LEX_STRUCTPTR);
         }
         default: return ERRORRET(token);
     }
+
     if(token==SUCCESS && ID_ENABLE == 0)
     {
         token=getnextToken(LEX_STRUCTPTR);
@@ -449,22 +451,47 @@ token = getnextToken(LEX_STRUCTPTR);
         }
         else if(token==BODKOCIARKA)
             return progcondition();
-        else
+
+    else if(token==ELSE && IF_ENABLE==1)
+        {
+            generate_inst(0,0,0,0,ELSE,0,0);
+             IF_ENABLE=0;
+             token=getnextToken(LEX_STRUCTPTR);
+             if(token==BEGIN)
+             {
+
+                token=progcondition();
+
+
+                if(token==SUCCESS)
+                {
+
+                    token=getnextToken(LEX_STRUCTPTR);
+                if(token==END)
+                {
+
+                    return SUCCESS;
+                }
+                else if(token==BODKOCIARKA)
+                   {
+                    return progcondition();
+                   }
+                else
+                    return ERRORRET(token);
+                }else
+                return ERRORRET(token);
+
+             }    else
             return ERRORRET(token);
-    }else if(token==SUCCESS && ID_ENABLE == 1)
+        }
+    }
+
+    else if(token==SUCCESS && ID_ENABLE == 1)
     {
-
-
-
         ID_ENABLE = 0;
         return progcondition();
     }else if(token==SUCCESS && ID_ENABLE == 2)   ///za end vo While a IF nenasleduje nic
     {
-
-
-
-
-
         generate_inst(0,0,0,0,ENDJUMP,0,0);
         ID_ENABLE = 0;
         return SUCCESS;
@@ -499,7 +526,6 @@ token = getnextToken(LEX_STRUCTPTR);
         case  READLN:
         {
             token=command(token);
-
             break;
         }
         default:
@@ -519,7 +545,8 @@ token = getnextToken(LEX_STRUCTPTR);
         ///if podmienka s else + vnorene IF
         else if(token==ELSE && IF_ENABLE==1)
         {
-
+             generate_inst(0,0,0,0,ENDJUMP,0,0);
+            generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
              if(token==BEGIN)
@@ -681,24 +708,25 @@ int command(int value)
        Vysledok=PODMIENKA;
        generate_inst(NULL,NULL,0,0,EQUAL,0,0);
        PrecedenceSA(LEX_STRUCTPTR,IF,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
-                                                                         ///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
+                                                                        ///  VYHODNOTI SA PODMIENKA + NACITA SA THEN
        generate_inst(NULL,NULL,0,0,JUMP,0,0);
        generate_inst(NULL,NULL,0,0,EQUAL,0,0);
 
         if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
       {
-
-
           return progcondition();
       }else ERRORRET(token);
     }
     ///WHILE CYKLUS + VNORENE WHILE CYKLY
+
+
     else if(value==WHILE)
     {
         Vysledok=PODMIENKA;
         generate_inst(NULL,NULL,0,0,EQUAL,0,0);
-        PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB,ELEMENT);  //VYHODNOTI SA PODMIENKA + NACITA SA do
+        generate_inst(NULL,NULL,0,0,WHILE,0,0);
+        PrecedenceSA(LEX_STRUCTPTR,WHILE,GlobalnaTAB,LokalnaTAB,ELEMENT);
+         generate_inst(NULL,NULL,0,0,LOOP,0,0);//VYHODNOTI SA PODMIENKA + NACITA SA do
          generate_inst(NULL,NULL,0,0,EQUAL,0,0);
 
             if((token=getnextToken(LEX_STRUCTPTR))==BEGIN)
@@ -707,6 +735,9 @@ int command(int value)
       }else ERRORRET(token);
 
     }
+
+
+
     ///write funkcia pre lubovolny pocet parametrov
     else if(value==WRITE)
     {

@@ -64,3 +64,5 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define BEGINJUMP 228
 #define ENDJUMP 229
 #define SAVE 230
+#define LOOP 231
+#define LOOPJUMP 232

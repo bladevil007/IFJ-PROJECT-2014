@@ -11,9 +11,14 @@
 #include "interpreter.h"
 #include "codegenerate.h"
 #include "ial.h"
+#include "stack.h"
+TStack *stackADRESS;
+int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
+int TOP;
 struct record *temp;
 struct record *temp2;
 struct record *temp3;
+int RES;
 char *globalne_pole=NULL;
 int LABEL;
 
@@ -37,6 +42,7 @@ int foo(INSTape *INSTR)
             break;
         case(BOOLEAN_hash):
             temp->value.b = hodnota;
+            temp->value.i=(int)hodnota-37;
             break;
         case(STRING_hash):
            free(temp->value.str);
@@ -185,6 +191,9 @@ int foo(INSTape *INSTR)
             case REAL_hash:
             INSTR->b =temp->value.d;
             break;
+            case BOOLEAN_hash:
+            INSTR->b =temp->value.i;
+            break;
              }
             }
             if(INSTR->a2!=NULL)
@@ -196,6 +205,9 @@ int foo(INSTape *INSTR)
             break;
             case REAL_hash:
             INSTR->c =temp->value.d;
+            break;
+            case BOOLEAN_hash:
+            INSTR->c =temp->value.i;
             break;
              }
             }
@@ -377,13 +389,16 @@ int foo(INSTape *INSTR)
             break;
 
        case JUMP:
+
        if(hodnota==0)
         {
             LABEL=INSTR->specialcode;
+            stack_push(stackADRESS,LABEL);
             return JUMP;
         }
         else
-                break;
+            break;
+
 
        case SAVE:
         hodnota4=hodnota;
@@ -399,8 +414,6 @@ int foo(INSTape *INSTR)
             }
         else hodnota=0;
         break;
-
-
 
 
         case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
@@ -469,6 +482,34 @@ int foo(INSTape *INSTR)
             break;
 
 
+
+        case ELSE:
+            LABEL=INSTR->specialcode;
+            stack_push(stackADRESS,LABEL);
+
+            return ELSE;
+            break;
+
+        case WHILE:
+            return WHILE;
+
+        case LOOP:
+          LABEL=INSTR->specialcode;
+          stack_push(stackADRESS,LABEL);
+          if (hodnota==0)
+          return LOOPJUMP;
+          else return LOOP;
+          break;
+
+
+
+
+
+
+
+
+
+
 ///*-+/ hotovo bez premennych
 
 
@@ -477,10 +518,22 @@ return 0;
 }
 int searchrecord(inf_pointer_array* beh_programu)
 {
+
+if(((stackADRESS=stack_init())==NULL))
+exit(E_INTERNAL);
+ stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
+
+
+
 hodnota2=0;
 hodnota=0;
 hodnota3=0;
 hodnota4=0;
+int RESULT;
+int RESULT1=0;
+int BREAKPOINT=0;
+
+
 
     int i=0;
 
@@ -491,23 +544,149 @@ hodnota4=0;
     }
     i++;
 
-
-///prechadzaj cely main program
     while(beh_programu->pole[i]->CODE != END_MAIN)
     {
-        if(foo(beh_programu->pole[i])==JUMP)
+       RESULT=foo(beh_programu->pole[i]);
+
+        switch(RESULT)
+        {
+
+    case JUMP:
+        stack_top(stackADRESS,&TOP);
+        if (RESULT1==0)
+        RESULT1=JUMP;
+        if (RESULT1==JUMP)
+        RESULT1=JUMP;
+        i++;
+        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+        i++;
+        stack_pop(stackADRESS);
+        break;
+
+    case LOOPJUMP:
+
+        stack_top(stackADRESS,&TOP);
+        i++;
+        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+        i++;
+        stack_pop(stackADRESS);
+        stack_top(stackADRESS,&TOP);
+        break;
+
+    case ELSE:
+            stack_top(stackADRESS,&TOP);
+            if (RESULT1==JUMP)
+            {
+
+                RESULT1=0;
+                break;
+            }
+            else
             {
                 i++;
-                while (beh_programu->pole[i]->specialcode!=LABEL && beh_programu->pole[i]->CODE!=ENDJUMP)
-                i++;
-            }
+                while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                    i++;
 
+            }
+            stack_pop(stackADRESS);
+            break;
+
+
+
+        case WHILE:
+
+            BREAKPOINT=i;
+            break;
+        case LOOP:
+            stack_top(stackADRESS,&TOP);
+                i=LOOPER(beh_programu,BREAKPOINT,i);
+                stack_pop(stackADRESS);
+                  break;
+        }
         i++;
+
 
     }
 
     return SUCCESS;
 }
+
+
+int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i)
+{
+int RESULT;
+int RESULT1=0;
+
+    while ( beh_programu->pole[i]->CODE!=ENDJUMP || beh_programu->pole[i]->specialcode!=TOP)
+    {
+                   RESULT=foo(beh_programu->pole[i]);
+
+
+                       switch(RESULT)           ///SKOKY + LOOP
+                    {
+
+                    case JUMP:
+
+                        stack_top(stackADRESS,&TOP);
+                        if (RESULT1==0)
+                        RESULT1=JUMP;
+                        if (RESULT1==JUMP)
+                        RESULT1=JUMP;
+                        i++;
+                        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                        i++;
+                        stack_pop(stackADRESS);
+                        stack_top(stackADRESS,&TOP);
+                        break;
+
+
+
+                   case ELSE:
+
+                    stack_top(stackADRESS,&TOP);
+                        if (RESULT1==JUMP)
+                    {
+                            RESULT1=0;
+                            stack_pop(stackADRESS);
+                            stack_top(stackADRESS,&TOP);
+                            break;
+                    }
+                        else
+                    {
+                            i++;
+                        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                            i++;
+                    }
+                    stack_pop(stackADRESS);
+                    stack_top(stackADRESS,&TOP);
+                    break;
+
+
+
+                case WHILE:           ///OPRAVIT
+                break;
+                case LOOP:
+                stack_top(stackADRESS,&TOP);
+                while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                i++;
+                break;
+                    }
+
+                    i++;
+
+}
+
+return BREAKPOINT;
+
+}
+
+
+
+
+
+
+
+
 
 
 

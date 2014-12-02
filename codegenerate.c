@@ -23,7 +23,7 @@
 #include "precedent.h"
 #include "codegenerate.h"
 
-int JUMPL=0;
+int JUMPL=5;
 
 int init_generate()
 {
@@ -370,11 +370,12 @@ case BEGINJUMP:
 case ENDJUMP:
     Instruction->a=NULL;
     Instruction->specialcode=JUMPL;
+    JUMPL--;
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=ENDJUMP;
     add_new_pointer(InstructionTape,Instruction);
-    JUMPL--;
+
     break;
 
 case SAVE:
@@ -391,7 +392,34 @@ case LESS:
     Instruction->CODE=LESS;
     add_new_pointer(InstructionTape,Instruction);
     break;
+case ELSE:
+    JUMPL++;
+    Instruction->a=NULL;
+    Instruction->specialcode=JUMPL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=ELSE;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 
+case WHILE:
+    Instruction->a=NULL;
+    Instruction->specialcode=JUMPL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=WHILE;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+case LOOP:
+    JUMPL++;
+    Instruction->a=NULL;
+    Instruction->specialcode=JUMPL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=LOOP;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 
 
 

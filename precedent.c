@@ -257,6 +257,8 @@ while(i<11)
          }
          else if(i==6 && CONTROL!=7)                    ///menej
          {
+             if(RULE==0)                       ///ak sa len porovnavaju hodnoty
+             generate_inst(X1,0,E1,0,ADD,0,0);
              generate_inst(0,0,0,0,LESS,0,0);
          }
       if((LASTindex %2)==0)
@@ -627,6 +629,10 @@ if ( TOP_Stdin==LESS || TOP_Stdin==GREATER|| TOP_Stdin==LESSEQUAL || TOP_Stdin==
 }
 
 
+
+
+
+
 PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
     if(PSA_Stalker!=0)
@@ -667,18 +673,18 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                 CONTROL=7;
 
 
-         if(E1==0 && ZERO!=1)
+         if(E1==0 && ZERO!=1 && CONTROL!=7)
          {
          X1=malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
          strcpy(X1,LEX_STRUCTPTR->str);
          E1=-1;
          }
-         else if(E2==0)
+         else if(E2==0 && CONTROL!=7)
          {
          X2=malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
          strcpy(X2,LEX_STRUCTPTR->str);
          E2=-1;
-         }else if(E2!=0)
+         }else if(E2!=0 && CONTROL!=7)
          {
 
              X3=malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
@@ -690,10 +696,16 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
          else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo)
          {
+             if(TOP_Stdin==TRUE)
+                E1=2;
+             else if(TOP_Stdin==FALSE)
+                E1=1;
+
              if(TOP_Stdin==CONST_STRING)
                 CONTROL=7;
 
-              if(LEX_STRUCTPTR->value==0)
+
+              if(LEX_STRUCTPTR->value==0 && TOP_Stdin==TRUE && TOP_Stdin==FALSE)
                ZERO=1;
 
              if (switch_control==0)
@@ -709,16 +721,14 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              }
              VysledokID(Vysledok,decodederSEM(TOP_Stdin));
 
-            if(E1==0 && ZERO!=1 )
+            if(E1==0 && ZERO!=1  && CONTROL!=7)
             {
                  E1=LEX_STRUCTPTR->value;
             }
-             else if((E1!=0 && E2==0)||ZERO==1)
+             else if(((E1!=0 && E2==0)||ZERO==1)&& CONTROL!=7)
                  E2=LEX_STRUCTPTR->value;
              else
                  E3=LEX_STRUCTPTR->value;
-
-
          }
 
 
@@ -757,9 +767,10 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
            {
                 return 0;
            }
-           if(EVAL==1)
-           {
-               generate_inst(X1,0,E1,0,ADD,0,0);
+
+               if(EVAL==1){
+                if(RULE==0)
+                generate_inst(X1,0,E1,0,ADD,0,0);
                 E1=0;
                 E2=0;
                 E3=0;
@@ -767,9 +778,12 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                 X2=NULL;
                 X3=NULL;
                 CONTROL=0;
-               generate_inst(0,0,0,0,SAVE,0,0);
-               EVAL=0;
-           }
+                RULE=0;
+                generate_inst(0,0,0,0,SAVE,0,0);
+                EVAL=0;
+               }
+
+
            stack_push(stackPSA,decodeSA(TOP_Stdin));
            stack_top(stackPSA,&TOP_Stack);
 
@@ -1020,6 +1034,7 @@ X1=NULL;
 X2=NULL;
 X3=NULL;
 ZERO=0;
+EVAL=0;
 PODMIENKA_POD=0;
 PODMIENKA_POD1=0;
 switch_control=0;
