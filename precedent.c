@@ -261,6 +261,32 @@ while(i<11)
              generate_inst(X1,0,E1,0,ADD,0,0);
              generate_inst(0,0,0,0,LESS,0,0);
          }
+          else if(i==7 && CONTROL!=7)                    ///menej
+         {
+             if(RULE==0)                       ///ak sa len porovnavaju hodnoty
+             generate_inst(X1,0,E1,0,ADD,0,0);
+             generate_inst(0,0,0,0,GREATER,0,0);
+         }
+          else if(i==8 && CONTROL!=7)                    ///menej
+         {
+             if(RULE==0)                       ///ak sa len porovnavaju hodnoty
+             generate_inst(X1,0,E1,0,ADD,0,0);
+             generate_inst(0,0,0,0,LESSEQUAL,0,0);
+         }
+          else if(i==9 && CONTROL!=7)                    ///menej
+         {
+             if(RULE==0)                       ///ak sa len porovnavaju hodnoty
+             generate_inst(X1,0,E1,0,ADD,0,0);
+             generate_inst(0,0,0,0,GREATEREQUAL,0,0);
+         }
+          else if(i==10 && CONTROL!=7)                    ///menej
+         {
+             if(RULE==0)                       ///ak sa len porovnavaju hodnoty
+             generate_inst(X1,0,E1,0,ADD,0,0);
+             generate_inst(0,0,0,0,NOTEQUAL,0,0);
+         }
+
+
       if((LASTindex %2)==0)
         LAST=i;
       else

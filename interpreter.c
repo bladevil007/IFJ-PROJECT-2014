@@ -416,6 +416,41 @@ int foo(INSTape *INSTR)
         break;
 
 
+ case GREATER:
+        if((hodnota4-hodnota)> 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+        break;
+
+
+case LESSEQUAL:
+        if((hodnota4-hodnota)<= 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+        break;
+
+ case GREATEREQUAL:
+        if((hodnota4-hodnota)>= 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+        break;
+
+case NOTEQUAL:
+        if((hodnota4!=hodnota))
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+        break;
+
+
+
         case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
             temp = hashtable_search(GlobalnaTAB,INSTR->a2);

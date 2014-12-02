@@ -392,6 +392,7 @@ case LESS:
     Instruction->CODE=LESS;
     add_new_pointer(InstructionTape,Instruction);
     break;
+
 case ELSE:
     JUMPL++;
     Instruction->a=NULL;
@@ -420,17 +421,34 @@ case LOOP:
     Instruction->CODE=LOOP;
     add_new_pointer(InstructionTape,Instruction);
     break;
-
-
-
-
-
-
-
-
-
-
-
+    case GREATER:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=GREATER;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+    case LESSEQUAL:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=LESSEQUAL;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+    case GREATEREQUAL:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=GREATEREQUAL;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+    case NOTEQUAL:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=NOTEQUAL;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 
 }
 }
