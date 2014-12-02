@@ -141,7 +141,6 @@ int program(int token)
             token=getnextToken(LEX_STRUCTPTR);
             if(token==E_LEXICAL)exit(E_LEXICAL); ///bud ide dalsia funkcia alebo ide uz telo programu
             IN_FUNCTION=0;
-            token=getnextToken(LEX_STRUCTPTR);
             return program(token);
         }
         else
@@ -216,7 +215,7 @@ int program(int token)
             if(token==E_LEXICAL)exit(E_LEXICAL);
                                                             ///bud ide dalsia funkcia alebo ide uz telo programu
             IN_FUNCTION=0;
-            token=getnextToken(LEX_STRUCTPTR);
+
             return program(token);
         }
         else
@@ -376,6 +375,7 @@ token = getnextToken(LEX_STRUCTPTR);
                     token=getnextToken(LEX_STRUCTPTR);
                 if(token==END)
                 {
+                    token=getnextToken(LEX_STRUCTPTR);
                     return SUCCESS;
                 }
                 else if(token==BODKOCIARKA)
