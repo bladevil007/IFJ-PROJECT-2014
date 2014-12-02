@@ -42,6 +42,8 @@ typedef struct
 
 //prototypy funkci:
 THash_table *GlobalnaTAB;
+THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
+
 
 void stringtolower (char *key);
 THash_table *hashtable_init (unsigned size);

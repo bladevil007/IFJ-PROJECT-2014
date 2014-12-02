@@ -640,6 +640,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
          {
 
             ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
+
             struct record *SUPPORT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
             struct record *SUPPORT1=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
 
@@ -1130,6 +1131,7 @@ int VysledokID(int Vysledok,int id )
                      ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
                     else
                     {
+
                      ELEMENT=(hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str));
                     }
                     if(ELEMENT==0)
@@ -1138,8 +1140,9 @@ int VysledokID(int Vysledok,int id )
                         if(ELEMENT!=0)
                         {
                                 return ELEMENT;
-                        }else
-                            exit(E_SEMANTIC_UNDEF);
+                        }else{
+
+                            exit(E_SEMANTIC_UNDEF);}
                     }
 return ELEMENT;
 }
