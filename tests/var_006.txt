@@ -6,6 +6,6 @@ a:real;
 
 Begin
 
-Length('ah ok')
+a:=Length('ah ok')
 
 End.

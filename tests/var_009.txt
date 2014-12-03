@@ -1,11 +1,12 @@
 {	0	}
 var
-a:boolean; 
+a:integer; 
 
 
 
 Begin
 
-Length('ah ok')
+a:=Length('ah ok');
+write(a)
 
 End.

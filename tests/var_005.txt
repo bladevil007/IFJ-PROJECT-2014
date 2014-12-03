@@ -1,9 +1,10 @@
 {	0	}
-
+var 
+x:real;
 
 
 Begin
 
-Length('ah ok')
+x:=Length('ah ok')
 
 End.

@@ -6,6 +6,7 @@ a:real;
 
 Begin
 
-Length('ah ok')
+a:=Length('ah ok');
+write(a,'1')
 
 End.

@@ -1,16 +1,16 @@
 {	0	}
 var
-a:boolean;
-b123:real;
 int:integer;
 int2:integer;
-bool:boolean; 
-str:string;
 
 
 
 Begin
-
-Length('ah ok')
+int2:=5;
+int:=Length('ah ok');
+if int=int2 then
+begin
+write('yes')
+end
 
 End.

@@ -1,4 +1,4 @@
-{	0	}
+{	3	}
 var
 a:boolean;b123:real;int:integer;int2:integer;
 bool:boolean; 
@@ -8,6 +8,6 @@ str:string;
 
 Begin
 
-Length('ah ok')
+int:=Length('ah ok')
 
 End.

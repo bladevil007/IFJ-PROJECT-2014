@@ -1,4 +1,4 @@
-{	0	}
+{	3	}
 var
 a:boolean;
 b123:real;
@@ -16,6 +16,6 @@ str2:string;
 
 Begin
 
-Length('ah ok')
+int:=Length('ah ok')
 
 End.

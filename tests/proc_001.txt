@@ -1,9 +1,11 @@
 {	0	}
+var
+x:integer;
 function dvakrat(co: integer): integer;
 begin
  dvakrat := co*2
 end;
 
 begin
- dvakrat(5)
+ x:=dvakrat(5)
 end. 

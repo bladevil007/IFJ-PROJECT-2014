@@ -1,11 +1,13 @@
 {	0	}
 var
-a:integer; 
+a:integer;
+b:integer; 
 
 
 
 Begin
 
-Length('ah ok')
+a:=Length('ah ok');
+b:=a+1
 
 End.

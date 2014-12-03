@@ -5,7 +5,7 @@ a:integer;
 
 Begin
 
-Length('ah ok');
+a:=Length('ah ok')
 0a=5;
 
 End.

@@ -1,0 +1,10 @@
+{	0	}
+var
+x:integer;
+y:integer;
+begin
+x := find('Ahoj jak se mas','jak se mas');
+y:=find('ah','a');
+y:=y+x;
+write(y)
+end.
