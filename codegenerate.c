@@ -370,12 +370,11 @@ case BEGINJUMP:
 case ENDJUMP:
     Instruction->a=NULL;
     Instruction->specialcode=JUMPL;
-    JUMPL--;
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=ENDJUMP;
     add_new_pointer(InstructionTape,Instruction);
-
+   JUMPL--;
     break;
 
 case SAVE:
@@ -405,7 +404,7 @@ case ELSE:
 
 case WHILE:
     Instruction->a=NULL;
-    Instruction->specialcode=JUMPL;
+    Instruction->specialcode=0;
     Instruction->b=B;
     Instruction->c=C;
     Instruction->CODE=WHILE;

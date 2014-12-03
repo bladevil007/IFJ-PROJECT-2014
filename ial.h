@@ -1,4 +1,5 @@
-
+#ifndef IAL_H_
+#define IAL_H_
 #define false_hash 0
 #define true_hash 1
 //slouzi k urceni, zda zaznam je zaznamem funkce ci promenne
@@ -41,8 +42,11 @@ typedef struct
 } THash_table;
 
 //prototypy funkci:
+///lokalna hashovacia tabulka
 THash_table *GlobalnaTAB;
-THash_table *LokalnaTAB; ///lokalna hashovacia tabulka
+
+
+
 
 
 void stringtolower (char *key);
@@ -68,3 +72,5 @@ void siftDown(char *s, int left, int right);
 void heapSort(char *s, int n);
 
 char *sort(char *s);
+
+#endif

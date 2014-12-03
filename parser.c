@@ -32,8 +32,8 @@ int IF_ENABLE=0;                ///na pouzitie else v progcondition
 inf_array *POLE_ID_GLOBAL;   ///nekonecne pole ID pre globalnu
 inf_array *POLE_ID_LOCAL;   ///nekonecne pole ID pre lokalnu
 inf_array *POLE_ID_GLOBALFUN;   ///nekonecne pole ID pre globalnu
-inf_array *POLE_ID_LOCAL_VOLANE;
-inf_array *POLE_ID_LOCAL1;
+inf_array *POLE_ID_LOCAL_VOLANE;              ///
+THash_table *LokalnaTAB;
 char *SKUSKA;
 
 inf_array *SUPPORT_POLE;  /// pomocna
@@ -226,7 +226,6 @@ if(token==SUCCESS && (token=getnextToken(LEX_STRUCTPTR))==EOFILE) /// za end. ne
     return SUCCESS;
 else
     return ERRORRET(token);
-
 }
 
 /** \brief Hlavna funkcia syntaktickej analyzi
@@ -255,11 +254,6 @@ if(((POLE_ID_LOCAL=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
 exit(E_INTERNAL);
 
 
-if(((POLE_ID_LOCAL1=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
-    (init_array(POLE_ID_LOCAL1)==-1))                                        ///alokujeme pole ID loc
-exit(E_INTERNAL);
-
-
 if(((GlobalnaTAB=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
     ((GlobalnaTAB=hashtable_init(100))==0))                                        ///alokujeme hashovaciu tabulku
 exit(E_INTERNAL);
@@ -283,9 +277,6 @@ exit(E_INTERNAL);
 if((ELEMENT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
 exit(E_INTERNAL);
 
-if((SUPPORT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
-exit(E_INTERNAL);
-
 
 IN_FUNCTION=0;                                                               ///nastavime,nenachadzame sa vo funkcii
 int token=getnextToken(LEX_STRUCTPTR);              ///nacitame prvy token
@@ -296,15 +287,15 @@ if(ok==SUCCESS)
     return SUCCESS;
 ///DEALOKACIE PRIDAT DALSIE + volat pri exit
 strClear(LEX_STRUCTPTR);
+free_array(POLE_ID_GLOBALFUN);
 free_array(POLE_ID_GLOBAL);
 free_array(POLE_ID_LOCAL);
+free_array(POLE_ID_LOCAL_VOLANE);
 hashtable_free(GlobalnaTAB);
 hashtable_free(LokalnaTAB);
 free(LEX_STRUCTPTR);
 return 0;
 }///
-
-
 
 /** \brief ///telo programu pre funkciu zacina begin a konci end;
 Tento neterminal sa vola len pri prijati terminalu/tokenu <function>
@@ -362,7 +353,7 @@ token = getnextToken(LEX_STRUCTPTR);
         else if(token==ELSE && IF_ENABLE==1)
         {
              generate_inst(0,0,0,0,ENDJUMP,0,0);
-            generate_inst(0,0,0,0,ELSE,0,0);
+             generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
              if(token==BEGIN)
@@ -599,7 +590,6 @@ int command(int value)
     ///Vstavane funkcie
     if(value==COPY || value==FIND ||value==LENGTH || value==SORT)
         return Libraryfunction(value);                                      ///zavola sa funckia ktora kontroluje vstavane funkcie
-
     else if(value==ID)
     {
          SUPPORT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
@@ -607,7 +597,6 @@ int command(int value)
            struct record  *SUPPORT2=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
 
             ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
-
              char *pole;
              pole=(char*)malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
                    strcpy(pole,LEX_STRUCTPTR->str);
@@ -965,7 +954,6 @@ else if(value==COPY)
                         }else return ERRORRET(token);
             }else return ERRORRET(token);
        }else return ERRORRET(token);
-
 }
     ///funkcia find
 else if(value==FIND)
@@ -1075,8 +1063,6 @@ else if(value==SORT)
 return ERRORRET(token);
 }
 
-
-
 ///VAR DEKLARACIA GLOBALNYCH PREMENNYCH  < VAR >
 /**
 Neterminal na kontrolu syntaxe deklaracie premennych
@@ -1100,18 +1086,13 @@ Neterminal na kontrolu syntaxe deklaracie premennych
             exit(E_SEMANTIC_UNDEF);
            else
             POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);
+
     }else
     {
-
-
-
         ELEMENT=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
 
                                                                                                                 ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
          struct record* SUPPORT1=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
-
-
-
 
          if(SUPPORT1!=0)
          {
@@ -1125,12 +1106,11 @@ Neterminal na kontrolu syntaxe deklaracie premennych
             exit(E_SEMANTIC_UNDEF);
          }
          else
-        POLE_ID_INDEX=add_str(POLE_ID_LOCAL1,LEX_STRUCTPTR->str);
+        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
 
-                                                                        ///dva krat definovany ten isty nazov
+                                                                    ///dva krat definovany ten isty nazov
     }
-
-                       ///neni jej priradena hodnota
+                ///neni jej priradena hodnota
                     if((token=getnextToken(LEX_STRUCTPTR))== DVOJBODKA)
                     {
                         token=getnextToken(LEX_STRUCTPTR);
@@ -1138,10 +1118,12 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                     {
 
                         if(IN_FUNCTION==0)
-                            hashtable_add(GlobalnaTAB,VARIABLE_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov GLOB
+                           {
+                            hashtable_add(GlobalnaTAB,VARIABLE_hash,POLE_ID_GLOBAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);
+                            }
+                            ///pridame ID do tabulky symbolov GLOB
                          else
-                            hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL1->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov    LOC
-
+                            hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov    LOC
                         token=getnextToken(LEX_STRUCTPTR);
                             ///pridat do tabulky
                         {
@@ -1273,7 +1255,7 @@ int fun_params()
             ELEMENT->valuedef=true_hash;
                       ///premenna pride jej zavolanim
 
-    add_str_param(POLE_ID_LOCAL_VOLANE,LEX_STRUCTPTR->str);
+            add_str_param(POLE_ID_LOCAL_VOLANE,LEX_STRUCTPTR->str);
 
 
             token = getnextToken(LEX_STRUCTPTR);
@@ -1296,8 +1278,8 @@ int fun_params()
                 {
                 if(SUPPORT->defined!=true_hash  && SUPPORT->defined!=false_hash)                                ///ked hlavicka uz bola deklarovana nealokujeme a zaroven redefinice parametrov funckie
                 {
-                    int newLength = length(ARRAY_PARAM->str);                           ///pridavame
-                    SUPPORT->params=malloc(sizeof(char)*(newLength+1));
+                     int newLength = length(ARRAY_PARAM->str);                           ///pridavame
+                     SUPPORT->params=malloc(sizeof(char)*(newLength+1));
                      strcpy(SUPPORT->params,ARRAY_PARAM->str);
 
                      newLength=length(POLE_ID_LOCAL_VOLANE->str);                           ///pridavame
@@ -1355,7 +1337,6 @@ int decodederSEM(int token)
         return INTEGER_hash;
     case TRUE:
         return BOOLEAN_hash;
-
     case FALSE:
         return BOOLEAN_hash;
     case CONST_STRING:

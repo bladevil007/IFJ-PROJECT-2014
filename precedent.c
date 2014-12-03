@@ -22,14 +22,14 @@ float E1=0;
 float E2=0;
 float E3=0;
 int ZEROIN=0;
-TStack *stackPSA;  /// stack pre tokeny
-TStack *stackSEM;  /// stack pre pravidla
-TStack *Helper;  ///na expresion
-int term ;        ///token
-int TOP_Stack;    ///vrchol zasobnika
-int TOP_Stdin;    ///vrchol vstupneho retazca
-int concateT;    ///token
-int PODMIENKA_POD=0;   /// vsetky premenne v IF a While musia byt stejneho typu
+TStack *stackPSA;                    /// stack pre tokeny
+TStack *stackSEM;                   /// stack pre pravidla
+TStack *Helper;                  ///na expresion
+int term ;                       ///token
+int TOP_Stack;                      ///vrchol zasobnika
+int TOP_Stdin;                ///vrchol vstupneho retazca
+int concateT;                    ///token
+int PODMIENKA_POD=0;            /// vsetky premenne v IF a While musia byt stejneho typu
 int PODMIENKA_POD1=0;
 int LAST=0;
 int EVAL=0;
@@ -43,7 +43,6 @@ int CONTROL=0;
 int switch_control=0;
 int PSA_Stalker;    ///polozka v PSA Table
 int ZERO=0;
-
 
 int PrecedenceTABLE[13][13];
 
@@ -71,7 +70,7 @@ while(i<11)
   if(rules[i][0]==scan[0] &&  rules[i][1]==scan[1] &&  rules[i][2]==scan[2])
   {
 
-     if(i==0 && CONTROL!=7)
+if(i==0 && CONTROL!=7)
      {
 
          RULE=1;
@@ -523,9 +522,6 @@ int CheckEND(int end,int type)
 		return 0;
 		}
 	}
-
-
-
  }
        return ERRORRET(end);
 }
@@ -654,11 +650,6 @@ if ( TOP_Stdin==LESS || TOP_Stdin==GREATER|| TOP_Stdin==LESSEQUAL || TOP_Stdin==
        exit(E_SYNTAX);
 }
 
-
-
-
-
-
 PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
 
     if(PSA_Stalker!=0)
@@ -698,6 +689,9 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
             if(ELEMENT->type==STRING_hash)
                 CONTROL=7;
 
+              if(ELEMENT->type==BOOLEAN_hash)
+              CONTROL=6;
+
 
          if(E1==0 && ZERO!=1 && CONTROL!=7)
          {
@@ -717,15 +711,18 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              strcpy(X3,LEX_STRUCTPTR->str);
              E3=-1;
          }
-
          }
 
          else if(TOP_Stdin ==CONST || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING || TOP_Stdin==REALo)
          {
              if(TOP_Stdin==TRUE)
-                E1=2;
+                {E1=2;
+                CONTROL=6;
+                }
              else if(TOP_Stdin==FALSE)
-                E1=1;
+               {E1=1;
+               CONTROL=6;
+               }
 
              if(TOP_Stdin==CONST_STRING)
                 CONTROL=7;
@@ -756,11 +753,7 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              else
                  E3=LEX_STRUCTPTR->value;
          }
-
-
-
-
-                                                                                ///jedna sa o konstantu overime ci jej hodnota moze byt prirade
+                                                                                   ///jedna sa o konstantu overime ci jej hodnota moze byt prirade
          TOP_Stdin=getnextToken(LEX_STRUCTPTR);
             checklex(TOP_Stdin);
           if(PODMIENKA_POD==BOOLEAN_hash)
@@ -794,21 +787,21 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                 return 0;
            }
 
-               if(EVAL==1){
+               if(EVAL==1 && CONTROL!=7)
+              {
                 if(RULE==0)
-                generate_inst(X1,0,E1,0,ADD,0,0);
-                E1=0;
-                E2=0;
-                E3=0;
-                X1=NULL;
-                X2=NULL;
-                X3=NULL;
-                CONTROL=0;
-                RULE=0;
-                generate_inst(0,0,0,0,SAVE,0,0);
-                EVAL=0;
+                    generate_inst(X1,0,E1,0,ADD,0,0);
+                    E1=0;
+                    E2=0;
+                    E3=0;
+                    X1=NULL;
+                    X2=NULL;
+                    X3=NULL;
+                    CONTROL=0;
+                    RULE=0;
+                    generate_inst(0,0,0,0,SAVE,0,0);
+                    EVAL=3;
                }
-
 
            stack_push(stackPSA,decodeSA(TOP_Stdin));
            stack_top(stackPSA,&TOP_Stack);
@@ -1051,6 +1044,12 @@ if(RULE==0 && CONTROL!=7 && type==ID)
 {
 generate_inst(X1,0,E1,0,ADD,0,0);
 }
+
+
+if(EVAL==0 && Vysledok==PODMIENKA && CONTROL==6 && (E1==2 || E1==1||E1==-1))           /// WHILE TRUE alebo IF true,false samostatna podmienka alebo cyklus
+ {
+  generate_inst(X1,0,E1,1,MINUS,0,0);
+ }
 RULE=0;
 CONTROL=0;
 E1=0;
@@ -1088,7 +1087,7 @@ int concate(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_ta
 
            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
            struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
-  ///zistime ci existuje v tabulke
+                ///zistime ci existuje v tabulke
            VysledokID(Vysledok,ELEMENT->type);
            if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                             exit(E_UNINITIALIZED_VAR);
@@ -1167,9 +1166,10 @@ int VysledokID(int Vysledok,int id )
 ///VYHLADAVANIE V TABULKACH CI MAME DEFINOVANY ID
  struct record* lookforElement(LEX_STRUCT *LEX_STRUCTPTR,int type,THash_table *GlobalnaTAB,THash_table*LokalnaTAB,struct record *ELEMENT)
 {
-
                     if(IN_FUNCTION==0)///Kontrola ci je definovana
-                     ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+                     {ELEMENT=(hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str));
+
+                     }
                     else
                     {
 

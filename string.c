@@ -135,17 +135,16 @@ int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 */
 int init_array(inf_array *a)
 {
-    if((a->str = (char*) malloc(ARR_INC)) == NULL)
+    if((a->str = (char*) malloc(ARR_INC*sizeof(char))) == NULL)
         return -1;
 
     a->str[0] = '\0';
     a->length = 0;
     a->act_pos = 0;
-    a->allocSize = ARR_INC;
+    a->allocSize = 100;    ///opravit velkost lebo hadze chyby
 
     return 1;
 }
-
 
 /** \brief Funkcia uvolni alokovanu pamat
 */
@@ -153,7 +152,6 @@ void free_array(inf_array *a)
 {
     free(a->str);
 }
-
 
 /** \brief  Funkcia pridava string do nekonecneho pola
             Navratova hodnota je index v poli, na ktorom zacina pridany string
@@ -185,9 +183,6 @@ int add_str_param(inf_array *a, char* strin)
     return ret_val;
 }
 
-
-
-
 /** \brief  Funkcia pridava string do nekonecneho pola
             Navratova hodnota je index v poli, na ktorom zacina pridany string
 */
@@ -196,11 +191,10 @@ int add_str(inf_array *a, char* strin)
     if((a->allocSize - a->length) <= (strlen(strin) + 1))       //ak je nedostatok volneho miesta v poli tak realokuj
     {
         if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC + strlen(strin))) == NULL)
-            return -1;
+            exit(E_INTERNAL);
 
         a->allocSize = a->allocSize + ARR_INC + strlen(strin);                  //aktualizacia premennej
     }
-
 
     int i;
     int ret_val = a->act_pos;                                   //navratova hodnota

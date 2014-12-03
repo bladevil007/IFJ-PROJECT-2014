@@ -1,3 +1,16 @@
+/* **************************** interpreter.c ************************************ */
+/* Soubor:             interpreter.c - Generovanie kodu a jeho vykonanie      */
+/* Kodovani:            UTF-8                                                 */
+/* Datum:               11.2014                                               */
+/* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
+/* Projekt:             Implementace interpretu jazyka IFJ14                  */
+/* Varianta zadani:     a/2/II                                                */
+/* Titul,Autori, login:         Ing. Natalya Loginova   xlogin00              */
+/*                              Jindrich Dudek          xdudek04              */
+/*                              Norbert Durcansky       xdurca01              */
+/*                              Jan Jusko               xjusko00              */
+/*                              Jiøí Dostál             xdosta40              */
+/* ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -12,6 +25,7 @@
 #include "codegenerate.h"
 #include "ial.h"
 #include "stack.h"
+
 TStack *stackADRESS;
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
 int TOP;
@@ -20,6 +34,7 @@ struct record *temp2;
 struct record *temp3;
 int RES;
 char *globalne_pole=NULL;
+char *globalne_pole1=NULL;
 int LABEL;
 
 int foo(INSTape *INSTR)
@@ -75,6 +90,7 @@ int foo(INSTape *INSTR)
         break;
 
     case READLN:
+
     temp = hashtable_search(GlobalnaTAB,INSTR->a);
     switch(temp->type)
        {
@@ -86,14 +102,14 @@ int foo(INSTape *INSTR)
             if(scanf("%f",&(temp->value.d))==0)
             exit(E_STDIN);
             break;
-        case(CHAR_hash):
-            if(scanf("%c",&(temp->value.c))==0)
+        case(BOOLEAN_hash):
+            if(scanf("%i",&(temp->value.b))==0)
             exit(E_STDIN);
             break;
         case(STRING_hash):
             free(temp->value.str);
             temp->value.str=(char*)malloc(sizeof(char)*256);
-            if(scanf("%s",(temp->value.str))==0)
+            if((scanf("%s",(temp->value.str)))==0)
             exit(E_STDIN);
             break;
         }
@@ -229,6 +245,7 @@ int foo(INSTape *INSTR)
             {
               hodnota=hodnota+hodnota2;
             }
+
             break;
 
         case MULTIPLY:
@@ -282,6 +299,7 @@ int foo(INSTape *INSTR)
 
 
         case MINUS:
+
                if(INSTR->a!=NULL)
             {
             temp = hashtable_search(GlobalnaTAB,INSTR->a);
@@ -292,11 +310,14 @@ int foo(INSTape *INSTR)
             case REAL_hash:
             INSTR->b =temp->value.d;
             break;
+            case BOOLEAN_hash:
+            INSTR->b =temp->value.i;
+            break;
              }
             }
+
             if(INSTR->a2!=NULL)
             {
-
             temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             switch(temp->type){
             case INTEGER_hash:
@@ -389,7 +410,6 @@ int foo(INSTape *INSTR)
             break;
 
        case JUMP:
-
        if(hodnota==0)
         {
             LABEL=INSTR->specialcode;
@@ -535,16 +555,6 @@ case NOTEQUAL:
           return LOOPJUMP;
           else return LOOP;
           break;
-
-
-
-
-
-
-
-
-
-
 ///*-+/ hotovo bez premennych
 
 
@@ -582,7 +592,6 @@ int BREAKPOINT=0;
     while(beh_programu->pole[i]->CODE != END_MAIN)
     {
        RESULT=foo(beh_programu->pole[i]);
-
         switch(RESULT)
         {
 
@@ -605,8 +614,9 @@ int BREAKPOINT=0;
         while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
         i++;
         stack_pop(stackADRESS);
-        stack_top(stackADRESS,&TOP);
         break;
+
+
 
     case ELSE:
             stack_top(stackADRESS,&TOP);
@@ -646,7 +656,6 @@ int BREAKPOINT=0;
     return SUCCESS;
 }
 
-
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i)
 {
 int RESULT;
@@ -657,7 +666,8 @@ int RESULT1=0;
                    RESULT=foo(beh_programu->pole[i]);
 
 
-                       switch(RESULT)           ///SKOKY + LOOP
+
+                    switch(RESULT)           ///SKOKY + LOOP
                     {
 
                     case JUMP:
@@ -697,15 +707,7 @@ int RESULT1=0;
                     break;
 
 
-
-                case WHILE:           ///OPRAVIT
-                break;
-                case LOOP:
-                stack_top(stackADRESS,&TOP);
-                while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
-                i++;
-                break;
-                    }
+        }
 
                     i++;
 
