@@ -1,0 +1,15 @@
+{	0	}
+var 
+x:integer;
+function lol(a: integer): integer;
+var
+f:integer;
+begin
+ f:=1;
+ lol:=a+f
+end;
+
+
+begin
+ x:=lol(2)
+end. 

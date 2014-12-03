@@ -1,8 +1,9 @@
+{	0	}
 function dvakrat(co: integer): integer;
 begin
- dvakrat := co*2;
+ dvakrat := co*2
 end;
 
 begin
- write(dvakrat(5))
+ dvakrat(5)
 end. 

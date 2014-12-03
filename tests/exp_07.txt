@@ -1,4 +1,4 @@
-{	4	}
+{	0	}
 var
 i:integer;
 x:real;

@@ -1,0 +1,12 @@
+{	0	}
+var 
+x:integer;
+function lol(a: integer): integer;
+begin
+ lol:=a*2
+end;
+
+begin
+ x:=lol(2);
+ write(x)
+end. 

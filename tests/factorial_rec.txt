@@ -19,15 +19,16 @@ factorial := n*temp_result
 end
 end;
 begin
-write('Zadejte cislo pro vypocet faktorialu:');
-readln(a);
+a:=3;
+
 if a < 0 then
 begin
 write('Faktorial nelze spocitat '#10'')
 end
 else
+
 begin
 vysl := factorial(a);
-write('Vysledek je :', vysl,''#10'')
+write(vysl)
 end
 end.

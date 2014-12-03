@@ -1,0 +1,11 @@
+{	4	}
+var 
+x:integer;
+function lol(a: integer;b:real): integer;
+begin
+ lol:=a*2
+end;
+
+begin
+ x:=lol(2.1);
+end. 

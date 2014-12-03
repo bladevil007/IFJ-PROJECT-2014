@@ -1,0 +1,12 @@
+{	0	}
+var 
+x:real;
+function lol(a: real): real;
+begin
+ lol:=a*2.1
+end;
+
+begin
+ x:=lol(1.0);
+ write(x)
+end. 
