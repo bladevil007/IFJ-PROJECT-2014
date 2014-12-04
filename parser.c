@@ -236,6 +236,7 @@ Nepatri medzi neterminaly ale spusta dolezite akcie
 int SyntacticAnalys ()
 {
 init_generate();
+
 ID_ENABLE = 0;
 if(((LEX_STRUCTPTR =(LEX_STRUCT*)malloc(sizeof(LEX_STRUCT))) == NULL) ||    ///alokacia pomocnej struktury lexikalnej analyzy
     (Init_str(LEX_STRUCTPTR)==E_INTERNAL))
@@ -623,7 +624,7 @@ int command(int value)
                     generate_inst(NULL,0,0,0,EQUAL,0,0);
 
 
-                    free(pole);
+                    //free(pole);
 
                     if(IN_FUNCTION==1 && SUPPORT!=0 && SUPPORT2==0 && ELEMENT->id!=FUNCTION_hash)
                      {
@@ -941,9 +942,9 @@ else if(value==COPY)
                                                 generate_inst(pole,pole1,0,0,COPYSTRINGIDID,0,pole2);
                                                 else if(what==1 && what1==1 && what2==1)
                                                  generate_inst(pole,pole1,0,0,COPYIDIDID,0,pole2);
-                                                    free(pole);
-                                                    free(pole1);
-                                                    free(pole2);
+                                                   // free(pole);
+                                                    //free(pole1);
+                                                  //  free(pole2);
                                             token=getnextToken(LEX_STRUCTPTR);
                                             if(token==RIGHT_ROUND)
                                                 return SUCCESS;
@@ -1018,7 +1019,7 @@ else if(value==FIND)
                                     else
                                     generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDSTRSTR,0,0);
                                 }
-                                    free(pole);
+                                   // free(pole);
 
                                 token=getnextToken(LEX_STRUCTPTR);
                                 if(token==RIGHT_ROUND)

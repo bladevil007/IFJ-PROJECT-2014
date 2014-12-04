@@ -39,6 +39,9 @@ int LABEL;
 
 int foo(INSTape *INSTR)
 {
+int g1;
+int g2;
+
     switch(INSTR->CODE)
     {
     case LENGTH:
@@ -421,6 +424,8 @@ int foo(INSTape *INSTR)
 
 
        case SAVE:
+        globalne_pole1=globalne_pole;
+        globalne_pole=NULL;
         hodnota4=hodnota;
         hodnota=0;
         hodnota2=0;
@@ -428,7 +433,17 @@ int foo(INSTape *INSTR)
         break;
 
        case LESS:
-        if((hodnota4-hodnota)< 0)
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+       {
+            g1=strlen(globalne_pole1);
+             g2=strlen(globalne_pole);
+           if((g1-g2)< 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+       }
+       else if((hodnota4-hodnota)< 0)
            {
             hodnota=1;
             }
@@ -437,7 +452,17 @@ int foo(INSTape *INSTR)
 
 
  case GREATER:
-        if((hodnota4-hodnota)> 0)
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+       {
+             g1=strlen(globalne_pole1);
+             g2=strlen(globalne_pole);
+           if((g1-g2)>0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+       }
+      else  if((hodnota4-hodnota)> 0)
            {
             hodnota=1;
             }
@@ -446,7 +471,17 @@ int foo(INSTape *INSTR)
 
 
 case LESSEQUAL:
-        if((hodnota4-hodnota)<= 0)
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+       {
+             g1=strlen(globalne_pole1);
+            g2=strlen(globalne_pole);
+           if((g1-g2)<= 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+       }
+      else  if((hodnota4-hodnota)<= 0)
            {
             hodnota=1;
             }
@@ -454,7 +489,17 @@ case LESSEQUAL:
         break;
 
  case GREATEREQUAL:
-        if((hodnota4-hodnota)>= 0)
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+       {
+            g1=strlen(globalne_pole1);
+            g2=strlen(globalne_pole);
+           if((g1-g2)>= 0)
+           {
+            hodnota=1;
+            }
+        else hodnota=0;
+       }
+      else  if((hodnota4-hodnota)>= 0)
            {
             hodnota=1;
             }
@@ -462,14 +507,20 @@ case LESSEQUAL:
         break;
 
 case NOTEQUAL:
-        if((hodnota4!=hodnota))
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+       {
+             g1=strlen(globalne_pole1);
+             g2=strlen(globalne_pole);
+            if(strcmp(globalne_pole,globalne_pole1)!=0)
+                hodnota=1;
+        else hodnota=0;
+       }
+       else if((hodnota4!=hodnota))
            {
             hodnota=1;
             }
         else hodnota=0;
         break;
-
-
 
         case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
@@ -564,11 +615,10 @@ return 0;
 int searchrecord(inf_pointer_array* beh_programu)
 {
 
+
 if(((stackADRESS=stack_init())==NULL))
 exit(E_INTERNAL);
  stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
-
-
 
 hodnota2=0;
 hodnota=0;
@@ -577,8 +627,6 @@ hodnota4=0;
 int RESULT;
 int RESULT1=0;
 int BREAKPOINT=0;
-
-
 
     int i=0;
 
@@ -635,8 +683,6 @@ int BREAKPOINT=0;
             }
             stack_pop(stackADRESS);
             break;
-
-
 
         case WHILE:
 

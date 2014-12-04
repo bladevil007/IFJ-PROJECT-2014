@@ -135,7 +135,7 @@ int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 */
 int init_array(inf_array *a)
 {
-    if((a->str = (char*) malloc(ARR_INC*sizeof(char))) == NULL)
+    if((a->str = (char*) malloc(100*sizeof(char))) == NULL)
         return -1;
 
     a->str[0] = '\0';

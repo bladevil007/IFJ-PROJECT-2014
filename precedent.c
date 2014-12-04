@@ -254,13 +254,13 @@ if(i==0 && CONTROL!=7)
                }
             }
          }
-         else if(i==6 && CONTROL!=7)                    ///menej
+         else if(i==6 )                    ///menej
          {
              if(RULE==0)                       ///ak sa len porovnavaju hodnoty
              generate_inst(X1,0,E1,0,ADD,0,0);
              generate_inst(0,0,0,0,LESS,0,0);
          }
-          else if(i==7 && CONTROL!=7)                    ///menej
+          else if(i==7 )                    ///menej
          {
              if(RULE==0)                       ///ak sa len porovnavaju hodnoty
              generate_inst(X1,0,E1,0,ADD,0,0);
@@ -272,13 +272,13 @@ if(i==0 && CONTROL!=7)
              generate_inst(X1,0,E1,0,ADD,0,0);
              generate_inst(0,0,0,0,LESSEQUAL,0,0);
          }
-          else if(i==9 && CONTROL!=7)                    ///menej
+          else if(i==9 )                    ///menej
          {
              if(RULE==0)                       ///ak sa len porovnavaju hodnoty
              generate_inst(X1,0,E1,0,ADD,0,0);
              generate_inst(0,0,0,0,GREATEREQUAL,0,0);
          }
-          else if(i==10 && CONTROL!=7)                    ///menej
+          else if(i==10 )                    ///menej
          {
              if(RULE==0)                       ///ak sa len porovnavaju hodnoty
              generate_inst(X1,0,E1,0,ADD,0,0);
@@ -687,7 +687,10 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
              VysledokID(Vysledok,ELEMENT->type);
 
             if(ELEMENT->type==STRING_hash)
+              {
+               generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATEID,0,0) ;
                 CONTROL=7;
+            }
 
               if(ELEMENT->type==BOOLEAN_hash)
               CONTROL=6;
@@ -725,7 +728,10 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                }
 
              if(TOP_Stdin==CONST_STRING)
-                CONTROL=7;
+              {CONTROL=7;
+               generate_inst(LEX_STRUCTPTR->str,0,0,0,CONCATESTRING,0,0) ;
+               }
+
 
 
               if(LEX_STRUCTPTR->value==0 && TOP_Stdin==TRUE && TOP_Stdin==FALSE)
@@ -800,6 +806,12 @@ PSA_Stalker=PrecedenceTABLE[TOP_Stack][decodeSA(TOP_Stdin)];
                     CONTROL=0;
                     RULE=0;
                     generate_inst(0,0,0,0,SAVE,0,0);
+                    EVAL=3;
+               }else if (CONTROL==7 && EVAL==1)
+               {
+                 generate_inst(0,0,0,0,SAVE,0,0);
+                    CONTROL=0;
+                    RULE=0;
                     EVAL=3;
                }
 
