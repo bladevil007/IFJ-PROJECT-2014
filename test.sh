@@ -1,3 +1,4 @@
+#testovaci skript
 make clean
 make
 compile=false
