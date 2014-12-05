@@ -25,8 +25,9 @@
 #include "codegenerate.h"
 #include "ial.h"
 #include "stack.h"
-
+int INFUN=0;
 TStack *stackADRESS;
+TStack *stackPC;
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
 int TOP;
 struct record *temp;
@@ -63,6 +64,7 @@ int g2;
             temp->value.i=(int)hodnota-37;
             break;
         case(STRING_hash):
+           if(temp->value.str!=NULL)
            free(temp->value.str);
            temp->value.str = malloc(sizeof(char)*length(INSTR->a));
            if(temp->value.str == NULL)
@@ -97,7 +99,6 @@ int g2;
         break;
 
     case READLN:
-
     temp = hashtable_search(GlobalnaTAB,INSTR->a);
     switch(temp->type)
        {
@@ -134,6 +135,7 @@ int g2;
         }
          break;
     case WRITEID:
+        if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         switch(temp->type)
         {
@@ -637,6 +639,19 @@ case NOTEQUAL:
           return LOOPJUMP;
           else return LOOP;
           break;
+
+            //  case CALLFUNCTION:
+          //  return CALLFUNCTION;
+
+
+
+
+
+
+
+
+
+
 ///*-+/ hotovo bez premennych
 
 
@@ -646,6 +661,7 @@ return 0;
 int searchrecord(inf_pointer_array* beh_programu)
 {
 
+//int j=0;
 
 if(((stackADRESS=stack_init())==NULL))
 {
@@ -653,7 +669,13 @@ if(((stackADRESS=stack_init())==NULL))
     exit(E_INTERNAL);
 }
 
- stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
+if(((stackPC=stack_init())==NULL))
+{
+    free_sources();
+    exit(E_INTERNAL);
+}
+stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
+stack_push(stackPC,0);
 
 hodnota2=0;
 hodnota=0;
@@ -665,18 +687,31 @@ int BREAKPOINT=0;
 
     int i=0;
 
-
     while(beh_programu->pole[i]->CODE != BEGIN_MAIN)
     {
         i++;
     }
     i++;
-
     while(beh_programu->pole[i]->CODE != END_MAIN)
     {
+
        RESULT=foo(beh_programu->pole[i]);
         switch(RESULT)
         {
+
+    /*case CALLFUNCTION:
+        INFUN=1;
+        stack_push(stackPC,i);
+    while(strcmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
+        {
+            j++;
+        }
+        stack_push(stackPC,j);
+        i=fun(beh_programu,j);
+        i++;
+        INFUN=0;
+        j=0;
+    break;*/
 
     case JUMP:
         stack_top(stackADRESS,&TOP);
@@ -691,7 +726,6 @@ int BREAKPOINT=0;
         break;
 
     case LOOPJUMP:
-
         stack_top(stackADRESS,&TOP);
         i++;
         while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
@@ -720,7 +754,6 @@ int BREAKPOINT=0;
             break;
 
         case WHILE:
-
             BREAKPOINT=i;
             break;
         case LOOP:
@@ -729,10 +762,15 @@ int BREAKPOINT=0;
                 stack_pop(stackADRESS);
                   break;
         }
+
         i++;
 
-
     }
+
+
+    stack_free(stackADRESS);
+    stack_free(stackPC);
+    //free_array(InstructionTape);
 
     return SUCCESS;
 }
@@ -745,8 +783,6 @@ int RESULT1=0;
     while ( beh_programu->pole[i]->CODE!=ENDJUMP || beh_programu->pole[i]->specialcode!=TOP)
     {
                    RESULT=foo(beh_programu->pole[i]);
-
-
 
                     switch(RESULT)           ///SKOKY + LOOP
                     {
@@ -786,24 +822,32 @@ int RESULT1=0;
                     stack_pop(stackADRESS);
                     stack_top(stackADRESS,&TOP);
                     break;
-
-
         }
 
                     i++;
-
 }
 
 return BREAKPOINT;
 
 }
+/*
+int fun(inf_pointer_array* beh_programu,int j)
+{
+int TOP;
+int RESULT;
+int RESULT1=0;
 
+while(beh_programu->pole[j]->CODE!=ENDFUNCTION)
+{
+//RESULT=foo(beh_programu->pole[j]);
+ j++;
+}
+stack_pop(stackPC);
+stack_top(stackPC,&TOP);
+return TOP;
 
-
-
-
-
-
+}
+*/
 
 
 

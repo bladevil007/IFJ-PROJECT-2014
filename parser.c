@@ -35,7 +35,7 @@ inf_array *POLE_ID_LOCAL;   ///nekonecne pole ID pre lokalnu
 inf_array *POLE_ID_GLOBALFUN;   ///nekonecne pole ID pre globalnu
 inf_array *POLE_ID_LOCAL_VOLANE;              ///
 THash_table *LokalnaTAB;
-char *SKUSKA;
+
 
 inf_array *SUPPORT_POLE;  /// pomocna
 int FUNCTION_ENABLE=0;        ///Moze nasledovat telo funkcie
@@ -314,10 +314,6 @@ if(((POLE_ID_LOCAL_VOLANE=(inf_array*)malloc(sizeof(inf_array))) == NULL) ||
 exit(E_INTERNAL);
 
 
-if((ELEMENT=(struct record*)malloc(sizeof(struct record))) == NULL)          ///alokujeme hashovaciu tabulku
-exit(E_INTERNAL);
-
-
 IN_FUNCTION=0;                                                               ///nastavime,nenachadzame sa vo funkcii
 int token=getnextToken(LEX_STRUCTPTR);              ///nacitame prvy token
 if(token==E_LEXICAL)
@@ -335,11 +331,8 @@ if(ok==SUCCESS)
     return SUCCESS;
 ///DEALOKACIE PRIDAT DALSIE + volat pri exit
 strClear(LEX_STRUCTPTR);
-free_array(POLE_ID_GLOBALFUN);
 free_array(POLE_ID_GLOBAL);
 free_array(POLE_ID_LOCAL);
-free_array(POLE_ID_LOCAL_VOLANE);
-hashtable_free(GlobalnaTAB);
 hashtable_free(LokalnaTAB);
 free(LEX_STRUCTPTR);
 return 0;
@@ -1394,9 +1387,6 @@ int fun_params()
     else if(token == ID)
     {
        POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
-       SKUSKA=malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
-       strcpy(SKUSKA,LEX_STRUCTPTR->str);
-
 
                                                               ///ulozime ID do pola ID a ulozime si nove posunutie pre dalsi ID
                                                                                                     ///Zistime ci uz nemame taku polozku
@@ -1541,7 +1531,7 @@ return;
 
 void free_sources()
 {
-    if(LEX_STRUCTPTR->str != NULL)
+  /*  if(LEX_STRUCTPTR->str != NULL)
         free(LEX_STRUCTPTR->str);
     if(LEX_STRUCTPTR != NULL)
         free(LEX_STRUCTPTR);
@@ -1580,8 +1570,6 @@ void free_sources()
     if(ELEMENT != NULL)
         free(ELEMENT);
 
-    if(SKUSKA != NULL)
-        free(SKUSKA);
 
     if(SUPPORT->params != NULL)
         free(SUPPORT->params);
@@ -1590,7 +1578,7 @@ void free_sources()
         free(SUPPORT->POLE_ID_LOCAL_VOLANE);
 
     if(InstructionTape != NULL)
-        free_pointer_array(InstructionTape);
+        free_pointer_array(InstructionTape);*/
 }
 
 
