@@ -26,6 +26,7 @@
 int PrecedenceSA(LEX_STRUCT*,int,THash_table*,THash_table*, struct record*);
 struct record* lookforElement(LEX_STRUCT *,int ,THash_table *,THash_table*,struct record*);
 
+
 LEX_STRUCT *LEX_STRUCTPTR;          ///sktruktura pre Tokeny
 LEX_STRUCT *ARRAY_PARAM;          ///pole pre parametre funkcie
 int IF_ENABLE=0;                ///na pouzitie else v progcondition
@@ -53,9 +54,16 @@ int Declar=0;
 int ERRORRET(int value)
 {
     if(value==E_LEXICAL)
+    {
+        free_sources();
         exit(E_LEXICAL);
+    }
     else
+    {
+        free_sources();
         exit(E_SYNTAX);
+    }
+
 }
 ///<PROGRAM>  <FUNCTION> v <VAR> v <PROG>
 /** \brief Koren derivacneho stromu, neterminal,
@@ -100,12 +108,18 @@ int program(int token)
             CHECK_FUN++;
 
             if(SUPPORT->defined==true_hash)
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
+            }
+
 
             IN_FUNCTION=0;
             if(SUPPORT->doubledefinition==1)                        ///flag aby neboli definovane dve hlavicky
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
-
+            }
 
             if(SUPPORT->doubledefinition==0)
                 SUPPORT->doubledefinition=1;
@@ -128,7 +142,10 @@ int program(int token)
 
 
             if(SUPPORT->defined==true_hash)
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
+            }
 
             SUPPORT->defined=true_hash;              ///funkcia je definovana
 
@@ -139,7 +156,11 @@ int program(int token)
             }
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
-            if(token==E_LEXICAL)exit(E_LEXICAL); ///bud ide dalsia funkcia alebo ide uz telo programu
+            if(token==E_LEXICAL)
+            {
+                free_sources();
+                exit(E_LEXICAL);
+            } ///bud ide dalsia funkcia alebo ide uz telo programu
             IN_FUNCTION=0;
             return program(token);
         }
@@ -155,7 +176,10 @@ int program(int token)
     {
         generate_inst(NULL,0,0,0,BEGIN_MAIN,0,0);
         if(CHECK_FUN!=0)                                                ///POCET HLAVICIEK SA ROVNA POCTU FUNKCII
+        {
+            free_sources();
             exit(E_SEMANTIC_UNDEF);
+        }
         FUNCTION_ENABLE=1;
         token=prog();
 
@@ -178,10 +202,18 @@ int program(int token)
         {
             CHECK_FUN++;
             if(SUPPORT->defined==true_hash)
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
+            }
+
             IN_FUNCTION=0;
                if(SUPPORT->doubledefinition==1)                         ///REDEFINICIA HLAVICKY
-                    exit(E_SEMANTIC_UNDEF);
+               {
+                   free_sources();
+                   exit(E_SEMANTIC_UNDEF);
+               }
+
             if(SUPPORT->doubledefinition==0)
                 SUPPORT->doubledefinition=1;
             if(SUPPORT->defined==3)
@@ -201,7 +233,10 @@ int program(int token)
         else if(token==BEGIN || token==VAR)
         {
                 if(SUPPORT->defined==true_hash)
+                {
+                    free_sources();
                     exit(E_SEMANTIC_UNDEF);
+                }
 
                 SUPPORT->defined=true_hash;
 
@@ -212,7 +247,11 @@ int program(int token)
             }
             progfunction();
             token=getnextToken(LEX_STRUCTPTR);
-            if(token==E_LEXICAL)exit(E_LEXICAL);
+            if(token==E_LEXICAL)
+            {
+                free_sources();
+                exit(E_LEXICAL);
+            }
                                                             ///bud ide dalsia funkcia alebo ide uz telo programu
             IN_FUNCTION=0;
 
@@ -281,8 +320,16 @@ exit(E_INTERNAL);
 
 IN_FUNCTION=0;                                                               ///nastavime,nenachadzame sa vo funkcii
 int token=getnextToken(LEX_STRUCTPTR);              ///nacitame prvy token
-if(token==E_LEXICAL)exit(E_LEXICAL);                   ///pri chybe v lexikalnej analyze skonci
-if(token==EOFILE) exit(E_SYNTAX);
+if(token==E_LEXICAL)
+{
+    free_sources();
+    exit(E_LEXICAL);                   ///pri chybe v lexikalnej analyze skonci
+}
+if(token==EOFILE)
+{
+    free_sources();
+    exit(E_SYNTAX);
+}
 int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
@@ -603,7 +650,11 @@ int command(int value)
                    strcpy(pole,LEX_STRUCTPTR->str);
                                                                                     ///Kontrola ci je definovana
             if(ELEMENT==0)
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
+            }
+
 
             Vysledok=ELEMENT->type;
 
@@ -673,7 +724,11 @@ int command(int value)
                     }
 
                     if(ELEMENT==0)
+                    {
+                        free_sources();
                         exit(E_SEMANTIC_UNDEF);
+                    }
+
                                                                                                 ///readln definuje variable
                 ELEMENT->defined=true_hash;
 
@@ -763,9 +818,16 @@ if(value==WRITE)
                       struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                                       ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_UNDEF);
+                        }
                         else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        {
+                            free_sources();
                             exit(E_UNINITIALIZED_VAR);
+                        }
+
                         }
               switch(token)
               {
@@ -814,11 +876,22 @@ else if(value==LENGTH)
                        struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
                                                                 ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_UNDEF);
+                        }
                         else if(ELEMENT->type!=STRING_hash)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_TYPE);
+                        }
+
                         else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
-                            exit(E_UNINITIALIZED_VAR);
+                        {
+                               free_sources();
+                               exit(E_UNINITIALIZED_VAR);
+                        }
+
                         generate_inst(LEX_STRUCTPTR->str,0,0,0,LENGTHID,0,0);
 
                         }else
@@ -856,11 +929,21 @@ else if(value==COPY)
                        ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                         struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                    ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_UNDEF);
+                        }
                         else if(ELEMENT->type!=STRING_hash)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_TYPE);
-                       else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        }
+                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        {
+                            free_sources();
                             exit(E_UNINITIALIZED_VAR);
+                        }
+
 
                         }
 
@@ -876,7 +959,11 @@ else if(value==COPY)
                             if(token==ID || token== CONST || token==REALo || token==BOOLEAN)
                             {
                                 if(token==REALo || token==BOOLEAN)
-                                exit(E_SEMANTIC_TYPE);
+                                {
+                                    free_sources();
+                                    exit(E_SEMANTIC_TYPE);
+                                }
+
                                 if(token==ID)
                                 {
 
@@ -884,11 +971,20 @@ else if(value==COPY)
                                 ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                  struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                      ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
+                                {
+                                    free_sources();
                                     exit(E_SEMANTIC_UNDEF);
+                                }
                                 else if(ELEMENT->type!=INTEGER_hash)
+                                {
+                                    free_sources();
                                     exit(E_SEMANTIC_TYPE);
+                                }
                                 else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
-                            exit(E_UNINITIALIZED_VAR);
+                                {
+                                    free_sources();
+                                    exit(E_UNINITIALIZED_VAR);
+                                }
 
                                    pole1=(char*)malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
                                    strcpy(pole1,LEX_STRUCTPTR->str);
@@ -904,7 +1000,11 @@ else if(value==COPY)
                                         int E2;
 
                                             if(token==REALo || token==BOOLEAN)
+                                            {
+                                                free_sources();
                                                 exit(E_SEMANTIC_TYPE);
+                                            }
+
                                             if(token==ID)
                                             {
 
@@ -913,11 +1013,21 @@ else if(value==COPY)
                                               ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                                struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                               ///Vrati na ukazatel na prvek v hash table
                                             if(ELEMENT==0)
+                                            {
+                                                free_sources();
                                                 exit(E_SEMANTIC_UNDEF);
+                                            }
                                             else if(ELEMENT->type!=INTEGER_hash)
+                                            {
+                                                free_sources();
                                                 exit(E_SEMANTIC_TYPE);
-                                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
-                                            exit(E_UNINITIALIZED_VAR);
+                                            }
+                                            else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                                            {
+                                                free_sources();
+                                                exit(E_UNINITIALIZED_VAR);
+                                            }
+
 
                                                     pole2=(char*)malloc(sizeof(char)*length(LEX_STRUCTPTR->str));
                                                     strcpy(pole2,LEX_STRUCTPTR->str);
@@ -976,11 +1086,21 @@ else if(value==FIND)
                       ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                        struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                     ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
-                            exit(E_SEMANTIC_UNDEF);
+                        {
+                            free_sources();
+                            exit(E_SEMANTIC_UNDEF);                        }
+
                         else if(ELEMENT->type!=STRING_hash)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_TYPE);
-                       else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        }
+                        else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        {
+                            free_sources();
                             exit(E_UNINITIALIZED_VAR);
+                        }
+
                         }else
                         {
 
@@ -1002,11 +1122,23 @@ else if(value==FIND)
                                ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                               struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                             ///Vrati na ukazatel na prvek v hash table
                                 if(ELEMENT==0)
+                                {
+                                    free_sources();
                                     exit(E_SEMANTIC_UNDEF);
+                                }
+
                                 else if(ELEMENT->type!=STRING_hash)
+                                {
+                                    free_sources();
                                     exit(E_SEMANTIC_TYPE);
-                               else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
-                            exit(E_UNINITIALIZED_VAR);
+                                }
+
+                                else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                                {
+                                    free_sources();
+                                    exit(E_UNINITIALIZED_VAR);
+
+                                }
                                    if(id==1)
                                    generate_inst(pole,LEX_STRUCTPTR->str,0,0,FINDIDID,0,0);
                                    else
@@ -1044,11 +1176,21 @@ else if(value==SORT)
                  ELEMENT=lookforElement(LEX_STRUCTPTR,0,GlobalnaTAB,LokalnaTAB,ELEMENT);
                  struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);                                                                   ///Vrati na ukazatel na prvek v hash table
                         if(ELEMENT==0)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_UNDEF);
+                        }
                         else if(ELEMENT->type!=STRING_hash)
+                        {
+                            free_sources();
                             exit(E_SEMANTIC_TYPE);
+                        }
                         else if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
+                        {
+                            free_sources();
                             exit(E_UNINITIALIZED_VAR);
+                        }
+
                      generate_inst(LEX_STRUCTPTR->str,0,0,0,SORTID,0,0);
 
                 }else
@@ -1084,8 +1226,11 @@ Neterminal na kontrolu syntaxe deklaracie premennych
 
                                   ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
-            exit(E_SEMANTIC_UNDEF);
-           else
+         {
+             free_sources();
+             exit(E_SEMANTIC_UNDEF);
+         }
+         else
             POLE_ID_INDEX=add_str(POLE_ID_GLOBAL,LEX_STRUCTPTR->str);
 
     }else
@@ -1098,13 +1243,18 @@ Neterminal na kontrolu syntaxe deklaracie premennych
          if(SUPPORT1!=0)
          {
              if(SUPPORT1->id==FUNCTION_hash)  ///alokuje sa rovnako premenna ako je nazov funkcie vo funkcii
-                   exit(E_SEMANTIC_UNDEF);
+             {
+                 free_sources();
+                 exit(E_SEMANTIC_UNDEF);
+             }
+
          }
              ///Zistime ci uz nemame taku polozku
                          ///Vrati na ukazatel na prvek v hash table
          if(ELEMENT!=0)
          {
-            exit(E_SEMANTIC_UNDEF);
+             free_sources();
+             exit(E_SEMANTIC_UNDEF);
          }
          else
         POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
@@ -1174,7 +1324,10 @@ int funkcia()
             ELEMENT=hashtable_search(GlobalnaTAB,LEX_STRUCTPTR->str);
             SUPPORT=ELEMENT;
             if(SUPPORT->id==VARIABLE_hash)                        ///NAJDE SA PREMENNA ALE V GLOBALNYCH AKO HODNOTA
+            {
+                free_sources();
                 exit(E_SEMANTIC_UNDEF);
+            }
 
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
@@ -1199,7 +1352,11 @@ int funkcia()
                         else if(SUPPORT->defined==false_hash)
                         {
                             if(SUPPORT->type!=decodederSEM(token))
+                            {
+                                free_sources();
                                 exit(E_SEMANTIC_TYPE);
+                            }
+
 
 
                         }
@@ -1251,7 +1408,11 @@ int fun_params()
             hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,0,NULL);  ///PRIDA DEFINICIU funkcie
             ELEMENT=((hashtable_search(LokalnaTAB,POLE_ID_LOCAL->str+POLE_ID_INDEX)));
          }else
-           exit(E_SEMANTIC_UNDEF);
+         {
+             free_sources();
+             exit(E_SEMANTIC_UNDEF);
+         }
+
             ELEMENT->defined=true_hash;
             ELEMENT->valuedef=true_hash;
                       ///premenna pride jej zavolanim
@@ -1290,15 +1451,25 @@ int fun_params()
                 else
                 {
                     if(SUPPORT->params==0)
+                    {
+                        free_sources();
                         exit(E_SEMANTIC_TYPE);
+                    }
+
                     int ok=strcmp(SUPPORT->params,ARRAY_PARAM->str);                           ///porovnanie ze si typy odpovedaju
                     if(ok!=0)
+                    {
+                        free_sources();
                         exit(E_SEMANTIC_TYPE);
-
+                    }
 
                     ok=strcmp(SUPPORT->POLE_ID_LOCAL_VOLANE,POLE_ID_LOCAL_VOLANE->str);       ///porovnanie ze si identifikatory odpovedaju
                     if(ok!=0)
+                    {
+                        free_sources();
                         exit(E_SEMANTIC_TYPE);
+                    }
+
 
 
                     ///ROZNE POLIA
@@ -1367,6 +1538,60 @@ void addparam(int token)
 return;
 }
 
+
+void free_sources()
+{
+    if(LEX_STRUCTPTR->str != NULL)
+        free(LEX_STRUCTPTR->str);
+    if(LEX_STRUCTPTR != NULL)
+        free(LEX_STRUCTPTR);
+
+    if(POLE_ID_GLOBAL->str != NULL)
+        free(POLE_ID_GLOBAL->str);
+    if(POLE_ID_GLOBAL != NULL)
+        free(POLE_ID_GLOBAL);
+
+    if(POLE_ID_GLOBALFUN->str != NULL)
+        free(POLE_ID_GLOBALFUN->str);
+    if(POLE_ID_GLOBALFUN != NULL)
+        free(POLE_ID_GLOBALFUN);
+
+    if(POLE_ID_LOCAL->str != NULL)
+        free(POLE_ID_LOCAL->str);
+    if(POLE_ID_LOCAL != NULL)
+        free(POLE_ID_LOCAL);
+
+    if(ARRAY_PARAM->str != NULL)
+        free(ARRAY_PARAM->str);
+    if(ARRAY_PARAM != NULL)
+        free(ARRAY_PARAM);
+
+    if(POLE_ID_LOCAL_VOLANE->str != NULL)
+        free(POLE_ID_LOCAL_VOLANE->str);
+    if(POLE_ID_LOCAL_VOLANE != NULL)
+        free(POLE_ID_LOCAL_VOLANE);
+
+    if(GlobalnaTAB != NULL)
+        hashtable_free(GlobalnaTAB);
+
+    if(LokalnaTAB != NULL)
+        hashtable_free(LokalnaTAB);
+
+    if(ELEMENT != NULL)
+        free(ELEMENT);
+
+    if(SKUSKA != NULL)
+        free(SKUSKA);
+
+    if(SUPPORT->params != NULL)
+        free(SUPPORT->params);
+
+    if(SUPPORT->POLE_ID_LOCAL_VOLANE != NULL)
+        free(SUPPORT->POLE_ID_LOCAL_VOLANE);
+
+    if(InstructionTape != NULL)
+        free_pointer_array(InstructionTape);
+}
 
 
 

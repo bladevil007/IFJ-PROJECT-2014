@@ -42,7 +42,11 @@ if(IN_FUNCTION==0)
 
 INSTape *Instruction;
 if((Instruction=(INSTape*)malloc(sizeof(INSTape)))==NULL)
-        exit(E_INTERNAL);
+{
+    free_sources();
+    exit(E_INTERNAL);
+}
+
 
 switch (CODE)
 {
@@ -519,6 +523,18 @@ return 0;
 
 void free_pointer_array(inf_pointer_array *a)
 {
+    for(int i=0; i < a->length; i++)
+    {
+        if(a->pole[i]->a != NULL)
+            free(a->pole[i]->a);
+
+        if(a->pole[i]->a2)
+            free(a->pole[i]->a2);
+
+        if(a->pole[i]->a3)
+            free(a->pole[i]->a);
+    }
+
     free(a->pole);
     return;
 }

@@ -66,7 +66,11 @@ int g2;
            free(temp->value.str);
            temp->value.str = malloc(sizeof(char)*length(INSTR->a));
            if(temp->value.str == NULL)
-              exit(E_INTERNAL);
+           {
+               free_sources();
+               exit(E_INTERNAL);
+           }
+
           strcpy(temp->value.str,globalne_pole);
           free(globalne_pole);
           globalne_pole=NULL;
@@ -99,21 +103,33 @@ int g2;
        {
         case(INTEGER_hash):
             if(scanf("%i",&(temp->value.i))==0)
+            {
+                free_sources();
                 exit(E_STDIN);
-                break;
+            }
+            break;
         case(REAL_hash):
             if(scanf("%f",&(temp->value.d))==0)
-            exit(E_STDIN);
+            {
+                free_sources();
+                exit(E_STDIN);
+            }
             break;
         case(BOOLEAN_hash):
             if(scanf("%i",&(temp->value.b))==0)
-            exit(E_STDIN);
+            {
+                free_sources();
+                exit(E_STDIN);
+            }
             break;
         case(STRING_hash):
             free(temp->value.str);
             temp->value.str=(char*)malloc(sizeof(char)*256);
             if((scanf("%s",(temp->value.str)))==0)
-            exit(E_STDIN);
+            {
+                free_sources();
+                exit(E_STDIN);
+            }
             break;
         }
          break;
@@ -153,13 +169,19 @@ int g2;
       case SORTID:
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         if((globalne_pole = (malloc(length(temp->value.str) * sizeof(char) + 1))) == NULL)
+        {
+            free_sources();
             exit(E_INTERNAL);
+        }
         globalne_pole = sort(temp->value.str);
         break;
 
     case SORTSTRING:
         if((globalne_pole = malloc(length(INSTR->a) * sizeof(char) + 1)) == NULL)
+        {
+            free_sources();
             exit(E_INTERNAL);
+        }
         globalne_pole = sort(INSTR->a);
         break;
 
@@ -383,14 +405,20 @@ int g2;
             if(hodnota==0)
             {hodnota=INSTR->b/INSTR->c;
              if(INSTR->c==0)
-                exit(E_DIVISION_BY_ZERO);
+             {
+                 free_sources();
+                 exit(E_DIVISION_BY_ZERO);
+             }
              hodnota3=1;
             }
             else
             {
             hodnota2=INSTR->b/INSTR->c;
              if(INSTR->c==0)
-                exit(E_DIVISION_BY_ZERO);
+             {
+                 free_sources();
+                 exit(E_DIVISION_BY_ZERO);
+             }
             hodnota3=2;
             }}
             else if(INSTR->specialcode==1)
@@ -400,7 +428,10 @@ int g2;
                 else
                 hodnota2=hodnota2/INSTR->b;
                 if(INSTR->b==0)
-                exit(E_DIVISION_BY_ZERO);
+                {
+                    free_sources();
+                    exit(E_DIVISION_BY_ZERO);
+                }
             }
             break;
 
@@ -617,7 +648,11 @@ int searchrecord(inf_pointer_array* beh_programu)
 
 
 if(((stackADRESS=stack_init())==NULL))
-exit(E_INTERNAL);
+{
+    free_sources();
+    exit(E_INTERNAL);
+}
+
  stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
 
 hodnota2=0;
