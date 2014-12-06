@@ -28,8 +28,10 @@
 int INFUN=0;
 TStack *stackADRESS;
 TStack *stackPC;
+TStack *StackBreak;
 TStack_ramec *stackramec;
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
+int fun(inf_pointer_array* beh_programu,int j);
 int TOP;
 struct record *temp;
 struct record *temp2;
@@ -430,8 +432,6 @@ int g2;
             break;
 
 
-
-
         case MINUS:
 
                if(INSTR->a!=NULL)
@@ -540,7 +540,6 @@ int g2;
             break;
              }
             }
-
              if(INSTR->specialcode==0)
              {
             if(hodnota==0)
@@ -592,7 +591,7 @@ int g2;
             return JUMP;
         }
         else
-            break;
+            return NOTJUMP;
 
 
        case SAVE:
@@ -932,14 +931,28 @@ case NOTEQUAL:
             stack_top_ramec(stackramec,&RAMEC);
             hashtable_add(RAMEC,VARIABLE_hash,INSTR->a,(int)INSTR->b,0);
             break;
+
+            case FMOF:                                        /// FUNNY FUNCTION FOR YOU <3
+                temp=hashtable_search(GlobalnaTAB,INSTR->a);
+                switch(temp->type)
+                {
+                case INTEGER_hash:
+                hodnota=temp->value.i;
+                break;
+                case REAL_hash:
+                hodnota=temp->value.d;
+                break;
+                case BOOLEAN_hash:
+                hodnota=temp->value.i;
+                break;
+                case  STRING_hash:
+                globalne_pole=temp->value.str;
+                break;
+                }
+                break;
+
     }
-
-
-
-
 ///*-+/ hotovo bez premennych
-
-
 
 return 0;
 }
@@ -965,6 +978,13 @@ if(((stackramec=stack_init_ramec())==NULL))
     free_sources();
     exit(E_INTERNAL);
 }
+
+if(((StackBreak=stack_init())==NULL))
+{
+    free_sources();
+    exit(E_INTERNAL);
+}
+
 
 stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
 stack_push(stackPC,0);
@@ -992,7 +1012,6 @@ int BREAKPOINT=0;
 /***********************************/
     case CALLFUN:
     INFUN=1;
-    stack_push(stackPC,i);
 
     while(strcasecmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
         {
@@ -1013,19 +1032,17 @@ int BREAKPOINT=0;
             int x=0;
             int k=0;
             int p=0;
-            struct record* Help;
             while (x < strlen(IDS->POLE_ID_LOCAL_VOLANE))
             {
                if(IDS->POLE_ID_LOCAL_VOLANE[x]=='$')
                {
-
                      i++;
                     foo(beh_programu->pole[i]);
-
 
                 if(beh_programu->pole[i]->c==3)
                     {
                         temp=hashtable_search(GlobalnaTAB,beh_programu->pole[i]->a);
+
                         switch(temp->type)
                         {
                         case INTEGER_hash:
@@ -1084,15 +1101,15 @@ int BREAKPOINT=0;
               x++;
              }
         }
+        stack_push(stackPC,i);
         stack_push_ramec(stackramec,RAMEC);                   ///PUSHNEME RAMEC na zasobnik
         stack_push(stackPC,j);
-        i=fun(beh_programu,j);
-        i++;
+       i=fun(beh_programu,j);
         INFUN=0;
         j=0;
         hashtable_free(RAMEC);
     break;
-/********************************************************************************************************/
+
 
     case JUMP:
         stack_top(stackADRESS,&TOP);
@@ -1106,7 +1123,10 @@ int BREAKPOINT=0;
         stack_pop(stackADRESS);
         break;
 
+
+
     case LOOPJUMP:
+        stack_pop(StackBreak);
         stack_top(stackADRESS,&TOP);
         i++;
         while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
@@ -1114,13 +1134,12 @@ int BREAKPOINT=0;
         stack_pop(stackADRESS);
         break;
 
-
-
     case ELSE:
-            stack_top(stackADRESS,&TOP);
+          stack_top(stackADRESS,&TOP);
             if (RESULT1==JUMP)
             {
                 RESULT1=0;
+                stack_pop(stackADRESS);
                 break;
             }
             else
@@ -1128,25 +1147,25 @@ int BREAKPOINT=0;
                 i++;
                 while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
                     i++;
-
             }
             stack_pop(stackADRESS);
             break;
 
         case WHILE:
-            BREAKPOINT=i;
+            stack_push(StackBreak,i);
             break;
         case LOOP:
             stack_top(stackADRESS,&TOP);
-                i=LOOPER(beh_programu,BREAKPOINT,i);
+                i=LOOPER(beh_programu,BREAKPOINT,i+1);
                 stack_pop(stackADRESS);
                   break;
+
+        case NOTJUMP:
+            RESULT1=0;
+            break;
         }
         i++;
     }
-    //stack_free_ramec(stackramec);
-    //stack_free(stackADRESS);
-    //stack_free(stackPC);
     return SUCCESS;
 }
 
@@ -1155,13 +1174,13 @@ int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i)
 int RESULT;
 int RESULT1=0;
 
-    while ( beh_programu->pole[i]->CODE!=ENDJUMP || beh_programu->pole[i]->specialcode!=TOP)
+    while ( beh_programu->pole[i]->CODE!=ENDJUMP || beh_programu->pole[i]->specialcode!=TOP)   ///opravit
     {
-                   RESULT=foo(beh_programu->pole[i]);
+
+                RESULT=foo(beh_programu->pole[i]);
 
                     switch(RESULT)           ///SKOKY + LOOP
                     {
-
                     case JUMP:
 
                         stack_top(stackADRESS,&TOP);
@@ -1176,15 +1195,12 @@ int RESULT1=0;
                         stack_top(stackADRESS,&TOP);
                         break;
 
-
-
                    case ELSE:
 
                     stack_top(stackADRESS,&TOP);
                         if (RESULT1==JUMP)
                     {
                             RESULT1=0;
-                            stack_pop(stackADRESS);
                             stack_top(stackADRESS,&TOP);
                             break;
                     }
@@ -1197,10 +1213,36 @@ int RESULT1=0;
                     stack_pop(stackADRESS);
                     stack_top(stackADRESS,&TOP);
                     break;
+
+                    case NOTJUMP:
+                        RESULT1=0;
+                    break;
+/*
+               case WHILE:
+                    stack_push(StackBreak,i);
+                    break;
+               case LOOP:
+                    stack_top(stackADRESS,&TOP);
+                        i=LOOPER(beh_programu,BREAKPOINT,i+1);
+                          break;
+
+             case LOOPJUMP:
+
+                    stack_pop(StackBreak);
+                    stack_top(StackBreak,&BREAKPOINT);
+                    stack_top(stackADRESS,&TOP);
+                    i++;
+                    while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                    i++;
+                    break;*/
         }
 
+
                     i++;
+
 }
+
+stack_top(StackBreak,&BREAKPOINT);
 
 return BREAKPOINT;
 
@@ -1208,23 +1250,190 @@ return BREAKPOINT;
 
 int fun(inf_pointer_array* beh_programu,int j)
 {
-int TOP;
 int RESULT;
 int RESULT1=0;
+int BREAKPOINT=0;
+int n=0;
+THash_table *aktRAMEC;
 
 while(beh_programu->pole[j]->CODE!=ENDFUN)
 {
 
 RESULT=foo(beh_programu->pole[j]);
 
+
+                   switch(RESULT)
+                   {
+
+                    case JUMP:
+                        stack_top(stackADRESS,&TOP);
+                        if (RESULT1==0)
+                        RESULT1=JUMP;
+                        if (RESULT1==JUMP)
+                        RESULT1=JUMP;
+                        j++;
+                        while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                        j++;
+                        stack_pop(stackADRESS);
+                        stack_top(stackADRESS,&TOP);
+                        break;
+
+
+                    case ELSE:
+                        stack_top(stackADRESS,&TOP);
+                        if (RESULT1==JUMP)
+                        {
+                        RESULT1=0;
+                        break;
+                        }
+                        else
+                        {
+                        j++;
+                        while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                            j++;
+                        }
+                        stack_pop(stackADRESS);
+                        stack_top(stackADRESS,&TOP);
+                        break;
+                             case WHILE:
+                            stack_push(StackBreak,j);
+                            break;
+                        case LOOP:
+                            stack_top(stackADRESS,&TOP);
+                                j=LOOPER(beh_programu,BREAKPOINT,j+1);
+                                stack_pop(stackADRESS);
+                                  break;
+
+                        case LOOPJUMP:
+
+                            stack_pop(StackBreak);
+                            stack_top(stackADRESS,&TOP);
+                            j++;
+                            while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                            j++;
+                            break;
+
+
+                     case CALLFUN:
+                           while((strcasecmp(beh_programu->pole[n]->a,beh_programu->pole[j]->a)!=0)||(beh_programu->pole[n]->CODE!=STARTFUN))
+                            {
+                                n++;
+
+                                while(beh_programu->pole[n]->a==NULL)
+                                n++;
+                            }
+                            struct record *IDS=hashtable_search(GlobalnaTAB,beh_programu->pole[n]->a);
+                            THash_table *RAMEC;
+                            if(((RAMEC=(THash_table*)malloc(sizeof(THash_table))) == NULL) || ((RAMEC=hashtable_init(100))==0))                                        ///alokujeme hashovaciu tabulku
+                                exit(E_INTERNAL);
+
+                            stack_top_ramec(stackramec,&aktRAMEC);
+
+                            if(IDS!=NULL && IDS->POLE_ID_LOCAL_VOLANE!=NULL)
+                            {
+                                int x=0;
+                                int k=0;
+                                int p=0;
+
+                                while (x < strlen(IDS->POLE_ID_LOCAL_VOLANE))
+                                {
+                                   if(IDS->POLE_ID_LOCAL_VOLANE[x]=='$')
+                                   {
+
+                                        j++;
+                                        foo(beh_programu->pole[j]);
+
+
+                                    if(beh_programu->pole[j]->c==3)
+                                        {
+                                            temp=hashtable_search(aktRAMEC,beh_programu->pole[j]->a);
+                                            if(temp == NULL)
+                                                temp=hashtable_search(GlobalnaTAB,beh_programu->pole[j]->a);
+
+                                            switch(temp->type)
+                                            {
+                                            case INTEGER_hash:
+                                             beh_programu->pole[j]->b=temp->value.i;
+                                            break;
+                                            case REAL_hash:
+                                               beh_programu->pole[j]->b=temp->value.d;
+                                            break;
+                                            case BOOLEAN_hash:
+                                                beh_programu->pole[j]->b=temp->value.i;
+                                                break;
+                                            case STRING_hash:
+                                                beh_programu->pole[j]->a=temp->value.str;
+                                                break;
+
+                                            }
+                                        }
+
+                                        if(beh_programu->pole[j]->c==1)                          ///BOLEAN HODNOTY
+                                        beh_programu->pole[j]->b=beh_programu->pole[j]->b-37;
+
+
+
+                                       char *Cislo=malloc(sizeof(char)*(x-k));
+                                       strncpy(Cislo,IDS->POLE_ID_LOCAL_VOLANE+k,x-k);
+
+
+                                       if(IDS->params[p]=='i')
+                                           {
+                                           hashtable_add(RAMEC,VARIABLE_hash,Cislo,INTEGER_hash,0);
+                                           struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                                           HLADAJ->value.i=(int)beh_programu->pole[j]->b;
+                                           }
+                                        else if(IDS->params[p]=='s')
+                                           {
+                                           hashtable_add(RAMEC,VARIABLE_hash,Cislo,STRING_hash,0);
+                                           struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                                           HLADAJ->value.str=malloc(sizeof(char)*strlen( beh_programu->pole[j]->a)+1);
+                                           strcpy(HLADAJ->value.str,beh_programu->pole[j]->a);
+                                           }
+                                        else if(IDS->params[p]=='b')
+                                           {
+                                           hashtable_add(RAMEC,VARIABLE_hash,Cislo,BOOLEAN_hash,0);
+                                           struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                                           HLADAJ->value.i=(int)beh_programu->pole[j]->b;
+                                           }
+                                        else if(IDS->params[p]=='r')
+                                           {
+                                           hashtable_add(RAMEC,VARIABLE_hash,Cislo,REAL_hash,0);
+                                           struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                                           HLADAJ->value.d=beh_programu->pole[j]->b;
+                                           }
+                                       k=x+1;
+                                       p++;
+                                   }
+                                  x++;
+                                 }
+                            }
+
+                            stack_push_ramec(stackramec,RAMEC);
+
+                            stack_push(stackPC,j);
+                            stack_push(stackPC,n);
+                            stack_top(stackPC,&TOP);
+
+                            j=fun(beh_programu,n);
+                            stack_top(stackPC,&TOP);
+                            stack_pop(stackPC);
+                            stack_top(stackPC,&TOP);
+                    break;
+
+                     case NOTJUMP:
+                        RESULT1=0;
+                    break;
+                   }
+
 j++;
 }
-
 stack_pop(stackPC);
 stack_pop_ramec(stackramec);
 stack_top(stackPC,&TOP);
-return TOP;
 
+
+return TOP;
 }
 
 

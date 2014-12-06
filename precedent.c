@@ -894,6 +894,9 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                             {
 
                                 struct record *SUPP=ELEMENT;
+                                char *navratova=malloc(sizeof(char)*strlen(LEX_STRUCTPTR->str));
+                                strcpy(navratova,LEX_STRUCTPTR->str);
+
                                  char hack=getc(source);
                                  if(hack=='(')
                                  {
@@ -926,7 +929,6 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                         {
                                            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                            struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
-//printf("tu sme %i %i ",ELEMENT->type ,recorderSEM2(SUPP->params[i]) );
                                             if(ELEMENT->type != recorderSEM2(SUPP->params[i]))
                                                {
 
@@ -965,7 +967,8 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                         i++;
                                     }
                                     }
-
+                                    generate_inst(navratova,0,0,0,FMOF,0,0);
+                                    free(navratova);
                                     TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                     if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin==CIARKA)
                                     {

@@ -71,4 +71,5 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define CALLFUN 235
 #define VALUE 236
 #define DECLARE 237
-
+#define FMOF 238
+#define NOTJUMP 239

@@ -496,6 +496,18 @@ case LOOP:
     Instruction->CODE=DECLARE;
     add_new_pointer(InstructionTape,Instruction);
     break;
+    case FMOF:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=FMOF;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+
+
+
+
 }
 
     return 0;
