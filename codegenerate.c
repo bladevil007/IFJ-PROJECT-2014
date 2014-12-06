@@ -37,8 +37,7 @@ return 0;
 int generate_inst(char *A,char *A2,float B,float C,int CODE,int what,char*A3)
 {
 
-if(IN_FUNCTION==0)
-{
+
 
 INSTape *Instruction;
 if((Instruction=(INSTape*)malloc(sizeof(INSTape)))==NULL)
@@ -452,8 +451,51 @@ case LOOP:
     Instruction->CODE=NOTEQUAL;
     add_new_pointer(InstructionTape,Instruction);
     break;
+   case STARTFUN:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=0;
+    Instruction->c=0;
+    Instruction->CODE=STARTFUN;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 
-}
+    case ENDFUN:
+    Instruction->a=NULL;
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=ENDFUN;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+    case CALLFUN:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=0;
+    Instruction->c=0;
+    Instruction->CODE=CALLFUN;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
+    case VALUE:
+    if(A!=NULL)
+    {
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    }
+    Instruction->b=B;
+    Instruction->c=what;
+    Instruction->CODE=VALUE;
+    add_new_pointer(InstructionTape,Instruction);
+
+    break;
+
+    case DECLARE:
+    Instruction->a=(char*)malloc(sizeof(char)*length(A));
+    strcpy(Instruction->a,A);
+    Instruction->b=B;
+    Instruction->c=C;
+    Instruction->CODE=DECLARE;
+    add_new_pointer(InstructionTape,Instruction);
+    break;
 }
 
     return 0;

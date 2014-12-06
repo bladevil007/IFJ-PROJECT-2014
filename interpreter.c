@@ -28,6 +28,7 @@
 int INFUN=0;
 TStack *stackADRESS;
 TStack *stackPC;
+TStack_ramec *stackramec;
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
 int TOP;
 struct record *temp;
@@ -40,8 +41,11 @@ int LABEL;
 
 int foo(INSTape *INSTR)
 {
+THash_table *RAMEC;
 int g1;
 int g2;
+
+
 
     switch(INSTR->CODE)
     {
@@ -50,7 +54,15 @@ int g2;
         break;
 
     case MOV:
+        if(INFUN==0)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+        stack_top_ramec(stackramec,&RAMEC);
+        temp=hashtable_search(RAMEC,INSTR->a);
+        if(temp==NULL)
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
         switch(temp->type)
         {
         case(INTEGER_hash):
@@ -60,8 +72,10 @@ int g2;
             temp->value.d = hodnota;
             break;
         case(BOOLEAN_hash):
-            temp->value.b = hodnota;
+
+            temp->value.b =(int)hodnota;
             temp->value.i=(int)hodnota-37;
+
             break;
         case(STRING_hash):
            if(temp->value.str!=NULL)
@@ -98,8 +112,19 @@ int g2;
         printf("%g",INSTR->b);
         break;
 
+
+
+
     case READLN:
-    temp = hashtable_search(GlobalnaTAB,INSTR->a);
+    if(INFUN==0)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+        stack_top_ramec(stackramec,&RAMEC);
+        temp=hashtable_search(RAMEC,INSTR->a);
+        if(temp==NULL)
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
     switch(temp->type)
        {
         case(INTEGER_hash):
@@ -122,6 +147,7 @@ int g2;
                 free_sources();
                 exit(E_STDIN);
             }
+            temp->value.b=temp->value.b+1;               ///true je 1 false je 0
             break;
         case(STRING_hash):
             free(temp->value.str);
@@ -134,9 +160,19 @@ int g2;
             break;
         }
          break;
+
+
     case WRITEID:
         if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
         switch(temp->type)
         {
         case(INTEGER_hash):
@@ -149,12 +185,13 @@ int g2;
             printf("%s",temp->value.str);
             break;
         case (BOOLEAN_hash):
-            if((int)temp->value.b == 39)
+            if((int)temp->value.b == 2)
                 printf("TRUE");
-            else if((int)temp->value.b == 38)
+            else if((int)temp->value.b == 1)
                 printf("FALSE");
                 break;
         }
+
         break;
 
         case COPYSTRING:
@@ -164,12 +201,30 @@ int g2;
 
         case COPYID:
         globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
+        if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
         globalne_pole = copy(temp->value.str, INSTR->b, INSTR->c);
         break;
 
       case SORTID:
+        if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
         if((globalne_pole = (malloc(length(temp->value.str) * sizeof(char) + 1))) == NULL)
         {
             free_sources();
@@ -203,7 +258,16 @@ int g2;
 
     case CONCATEID:
 
+        if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
 
             if(globalne_pole==0){
             globalne_pole = (char*)malloc(sizeof(char) * (length(temp->value.str))+1);
@@ -219,14 +283,33 @@ int g2;
         break;
 
         case LENGTHID:
+        if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
         hodnota = length(temp->value.str);
         break;
 
         case ADD:
 
             if(INSTR->a!=NULL)
-            {temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            {
+
+            if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->b =temp->value.i;
@@ -241,7 +324,15 @@ int g2;
             }
             if(INSTR->a2!=NULL)
             {
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a2);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->c =temp->value.i;
@@ -275,10 +366,20 @@ int g2;
 
             break;
 
+
+
         case MULTIPLY:
             if(INSTR->a!=NULL)
             {
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+             if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->b =temp->value.i;
@@ -291,7 +392,15 @@ int g2;
             if(INSTR->a2!=NULL)
             {
 
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+             if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a2);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->c =temp->value.i;
@@ -301,8 +410,6 @@ int g2;
             break;
              }
             }
-
-
             if(INSTR->specialcode==0)
             {if(hodnota==0)
             {hodnota=INSTR->b*INSTR->c;
@@ -329,7 +436,15 @@ int g2;
 
                if(INSTR->a!=NULL)
             {
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->b =temp->value.i;
@@ -345,7 +460,15 @@ int g2;
 
             if(INSTR->a2!=NULL)
             {
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+             if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a2);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->c =temp->value.i;
@@ -378,7 +501,15 @@ int g2;
        case DIVIDE:
                 if(INSTR->a!=NULL)
             {
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+             if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->b =temp->value.i;
@@ -391,7 +522,15 @@ int g2;
             if(INSTR->a2!=NULL)
             {
 
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+             if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a2);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            }
             switch(temp->type){
             case INTEGER_hash:
             INSTR->c =temp->value.i;
@@ -557,19 +696,58 @@ case NOTEQUAL:
 
         case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a2);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
             globalne_pole = copy(INSTR->a, temp->value.i, INSTR->c);
             break;
 
+
+
+
         case COPYSTRING_ID:         //copy('ahoj', 52, i);                 ///ok
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a2);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
             globalne_pole = malloc(temp->value.i * sizeof(char) + 1);
             globalne_pole = copy(INSTR->a, INSTR->b, temp->value.i);
             break;
 
         case COPYSTRINGIDID:         //copy('ahoj', i, i);                //ok
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a3);
+            if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a2);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
+            if(INFUN!=1)
+        temp2 = hashtable_search(GlobalnaTAB,INSTR->a3);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp2 = hashtable_search(RAMEC,INSTR->a3);
+         if(temp2==NULL)
+                temp2 = hashtable_search(GlobalnaTAB,INSTR->a3);
+        }
             globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
             globalne_pole = copy(INSTR->a, temp->value.i, temp2->value.i);
             break;
@@ -577,24 +755,90 @@ case NOTEQUAL:
 
         case COPYIDID_:             //copy(id,id,52);                      ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+            if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
+                 if(INFUN!=1)
+        temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp2 = hashtable_search(RAMEC,INSTR->a2);
+         if(temp2==NULL)
+                temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
             globalne_pole = copy(temp->value.str, temp2->value.i, INSTR->c);
             break;
 
 
         case COPYID_ID:             //copy(id,52,id);                     //ok
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+                 if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
+                 if(INFUN!=1)
+        temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp2 = hashtable_search(RAMEC,INSTR->a2);
+         if(temp2==NULL)
+                temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
             globalne_pole = malloc(temp2->value.i * sizeof(char) + 1);
             globalne_pole = copy(temp->value.str, INSTR->b, temp2->value.i);
             break;
 
 
         case COPYIDIDID:             //copy(id,id,id);
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
-            temp3 = hashtable_search(GlobalnaTAB,INSTR->a3);
+        if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
+
+
+        if(INFUN!=1)
+        temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp2 = hashtable_search(RAMEC,INSTR->a2);
+         if(temp2==NULL)
+                temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
+
+        if(INFUN!=1)
+        temp3 = hashtable_search(GlobalnaTAB,INSTR->a3);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp3 = hashtable_search(RAMEC,INSTR->a3);
+         if(temp3==NULL)
+                temp3 = hashtable_search(GlobalnaTAB,INSTR->a3);
+        }
             globalne_pole = malloc(temp3->value.i * sizeof(char) + 1);
             globalne_pole = copy(temp->value.str, temp2->value.i, temp3->value.i);
             break;
@@ -605,20 +849,58 @@ case NOTEQUAL:
             break;
 
         case FINDIDSTR:
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
             hodnota = find(temp->value.str, INSTR->a2);
             break;
 
         case FINDSTRID:
-            temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+             if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a2);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
             hodnota = find(INSTR->a,temp->value.str);
             break;
 
         case FINDIDID:
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
-            hodnota = find(temp->value.str,temp2->value.str);
-            break;
+        if(INFUN!=1)
+        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp = hashtable_search(RAMEC,INSTR->a);
+         if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+        }
+
+             if(INFUN!=1)
+        temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        else
+        {
+         THash_table *RAMEC;
+         stack_top_ramec(stackramec,&RAMEC);
+         temp2 = hashtable_search(RAMEC,INSTR->a2);
+         if(temp2==NULL)
+                temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
+        }
+
+        hodnota = find(temp->value.str,temp2->value.str);
+        break;
 
 
 
@@ -640,28 +922,25 @@ case NOTEQUAL:
           else return LOOP;
           break;
 
-            //  case CALLFUNCTION:
-          //  return CALLFUNCTION;
+            case CALLFUN:
+           return CALLFUN;
 
 
-
-
-
-
-
-
-
-
+            case VALUE:
+                break;
+            case DECLARE:
+            stack_top_ramec(stackramec,&RAMEC);
+            hashtable_add(RAMEC,VARIABLE_hash,INSTR->a,(int)INSTR->b,0);
+            break;
+    }
 ///*-+/ hotovo bez premennych
 
-
-    }
 return 0;
 }
 int searchrecord(inf_pointer_array* beh_programu)
 {
 
-//int j=0;
+int j=0;
 
 if(((stackADRESS=stack_init())==NULL))
 {
@@ -674,6 +953,13 @@ if(((stackPC=stack_init())==NULL))
     free_sources();
     exit(E_INTERNAL);
 }
+
+if(((stackramec=stack_init_ramec())==NULL))
+{
+    free_sources();
+    exit(E_INTERNAL);
+}
+
 stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
 stack_push(stackPC,0);
 
@@ -698,21 +984,101 @@ int BREAKPOINT=0;
        RESULT=foo(beh_programu->pole[i]);
         switch(RESULT)
         {
-
-    /*case CALLFUNCTION:
-        INFUN=1;
-        stack_push(stackPC,i);
+/***********************************/
+    case CALLFUN:
+    INFUN=1;
+    stack_push(stackPC,i);
     while(strcmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
         {
             j++;
         }
+        struct record *IDS=hashtable_search(GlobalnaTAB,beh_programu->pole[j]->a);
+        THash_table *RAMEC;
+            if(((RAMEC=(THash_table*)malloc(sizeof(THash_table))) == NULL) ||
+            ((RAMEC=hashtable_init(100))==0))                                        ///alokujeme hashovaciu tabulku
+            exit(E_INTERNAL);
+
+
+        if(IDS!=NULL && IDS->POLE_ID_LOCAL_VOLANE!=NULL)
+        {
+            int x=0;
+            int k=0;
+            int p=0;
+            struct record* Help;
+            while (x < strlen(IDS->POLE_ID_LOCAL_VOLANE))
+            {
+               if(IDS->POLE_ID_LOCAL_VOLANE[x]=='$')
+               {
+
+                     i++;
+                    foo(beh_programu->pole[i]);
+
+                if(beh_programu->pole[i]->c==3)
+                    {
+                        temp=hashtable_search(GlobalnaTAB,beh_programu->pole[i]->a);
+                        switch(temp->type)
+                        {
+                        case INTEGER_hash:
+                         beh_programu->pole[i]->b=temp->value.i;
+                        break;
+                        case REAL_hash:
+                           beh_programu->pole[i]->b=temp->value.d;
+                        break;
+                        case BOOLEAN_hash:
+                            beh_programu->pole[i]->b=temp->value.i;
+                            break;
+                        case STRING_hash:
+                            beh_programu->pole[i]->a=temp->value.str;
+                            break;
+                        }
+                    }
+                    if(beh_programu->pole[i]->c==1)                          ///BOLEAN HODNOTY
+                    beh_programu->pole[i]->b=beh_programu->pole[i]->b-37;
+
+                    char *Cislo=malloc(sizeof(char)*(x-k));
+                    strncpy(Cislo,IDS->POLE_ID_LOCAL_VOLANE+k,x-k);
+
+
+                   if(IDS->params[p]=='i')
+                       {
+                       hashtable_add(RAMEC,VARIABLE_hash,Cislo,INTEGER_hash,0);
+                       struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                       HLADAJ->value.i=(int)beh_programu->pole[i]->b;
+                       }
+                    else if(IDS->params[p]=='s')
+                       {
+                       hashtable_add(RAMEC,VARIABLE_hash,Cislo,STRING_hash,0);
+                       struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                       HLADAJ->value.str=malloc(sizeof(char)*strlen( beh_programu->pole[i]->a)+1);
+                       strcpy(HLADAJ->value.str,beh_programu->pole[i]->a);
+                       }
+                    else if(IDS->params[p]=='b')
+                       {
+                       hashtable_add(RAMEC,VARIABLE_hash,Cislo,BOOLEAN_hash,0);
+                       struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                       HLADAJ->value.i=(int)beh_programu->pole[i]->b;
+                       }
+                    else if(IDS->params[p]=='r')
+                       {
+                       hashtable_add(RAMEC,VARIABLE_hash,Cislo,REAL_hash,0);
+                       struct record *HLADAJ=hashtable_search(RAMEC,Cislo);
+                       HLADAJ->value.d=beh_programu->pole[i]->b;
+                       }
+                   k=x+1;
+                   p++;
+               }
+              x++;
+             }
+        }
+        stack_push_ramec(stackramec,RAMEC);                   ///PUSHNEME RAMEC na zasobnik
         stack_push(stackPC,j);
         i=fun(beh_programu,j);
         i++;
         INFUN=0;
         j=0;
-    break;*/
-
+        hashtable_free(RAMEC);
+    break;
+/********************************************************************************************************/
     case JUMP:
         stack_top(stackADRESS,&TOP);
         if (RESULT1==0)
@@ -739,7 +1105,6 @@ int BREAKPOINT=0;
             stack_top(stackADRESS,&TOP);
             if (RESULT1==JUMP)
             {
-
                 RESULT1=0;
                 break;
             }
@@ -764,14 +1129,10 @@ int BREAKPOINT=0;
         }
 
         i++;
-
     }
-
-
-    stack_free(stackADRESS);
-    stack_free(stackPC);
-    //free_array(InstructionTape);
-
+    //stack_free_ramec(stackramec);
+    //stack_free(stackADRESS);
+    //stack_free(stackPC);
     return SUCCESS;
 }
 
@@ -830,24 +1191,28 @@ int RESULT1=0;
 return BREAKPOINT;
 
 }
-/*
+
 int fun(inf_pointer_array* beh_programu,int j)
 {
 int TOP;
 int RESULT;
 int RESULT1=0;
 
-while(beh_programu->pole[j]->CODE!=ENDFUNCTION)
+while(beh_programu->pole[j]->CODE!=ENDFUN)
 {
-//RESULT=foo(beh_programu->pole[j]);
- j++;
+RESULT=foo(beh_programu->pole[j]);
+
+
+
+j++;
 }
 stack_pop(stackPC);
+stack_pop_ramec(stackramec);
 stack_top(stackPC,&TOP);
 return TOP;
 
 }
-*/
+
 
 
 

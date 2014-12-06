@@ -49,6 +49,27 @@ THash_table *GlobalnaTAB;
 
 
 
+//hlavickovy soubor k zasobniku na ramce:
+typedef struct stackElement_ramec //element ulozeny na zasobniku
+{
+	THash_table *data; //zde se ZMENI datovy typ podle toho, co bude obsahem zasobniku
+	struct stackElement_ramec *next;
+} stackElement_ramec;
+
+
+typedef struct  //struktura pro zasobnik
+{
+	stackElement_ramec *top;
+} TStack_ramec;
+
+//prototypy funkci:
+TStack_ramec *stack_init_ramec ();
+int stack_push_ramec (TStack_ramec *stack, THash_table *data);
+void stack_pop_ramec (TStack_ramec *stack);
+int stack_top_ramec (TStack_ramec *stack, THash_table **element);
+void stack_free_ramec (TStack_ramec *stack);
+
+
 void stringtolower (char *key);
 THash_table *hashtable_init (unsigned size);
 unsigned int hash_function (const char *str, unsigned hashtable_size);

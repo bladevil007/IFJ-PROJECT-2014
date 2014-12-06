@@ -897,6 +897,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                  char hack=getc(source);
                                  if(hack=='(')
                                  {
+                                generate_inst(LEX_STRUCTPTR->str,0,0,0,CALLFUN,0,0);
                                 fseek(source,ftell(source)-1,SEEK_SET);
                                 TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                 if(TOP_Stdin==LEFT_ROUND)
@@ -925,21 +926,35 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                         {
                                            ELEMENT=lookforElement(LEX_STRUCTPTR,type,GlobalnaTAB,LokalnaTAB,ELEMENT);
                                            struct record *SUP=hashtable_search(LokalnaTAB,LEX_STRUCTPTR->str);
-                                            if(ELEMENT->type != SUPP->params[i])
+//printf("tu sme %i %i ",ELEMENT->type ,recorderSEM2(SUPP->params[i]) );
+                                            if(ELEMENT->type != recorderSEM2(SUPP->params[i]))
+                                               {
+
                                                 exit(E_SEMANTIC_TYPE);
+                                                }
+
+
                                            if((ELEMENT->defined!=true_hash && IN_FUNCTION==0) || ( IN_FUNCTION==1 && SUP!=0 && ELEMENT->valuedef!=true_hash))
                                             exit(E_UNINITIALIZED_VAR);
+
+                                            generate_inst(LEX_STRUCTPTR->str,0,LEX_STRUCTPTR->value,0,VALUE,3,0);
 
                                         }
 
                                         else if(TOP_Stdin == CONST || TOP_Stdin==REALo || TOP_Stdin==TRUE || TOP_Stdin==FALSE|| TOP_Stdin==CONST_STRING)
                                         {
+                                            if( TOP_Stdin!=TRUE && TOP_Stdin!=FALSE)
+                                              generate_inst(LEX_STRUCTPTR->str,NULL,LEX_STRUCTPTR->value,0,VALUE,0,0);
+                                            else
+                                               generate_inst(LEX_STRUCTPTR->str,0,TOP_Stdin,0,VALUE,1,0);
+
                                             if(TOP_Stdin==TRUE || TOP_Stdin==FALSE)
                                             {
                                                 TOP_Stdin=BOOLEAN;
                                             }
                                             if(TOP_Stdin!=recorderSEM(SUPP->params[i]))
                                             {
+
                                                 exit(E_SEMANTIC_TYPE);
                                             }
 
@@ -954,7 +969,7 @@ if((TOP_Stdin==ID || TOP_Stdin==COPY || TOP_Stdin==LENGTH || TOP_Stdin==FIND || 
                                     TOP_Stdin=getnextToken(LEX_STRUCTPTR);
                                     if(TOP_Stdin==RIGHT_ROUND || TOP_Stdin==CIARKA)
                                     {
-                                        VysledokID(Vysledok,ELEMENT->type);            ///SKONTROLUJ NAVRATOVY TYP FUNKCIE
+                                        VysledokID(Vysledok,SUPP->type);            ///SKONTROLUJ NAVRATOVY TYP FUNKCIE
 
                                         if(TOP_Stdin==CIARKA)
                                         {
@@ -1219,6 +1234,24 @@ default:
     return 0;
 }
 
+int recorderSEM2(char c)
+{
+     switch(c){
+
+case 'i':
+    return INTEGER_hash;
+case 'b':
+    return BOOLEAN_hash;
+case 'r':
+    return REAL_hash;
+case 's':
+    return STRING_hash;
+default:
+    exit(E_SEMANTIC_TYPE);
+}
+    return 0;
+
+}
 
 
 

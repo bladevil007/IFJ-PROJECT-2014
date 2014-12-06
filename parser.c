@@ -35,6 +35,7 @@ inf_array *POLE_ID_LOCAL;   ///nekonecne pole ID pre lokalnu
 inf_array *POLE_ID_GLOBALFUN;   ///nekonecne pole ID pre globalnu
 inf_array *POLE_ID_LOCAL_VOLANE;              ///
 THash_table *LokalnaTAB;
+char *id_fun;
 
 
 inf_array *SUPPORT_POLE;  /// pomocna
@@ -105,6 +106,9 @@ int program(int token)
         token=getnextToken(LEX_STRUCTPTR);
         if(token==FORWARD)                                          /// len hlavicka funkcie ziadne telo za nou nenasleduje
         {
+            if (id_fun!=NULL)
+                free(id_fun);
+
             CHECK_FUN++;
 
             if(SUPPORT->defined==true_hash)
@@ -139,7 +143,9 @@ int program(int token)
         }
         else if(token==BEGIN || token==VAR)        ///nasleduje telo funkcie takze bude definovana
         {
-
+                generate_inst(id_fun,0,0,0,STARTFUN,0,0);
+                if (id_fun!=NULL)
+                free(id_fun);
 
             if(SUPPORT->defined==true_hash)
             {
@@ -155,6 +161,7 @@ int program(int token)
                 declarelist();
             }
             progfunction();
+            generate_inst(0,0,0,0,ENDFUN,0,0);
             token=getnextToken(LEX_STRUCTPTR);
             if(token==E_LEXICAL)
             {
@@ -329,6 +336,7 @@ if(token==EOFILE)
 int ok=program(token);
 if(ok==SUCCESS)
     return SUCCESS;
+
 ///DEALOKACIE PRIDAT DALSIE + volat pri exit
 strClear(LEX_STRUCTPTR);
 free_array(POLE_ID_GLOBAL);
@@ -724,6 +732,7 @@ int command(int value)
 
                                                                                                 ///readln definuje variable
                 ELEMENT->defined=true_hash;
+                ELEMENT->valuedef=true_hash;
 
                 token=getnextToken(LEX_STRUCTPTR);
                 if(token==RIGHT_ROUND)
@@ -1251,7 +1260,6 @@ Neterminal na kontrolu syntaxe deklaracie premennych
          }
          else
         POLE_ID_INDEX=add_str(POLE_ID_LOCAL,LEX_STRUCTPTR->str);
-
                                                                     ///dva krat definovany ten isty nazov
     }
                 ///neni jej priradena hodnota
@@ -1267,7 +1275,11 @@ Neterminal na kontrolu syntaxe deklaracie premennych
                             }
                             ///pridame ID do tabulky symbolov GLOB
                          else
-                            hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);  ///pridame ID do tabulky symbolov    LOC
+                            {
+                                hashtable_add(LokalnaTAB,VARIABLE_hash,POLE_ID_LOCAL->str+POLE_ID_INDEX,decodederSEM(token),NULL);
+                              generate_inst(POLE_ID_LOCAL->str+POLE_ID_INDEX,0,decodederSEM(token),0,DECLARE,0,0);
+
+                            } ///pridame ID do tabulky symbolov    LOC
                         token=getnextToken(LEX_STRUCTPTR);
                             ///pridat do tabulky
                         {
@@ -1321,6 +1333,10 @@ int funkcia()
                 free_sources();
                 exit(E_SEMANTIC_UNDEF);
             }
+
+            id_fun=malloc(sizeof(char)*strlen(LEX_STRUCTPTR->str));
+            strcpy(id_fun,LEX_STRUCTPTR->str);
+
 
         if ((token = getnextToken(LEX_STRUCTPTR)) == LEFT_ROUND)
         {
