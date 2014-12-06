@@ -933,7 +933,13 @@ case NOTEQUAL:
             hashtable_add(RAMEC,VARIABLE_hash,INSTR->a,(int)INSTR->b,0);
             break;
     }
+
+
+
+
 ///*-+/ hotovo bez premennych
+
+
 
 return 0;
 }
@@ -972,7 +978,6 @@ int RESULT1=0;
 int BREAKPOINT=0;
 
     int i=0;
-
     while(beh_programu->pole[i]->CODE != BEGIN_MAIN)
     {
         i++;
@@ -988,9 +993,13 @@ int BREAKPOINT=0;
     case CALLFUN:
     INFUN=1;
     stack_push(stackPC,i);
-    while(strcmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
+
+    while(strcasecmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
         {
-            j++;
+           j++;
+
+            while(beh_programu->pole[j]->a==NULL)
+                j++;
         }
         struct record *IDS=hashtable_search(GlobalnaTAB,beh_programu->pole[j]->a);
         THash_table *RAMEC;
@@ -1013,6 +1022,7 @@ int BREAKPOINT=0;
                      i++;
                     foo(beh_programu->pole[i]);
 
+
                 if(beh_programu->pole[i]->c==3)
                     {
                         temp=hashtable_search(GlobalnaTAB,beh_programu->pole[i]->a);
@@ -1030,13 +1040,17 @@ int BREAKPOINT=0;
                         case STRING_hash:
                             beh_programu->pole[i]->a=temp->value.str;
                             break;
+
                         }
                     }
+
                     if(beh_programu->pole[i]->c==1)                          ///BOLEAN HODNOTY
                     beh_programu->pole[i]->b=beh_programu->pole[i]->b-37;
 
-                    char *Cislo=malloc(sizeof(char)*(x-k));
-                    strncpy(Cislo,IDS->POLE_ID_LOCAL_VOLANE+k,x-k);
+
+
+                   char *Cislo=malloc(sizeof(char)*(x-k));
+                   strncpy(Cislo,IDS->POLE_ID_LOCAL_VOLANE+k,x-k);
 
 
                    if(IDS->params[p]=='i')
@@ -1079,6 +1093,7 @@ int BREAKPOINT=0;
         hashtable_free(RAMEC);
     break;
 /********************************************************************************************************/
+
     case JUMP:
         stack_top(stackADRESS,&TOP);
         if (RESULT1==0)
@@ -1127,7 +1142,6 @@ int BREAKPOINT=0;
                 stack_pop(stackADRESS);
                   break;
         }
-
         i++;
     }
     //stack_free_ramec(stackramec);
@@ -1200,12 +1214,12 @@ int RESULT1=0;
 
 while(beh_programu->pole[j]->CODE!=ENDFUN)
 {
+
 RESULT=foo(beh_programu->pole[j]);
-
-
 
 j++;
 }
+
 stack_pop(stackPC);
 stack_pop_ramec(stackramec);
 stack_top(stackPC,&TOP);

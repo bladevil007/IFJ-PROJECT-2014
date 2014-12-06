@@ -239,6 +239,10 @@ int program(int token)
         }
         else if(token==BEGIN || token==VAR)
         {
+            generate_inst(id_fun,0,0,0,STARTFUN,0,0);
+                if (id_fun!=NULL)
+                free(id_fun);
+
                 if(SUPPORT->defined==true_hash)
                 {
                     free_sources();
@@ -253,6 +257,7 @@ int program(int token)
                 declarelist();
             }
             progfunction();
+            generate_inst(0,0,0,0,ENDFUN,0,0);
             token=getnextToken(LEX_STRUCTPTR);
             if(token==E_LEXICAL)
             {
@@ -811,7 +816,6 @@ if(value==WRITE)
     token=getnextToken(LEX_STRUCTPTR);
             if(token==ID || token==CONST_STRING || token==REALo || token==CONST || token==TRUE || token==FALSE)
             {
-
                         if(token==ID)
                         {
                         generate_inst(LEX_STRUCTPTR->str,0,0,0,WRITEID,0,0);
@@ -829,7 +833,6 @@ if(value==WRITE)
                             free_sources();
                             exit(E_UNINITIALIZED_VAR);
                         }
-
                         }
               switch(token)
               {
