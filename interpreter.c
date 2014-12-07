@@ -994,33 +994,33 @@ int searchrecord(inf_pointer_array* beh_programu)
 
 int j=0;
 
-if(((stackADRESS=stack_init())==NULL))
+if(((stackADRESS=stack_init())==NULL))                      ///zasobnik adries navesti
 {
     free_sources();
     exit(E_INTERNAL);
 }
 
-if(((stackPC=stack_init())==NULL))
+if(((stackPC=stack_init())==NULL))                           ///zasobnik Program counter
 {
     free_sources();
     exit(E_INTERNAL);
 }
 
-if(((stackramec=stack_init_ramec())==NULL))
+if(((stackramec=stack_init_ramec())==NULL))                    ///zasobnik ramcov
 {
     free_sources();
     exit(E_INTERNAL);
 }
 
-if(((StackBreak=stack_init())==NULL))
+if(((StackBreak=stack_init())==NULL))                         ///zasobnik breakpoint pre while cykly
 {
     free_sources();
     exit(E_INTERNAL);
 }
 
 
-stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na dolar
-stack_push(stackPC,0);
+stack_push(stackADRESS,0);                                      ///inicializacia vrcholu na 0
+stack_push(stackPC,0);                                          ///inicializacia vrcholu na 0
 
 hodnota2=0;
 hodnota=0;
@@ -1031,7 +1031,7 @@ int RESULT1=0;
 int BREAKPOINT=0;
 
     int i=0;
-    while(beh_programu->pole[i]->CODE != BEGIN_MAIN)
+    while(beh_programu->pole[i]->CODE != BEGIN_MAIN)                      ///Prechadzame kym nenajdeme Begin Main
     {
         i++;
     }
@@ -1042,11 +1042,10 @@ int BREAKPOINT=0;
        RESULT=foo(beh_programu->pole[i]);
         switch(RESULT)
         {
-/***********************************/
     case CALLFUN:
     INFUN=1;
 
-    while(strcasecmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)
+    while(strcasecmp(beh_programu->pole[j]->a,beh_programu->pole[i]->a)!=0)       ///hladame zaciatok nasej funkcie
         {
            j++;
 
@@ -1158,7 +1157,7 @@ int BREAKPOINT=0;
 
 
 
-    case LOOPJUMP:
+    case LOOPJUMP:                                   /// nepojde uz dalsi loop ale preskoci sa to
         stack_pop(StackBreak);
         stack_top(stackADRESS,&TOP);
         i++;
@@ -1230,7 +1229,6 @@ int RESULT1=0;
                         break;
 
                    case ELSE:
-
                     stack_top(stackADRESS,&TOP);
                         if (RESULT1==JUMP)
                     {
@@ -1319,7 +1317,6 @@ RESULT=foo(beh_programu->pole[j]);
 
 
                     case ELSE:
-                        exit(10);
                         stack_top(stackADRESS,&TOP);
                         if (RESULT1==JUMP)
                         {
