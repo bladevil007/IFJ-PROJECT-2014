@@ -8,7 +8,7 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Jiri­ Dostal            xdosta40               */
+/*                              Jiri Dostal            xdosta40               */
 /* ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,7 +92,7 @@ int g2; /// pomocna premenna pre interpret
            temp->value.str = malloc(sizeof(char)*length(INSTR->a));
            if(temp->value.str == NULL)
            {
-               free_sources();
+
                exit(E_INTERNAL);
            }
            strcpy(temp->value.str,globalne_pole);
@@ -136,7 +136,7 @@ int g2; /// pomocna premenna pre interpret
         case(INTEGER_hash):
             if(scanf("%i",&(temp->value.i))==0)      ///pri nespravnej hodnote program skonci
             {
-                free_sources();
+
                 exit(E_STDIN);
             }
             break;
@@ -144,7 +144,7 @@ int g2; /// pomocna premenna pre interpret
         case(REAL_hash):
             if(scanf("%f",&(temp->value.d))==0)
             {
-                free_sources();
+
                 exit(E_STDIN);
             }
             break;
@@ -152,7 +152,7 @@ int g2; /// pomocna premenna pre interpret
         case(BOOLEAN_hash):
             if(scanf("%i",&(temp->value.b))==0)
             {
-                free_sources();
+
                 exit(E_STDIN);
             }
             temp->value.b=temp->value.b+1;               ///true je 1 false je 0
@@ -163,7 +163,7 @@ int g2; /// pomocna premenna pre interpret
             temp->value.str=(char*)malloc(sizeof(char)*256);     ///size of one line
             if((scanf("%s",(temp->value.str)))==0)
             {
-                free_sources();
+
                 exit(E_STDIN);
             }
             break;
@@ -237,7 +237,7 @@ int g2; /// pomocna premenna pre interpret
         }
         if((globalne_pole = (malloc(length(temp->value.str) * sizeof(char) + 1))) == NULL)
         {
-            free_sources();
+
             exit(E_INTERNAL);
         }
         globalne_pole = sort(temp->value.str);
@@ -246,7 +246,7 @@ int g2; /// pomocna premenna pre interpret
     case SORTSTRING:
         if((globalne_pole = malloc(length(INSTR->a) * sizeof(char) + 1)) == NULL)
         {
-            free_sources();
+
             exit(E_INTERNAL);
         }
         globalne_pole = sort(INSTR->a);
@@ -574,7 +574,7 @@ int g2; /// pomocna premenna pre interpret
                     hodnota=INSTR->b/INSTR->c;
                     if(INSTR->c==0)
                     {
-                    free_sources();          ///chyba delenie nulou
+                                ///chyba delenie nulou
                     exit(E_DIVISION_BY_ZERO);
                     }
                 hodnota3=1;   ///pomocna premenna
@@ -584,7 +584,7 @@ int g2; /// pomocna premenna pre interpret
                     hodnota2=INSTR->b/INSTR->c;
                     if(INSTR->c==0)
                     {
-                        free_sources();
+
                         exit(E_DIVISION_BY_ZERO);
                     }
                 hodnota3=2;
@@ -598,7 +598,7 @@ int g2; /// pomocna premenna pre interpret
                     hodnota2=hodnota2/INSTR->b;
                 if(INSTR->b==0)
                 {
-                    free_sources();
+
                     exit(E_DIVISION_BY_ZERO);
                 }
             }
@@ -995,25 +995,25 @@ int j=0;
 
 if(((stackADRESS=stack_init())==NULL))                      ///zasobnik adries navesti
 {
-    free_sources();
+
     exit(E_INTERNAL);
 }
 
 if(((stackPC=stack_init())==NULL))                           ///zasobnik Program counter
 {
-    free_sources();
+
     exit(E_INTERNAL);
 }
 
 if(((stackramec=stack_init_ramec())==NULL))                    ///zasobnik ramcov
 {
-    free_sources();
+
     exit(E_INTERNAL);
 }
 
 if(((StackBreak=stack_init())==NULL))                         ///zasobnik breakpoint pre while cykly
 {
-    free_sources();
+
     exit(E_INTERNAL);
 }
 
@@ -1138,7 +1138,6 @@ int BREAKPOINT=0;
        i=fun(beh_programu,j);
         INFUN=0;
         j=0;
-        hashtable_free(RAMEC);
     break;
 
 
@@ -1305,6 +1304,7 @@ int RESULT1=0;
 int BREAKPOINT=0;
 int n=0;
 THash_table *aktRAMEC;
+THash_table *freeRamec;
 
 while(beh_programu->pole[j]->CODE!=ENDFUN)
 {
@@ -1481,6 +1481,8 @@ RESULT=foo(beh_programu->pole[j]);
 j++;
 }
 stack_pop(stackPC);
+stack_top_ramec(stackramec,&freeRamec);
+hashtable_free(freeRamec);
 stack_pop_ramec(stackramec);
 stack_top(stackPC,&TOP);
 

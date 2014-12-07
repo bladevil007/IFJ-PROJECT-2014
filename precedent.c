@@ -1,3 +1,16 @@
+/* **************************** precedence.c ************************************ */
+/* Soubor:              precedence.c - Precedencna syntakticka analyza        */
+/* Kodovani:            UTF-8                                                 */
+/* Datum:               14.12.2014                                             */
+/* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
+/* Projekt:             Implementace interpretu jazyka IFJ14                  */
+/* Varianta zadani:     a/2/II                                                */
+/* Titul,Autori, login:         Ing. Natalya Loginova   xlogin00              */
+/*                              Jindrich Dudek          xdudek04              */
+/*                              Norbert Durcansky       xdurca01              */
+/*                              Jan Jusko               xjusko00              */
+/*                              Jiri­ Dostal          xdosta40           */
+/* ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

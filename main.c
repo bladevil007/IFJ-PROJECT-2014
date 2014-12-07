@@ -1,7 +1,7 @@
 /* **************************** main.c ************************************** */
 /* Soubor:              main.c - Riadiacy cast interpretu                     */
 /* Kodovani:            UTF-8                                                 */
-/* Datum:               11.2014                                               */
+/* Datum:               14.12.2014                                               */
 /* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
 /* Projekt:             Implementace interpretu jazyka IFJ14                  */
 /* Varianta zadani:     a/2/II                                                */
@@ -9,7 +9,7 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Jiří Dostál             xdosta40              */
+/*                              Jiri� Dostal             xdosta40              */
 /* ****************************************************************************/
 
 #include <stdio.h>

@@ -1,3 +1,17 @@
+/* **************************** stack.c ************************************ */
+/* Soubor:              stack.c -  Struktury zasobnikov                        */
+/* Kodovani:            UTF-8                                                 */
+/* Datum:               11.2014                                               */
+/* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
+/* Projekt:             Implementace interpretu jazyka IFJ14                  */
+/* Varianta zadani:     a/2/II                                                */
+/* Titul,Autori, login:         Ing. Natalya Loginova   xlogin00              */
+/*                              Jindrich Dudek          xdudek04              */
+/*                              Norbert Durcansky       xdurca01              */
+/*                              Jan Jusko               xjusko00              */
+/*                              Jiri Dostal             xdosta40              */
+/* ****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
@@ -10,7 +24,7 @@ TStack *stack_init () //funkce, ktera inicializuje zasobnik, navratova hodnota j
 	if ((tmp = malloc(sizeof(TStack))) == NULL) //alokace zasobniku
 	{
 		fprintf(stderr, "Allocation error.\n");
-		return NULL;		
+		return NULL;
 	}
 	tmp->top = NULL; //inicializace prazdneho zasobniku
 	return tmp;
@@ -22,9 +36,9 @@ int stack_push (TStack *stack, int data) //funkce pro vlozeni dat na zásobník,
 	if ((tmp = malloc(sizeof(stackElement))) == NULL) //alokace prvku na zasobniku
 	{
 		fprintf(stderr,"Allocation Error.\n");
-		return 1;	
+		return 1;
 	}
-	tmp->data = data; //prirazeni dat na nove vznikly prvek zasobniku 
+	tmp->data = data; //prirazeni dat na nove vznikly prvek zasobniku
 	tmp->next = stack->top; //novy prvek bude ukazovat na vrchol zasobniku
 	stack->top = tmp; //zmeni se vrchol zasobniku na nove vytvoreny prvek
 	return 0;
@@ -46,7 +60,7 @@ int stack_top (TStack *stack, int *element) //prostrednictvim parametru element 
 	if (stack->top != NULL) //pokud zasobnik neni prazdny
 	{
 		*element = stack->top->data;
-		return 0;	
+		return 0;
 	}
 	else
 	{
@@ -62,7 +76,7 @@ void stack_free(TStack *stack) //funkce ktera uvolni zasobnik
 		stackElement *tmp;
 		tmp = stack->top;
 		stack->top = tmp->next;
-		free(tmp);		
-	}	
+		free(tmp);
+	}
 	free (stack);
 }

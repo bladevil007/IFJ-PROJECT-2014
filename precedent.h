@@ -1,4 +1,5 @@
-
+#ifndef PRECEDENT_H_
+#define PRECEDENT_H_
 
 int decodeSA(int);
 void initPrecedenceTABLE(); ///vytvori precedencnu tabulku
@@ -24,3 +25,5 @@ int recorderSEM2(char );
 #define  PSA_GREATEREQ 10
 #define  PSA_DOLAR 11
 #define  PSA_NOTEQUAL 12
+
+#endif

@@ -4,6 +4,7 @@
 #define STRLEN 8
 #define ARR_INC 8
 
+
 typedef struct
 {
   int *pole;		// samotne pole

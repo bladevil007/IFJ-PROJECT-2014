@@ -1,4 +1,5 @@
-
+#ifndef SCANER_H_
+#define SCANER_H_
 // TOKENY
 #include "string.h"
 void SourceInitialize(FILE *f);
@@ -59,3 +60,4 @@ FILE *source;
 #define NOTEQUAL 61
 
 
+#endif

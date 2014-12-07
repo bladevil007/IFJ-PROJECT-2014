@@ -1,7 +1,7 @@
 /* **************************** codegenerate.c ************************************ */
 /* Soubor:             codegenerate.c - Generovanie kodu a jeho vykonanie      */
 /* Kodovani:            UTF-8                                                 */
-/* Datum:               11.2014                                               */
+/* Datum:               14.12.2014                                               */
 /* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
 /* Projekt:             Implementace interpretu jazyka IFJ14                  */
 /* Varianta zadani:     a/2/II                                                */
@@ -9,7 +9,7 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Jiøí Dostál             xdosta40              */
+/*                              Jiri Dostal             xdosta40              */
 /* ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +60,7 @@ int generate_inst(char *A,char *A2,float B,float C,int CODE,int what,char*A3)
     INSTape *Instruction;
     if((Instruction=(INSTape*)malloc(sizeof(INSTape)))==NULL)   ///malloc fail
     {
-        free_sources();
+
         exit(E_INTERNAL);
     }
 
@@ -554,7 +554,7 @@ void init_pointer_array(inf_pointer_array *a)
     a->pole = (INSTape **)malloc(sizeof(INSTape)*100);
     if(a->pole == NULL)
         {
-            free_sources();
+
             exit(E_INTERNAL);
         }
     a->allocSize = 100;
@@ -601,7 +601,7 @@ int add_new_pointer(inf_pointer_array *a, INSTape* pointer)
         a->pole = realloc(a->pole, a->allocSize + (100 * sizeof(INSTape*)) );
         if (a->pole == NULL)               ///realloc fail
             {
-                free_sources();
+
                 exit(E_INTERNAL);
             }
         a->allocSize = a->allocSize + 100; ///aktualizacia premennej

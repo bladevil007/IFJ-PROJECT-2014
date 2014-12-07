@@ -1,7 +1,7 @@
 /* ****************************   ial.c  ************************************ */
 /* Soubor:              ial.c - Vestavene funkce a tabulka symbolu            */
 /* Kodovani:            UTF-8                                                 */
-/* Datum:               11.2014                                               */
+/* Datum:               14.12.2014                                               */
 /* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
 /* Projekt:             Implementace interpretu jazyka IFJ14                  */
 /* Varianta zadani:     a/2/II                                                */
