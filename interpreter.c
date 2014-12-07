@@ -1,7 +1,6 @@
 /* **************************** interpreter.c ************************************ */
 /* Soubor:             interpreter.c - Generovanie kodu a jeho vykonanie      */
-/* Kodovani:            UTF-8                                                 */
-/* Datum:               11.2014                                               */
+/* Datum:               14.12.2014                                            */
 /* Predmet:             Formalni jazyky a prekladace (IFJ)                    */
 /* Projekt:             Implementace interpretu jazyka IFJ14                  */
 /* Varianta zadani:     a/2/II                                                */
@@ -9,7 +8,7 @@
 /*                              Jindrich Dudek          xdudek04              */
 /*                              Norbert Durcansky       xdurca01              */
 /*                              Jan Jusko               xjusko00              */
-/*                              Jiøí Dostál             xdosta40              */
+/*                              Jiri� Dostal            xdosta40               */
 /* ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -1201,6 +1200,13 @@ int BREAKPOINT=0;
     }
     return SUCCESS;
 }
+/** \brief sluzi na  pocitanie while cyklov  a vnorenych while
+ *
+ * \param  ukazatel  na pole instrukcii
+ * \param Breakpoint kde zaciname
+ * \return Breakpoint
+ *
+ */
 
 int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i)
 {
@@ -1284,6 +1290,13 @@ stack_top(StackBreak,&BREAKPOINT);
 return BREAKPOINT;
 
 }
+/** \brief Funkcia pre rekurziu funkcii a ich tela
+ *
+ * \param ukazatel na pole instrukcii
+ * \param  index kde fnkcia zacina
+ * \return ok 0
+ *
+ */
 
 int fun(inf_pointer_array* beh_programu,int j)
 {
