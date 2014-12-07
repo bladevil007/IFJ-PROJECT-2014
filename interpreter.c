@@ -25,86 +25,96 @@
 #include "codegenerate.h"
 #include "ial.h"
 #include "stack.h"
-int INFUN=0;
-TStack *stackADRESS;
-TStack *stackPC;
-TStack *StackBreak;
-TStack_ramec *stackramec;
-int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);
-int fun(inf_pointer_array* beh_programu,int j);
-int TOP;
-struct record *temp;
-struct record *temp2;
-struct record *temp3;
-int RES;
-char *globalne_pole=NULL;
-char *globalne_pole1=NULL;
-int LABEL;
+int INFUN=0;                /// premenna ktora urcuje ci sa nachadzame vo funkcii alebo mimo nej
+TStack *stackADRESS;        /// zasobik adries navesti
+TStack *stackPC;            /// zasobnik adries pri viacerych volaniach funkcii
+TStack *StackBreak;         ///  breakpoint pre while cyklus, kam sa vratit aku cast programu prevadzat
+TStack_ramec *stackramec;    /// zasobnik ramcov, ukazatelov na tabulku symbolov
+int LOOPER (inf_pointer_array* beh_programu,int BREAKPOINT,int i);     ///Hlavicka funkcie pre while cykly
+int fun(inf_pointer_array* beh_programu,int j);  ///hlavicka funkcie pre prevadzanie tela funkcie
+int TOP; ///Vrchol zasobnik StackAdress
+struct record *temp;   /// pomocna premenna pre interpret
+struct record *temp2;  /// pomocna premenna pre interpret
+struct record *temp3;  /// pomocna premenna pre interpret
+int RES;               /// pomocna premenna pre interpret
+char *globalne_pole=NULL;  /// pomocna premenna pre interpret
+char *globalne_pole1=NULL;  /// pomocna premenna pre interpret
+int LABEL; /// pomocna premenna pre interpret
 
+
+
+/** \brief Funkcia je pomocnou funkciou interpretu, kde sa prevadzaju vsetky instrukcie
+ *
+ * \param  ukazatel na Instrukiu
+ * \return 0 alebo specialcode ktory riadi dalsie operacie
+ *
+ */
 int foo(INSTape *INSTR)
 {
-THash_table *RAMEC;
-int g1;
-int g2;
+THash_table *RAMEC; /// pomocna premenna pre interpret
+int g1; /// pomocna premenna pre interpret
+int g2; /// pomocna premenna pre interpret
 
-    switch(INSTR->CODE)
+    switch(INSTR->CODE)                   ///Podla Code vieme o aku instrukciu sa jedna
     {
-    case LENGTH:
+    case LENGTH:                           ///instrukcia length vrati dlzku retazca /implementova v ial.c
         hodnota = length(INSTR->a);
         break;
 
-    case MOV:
-        if(INFUN==0)
+    case MOV:                              /// instrukcia MOV sluzi na vkladanie hodnot o premennych
+        if(INFUN==0)                       ///podla tohto flagu vieme kde sa nachadzame a kde mame hladat ID
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-        stack_top_ramec(stackramec,&RAMEC);
+        stack_top_ramec(stackramec,&RAMEC);                  ///nachadzame sa vo funkcii tak hladame v najvyssom Ramci na zasobniku
         temp=hashtable_search(RAMEC,INSTR->a);
         if(temp==NULL)
             temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
-        switch(temp->type)
+        switch(temp->type)                    ///podla typu  vieme kam danu hodnotu vlozit
         {
-        case(INTEGER_hash):
+
+        case(INTEGER_hash):                    ///int
             temp->value.i = (int)hodnota;
             break;
-        case(REAL_hash):
+
+        case(REAL_hash):                     ///float
             temp->value.d = hodnota;
             break;
-        case(BOOLEAN_hash):
 
+        case(BOOLEAN_hash):                    ///boolean
             temp->value.b =(int)hodnota;
             temp->value.i=(int)hodnota-37;
-
             break;
-        case(STRING_hash):
+
+        case(STRING_hash):                        ///string
            if(temp->value.str!=NULL)
-           free(temp->value.str);
+                free(temp->value.str);
            temp->value.str = malloc(sizeof(char)*length(INSTR->a));
            if(temp->value.str == NULL)
            {
                free_sources();
                exit(E_INTERNAL);
            }
+           strcpy(temp->value.str,globalne_pole);
+           free(globalne_pole);
+           globalne_pole=NULL;
+           break;
+        }
+        break;
 
-          strcpy(temp->value.str,globalne_pole);
-          free(globalne_pole);
-          globalne_pole=NULL;
-        }break;
-
-
-    case WRITESTRING:
+    case WRITESTRING:                         ///Instrukcia zapise string na stdout
         printf("%s",INSTR->a);
         break;
 
-    case WRITEBOOL:
+    case WRITEBOOL:                             ///Instrukcia zapise bool na stdout
         if((int)INSTR->b == 39)
             printf("TRUE");
-        else if((int)INSTR->b == 38)
+        else if((int)INSTR->b == 38)                  ///hodnoty su dane podla hodnot tokenu zo scaner.c
             printf("FALSE");
-            break;
+        break;
 
-    case WRITEINT:
+    case WRITEINT:                               ///Instrukcia zapise Integer na stdout
         printf("%i",(int)INSTR->b);
         break;
 
@@ -112,28 +122,26 @@ int g2;
         printf("%g",INSTR->b);
         break;
 
-
-
-
-    case READLN:
-    if(INFUN==0)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+    case READLN:                                ///Instrukcia nacitava hodnotu z stdin
+        if(INFUN==0)
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-        stack_top_ramec(stackramec,&RAMEC);
-        temp=hashtable_search(RAMEC,INSTR->a);
-        if(temp==NULL)
-            temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            stack_top_ramec(stackramec,&RAMEC);
+            temp=hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
-    switch(temp->type)
-       {
+        switch(temp->type)
+        {
         case(INTEGER_hash):
-            if(scanf("%i",&(temp->value.i))==0)
+            if(scanf("%i",&(temp->value.i))==0)      ///pri nespravnej hodnote program skonci
             {
                 free_sources();
                 exit(E_STDIN);
             }
             break;
+
         case(REAL_hash):
             if(scanf("%f",&(temp->value.d))==0)
             {
@@ -141,6 +149,7 @@ int g2;
                 exit(E_STDIN);
             }
             break;
+
         case(BOOLEAN_hash):
             if(scanf("%i",&(temp->value.b))==0)
             {
@@ -150,8 +159,8 @@ int g2;
             temp->value.b=temp->value.b+1;               ///true je 1 false je 0
             break;
         case(STRING_hash):
-            if(temp->value.str!=NULL)                          ///najprv overit
-            free(temp->value.str);
+            if(temp->value.str!=NULL)                          ///vymazeme pole ak tam nieco je
+                free(temp->value.str);
             temp->value.str=(char*)malloc(sizeof(char)*256);     ///size of one line
             if((scanf("%s",(temp->value.str)))==0)
             {
@@ -160,17 +169,16 @@ int g2;
             }
             break;
         }
-         break;
+        break;
 
-
-    case WRITEID:
+    case WRITEID:                                   ///Instruckia zapise na stdout hodnotu ID
         if(INFUN!=1)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-         THash_table *RAMEC;
-         stack_top_ramec(stackramec,&RAMEC);
-         temp = hashtable_search(RAMEC,INSTR->a);
+            THash_table *RAMEC;
+            stack_top_ramec(stackramec,&RAMEC);
+            temp = hashtable_search(RAMEC,INSTR->a);
          if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
@@ -179,51 +187,53 @@ int g2;
         case(INTEGER_hash):
             printf("%i",(int)temp->value.i);
             break;
+
         case(REAL_hash):
             printf("%g",temp->value.d);
             break;
+
         case(STRING_hash):
             printf("%s",temp->value.str);
             break;
+
         case (BOOLEAN_hash):
             if((int)temp->value.b == 2)
                 printf("TRUE");
             else if((int)temp->value.b == 1)
                 printf("FALSE");
-                break;
+            break;
         }
-
         break;
 
-        case COPYSTRING:
+    case COPYSTRING:                                          ///Instrukcia kopiruje string a vklada ho do pomocnej premennej
         globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
         globalne_pole = copy(INSTR->a, INSTR->b, INSTR->c);
-        break;
+    break;
 
-        case COPYID:
+    case COPYID:                                                ///Instrukcia kopiruje string za pouzitia premennej
         globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
         if(INFUN!=1)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-         THash_table *RAMEC;
-         stack_top_ramec(stackramec,&RAMEC);
-         temp = hashtable_search(RAMEC,INSTR->a);
-         if(temp==NULL)
+            THash_table *RAMEC;
+            stack_top_ramec(stackramec,&RAMEC);
+            temp = hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
         globalne_pole = copy(temp->value.str, INSTR->b, INSTR->c);
         break;
 
-      case SORTID:
+    case SORTID:                                                        ///Instrukcia na prevedenie funckie sort
         if(INFUN!=1)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-         THash_table *RAMEC;
-         stack_top_ramec(stackramec,&RAMEC);
-         temp = hashtable_search(RAMEC,INSTR->a);
-         if(temp==NULL)
+            THash_table *RAMEC;
+            stack_top_ramec(stackramec,&RAMEC);
+            temp = hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
         if((globalne_pole = (malloc(length(temp->value.str) * sizeof(char) + 1))) == NULL)
@@ -243,11 +253,12 @@ int g2;
         globalne_pole = sort(INSTR->a);
         break;
 
-    case CONCATESTRING:
-            if(globalne_pole==0){
-            globalne_pole = (char*)malloc(sizeof(char) * (length(INSTR->a)));
-            tempstr = concatenate("",INSTR->a);
-            strcpy(globalne_pole, tempstr);
+    case CONCATESTRING:                      ///konkatenacia stringov
+            if(globalne_pole==0)
+            {
+                globalne_pole = (char*)malloc(sizeof(char) * (length(INSTR->a)));
+                tempstr = concatenate("",INSTR->a);
+                strcpy(globalne_pole, tempstr);
              }
            else
             {
@@ -258,101 +269,105 @@ int g2;
         break;
 
     case CONCATEID:
-
         if(INFUN!=1)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-         THash_table *RAMEC;
-         stack_top_ramec(stackramec,&RAMEC);
-         temp = hashtable_search(RAMEC,INSTR->a);
-         if(temp==NULL)
+            THash_table *RAMEC;
+            stack_top_ramec(stackramec,&RAMEC);
+            temp = hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
-
-            if(globalne_pole==0){
+        if(globalne_pole==0)
+        {
             globalne_pole = (char*)malloc(sizeof(char) * (length(temp->value.str))+1);
             tempstr = concatenate("",temp->value.str);
             strcpy(globalne_pole, tempstr);
-             }
-           else
-            {
-                globalne_pole = (char*)realloc(globalne_pole, length(globalne_pole) + length(temp->value.str)+1);
-                tempstr = concatenate(globalne_pole,temp->value.str);
-                strcpy(globalne_pole, tempstr);
-            }
+         }
+         else
+         {
+            globalne_pole = (char*)realloc(globalne_pole, length(globalne_pole) + length(temp->value.str)+1);
+            tempstr = concatenate(globalne_pole,temp->value.str);
+            strcpy(globalne_pole, tempstr);
+         }
         break;
 
-        case LENGTHID:
+    case LENGTHID:                                          ///Dlzka retazca z identifikatoru
         if(INFUN!=1)
-        temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
         {
-         THash_table *RAMEC;
-         stack_top_ramec(stackramec,&RAMEC);
-         temp = hashtable_search(RAMEC,INSTR->a);
-         if(temp==NULL)
+            THash_table *RAMEC;
+            stack_top_ramec(stackramec,&RAMEC);
+            temp = hashtable_search(RAMEC,INSTR->a);
+            if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
         hodnota = length(temp->value.str);
         break;
 
-        case ADD:
-
-            if(INSTR->a!=NULL)
-            {
-
+    case ADD:                                               ///Instruckia ADD sluzi na scitanie
+        if(INSTR->a!=NULL)                                ///Instruckia prima 2x float a 2x pole. Ak pole neni prazdne tak ho berie ako identifikator a pouzije jeho hodnotu
+        {
             if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
             else
             {
                 stack_top_ramec(stackramec,&RAMEC);
                 temp=hashtable_search(RAMEC,INSTR->a);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a);
             }
-            switch(temp->type){
+            switch(temp->type)
+            {
             case INTEGER_hash:
             INSTR->b =temp->value.i;
             break;
+
             case REAL_hash:
             INSTR->b =temp->value.d;
             break;
+
             case BOOLEAN_hash:
             INSTR->b =temp->value.i;
             break;
-             }
             }
-            if(INSTR->a2!=NULL)
-            {
+        }
+        if(INSTR->a2!=NULL)
+        {
             if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             else
             {
                 stack_top_ramec(stackramec,&RAMEC);
                 temp=hashtable_search(RAMEC,INSTR->a2);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             }
-            switch(temp->type){
+            switch(temp->type)
+            {
             case INTEGER_hash:
             INSTR->c =temp->value.i;
             break;
+
             case REAL_hash:
             INSTR->c =temp->value.d;
             break;
+
             case BOOLEAN_hash:
             INSTR->c =temp->value.i;
             break;
-             }
             }
-
-            if(INSTR->specialcode==0)
-            if(hodnota==0)
-            hodnota=INSTR->b+INSTR->c;
-            else
-            hodnota2=INSTR->b+INSTR->c;
-            else if(INSTR->specialcode==1)
+        }
+            if(INSTR->specialcode==0)                       ///Scitame  dve cisla , pomocne vysledky su nulove
+            {
+                if(hodnota==0)
+                    hodnota=INSTR->b+INSTR->c;
+                else
+                    hodnota2=INSTR->b+INSTR->c;
+            }
+            else if(INSTR->specialcode==1)                  /// pripocitavame  cislo uz k vypocitanej hodnote
             {
                 hodnota=hodnota+INSTR->b;
             }
@@ -360,129 +375,138 @@ int g2;
             {
                 hodnota=hodnota+INSTR->b;
             }
-            else if(INSTR->specialcode==4)
+            else if(INSTR->specialcode==4)                     ///robime sum dvoch uz vypocitanych hodnot
             {
               hodnota=hodnota+hodnota2;
             }
 
             break;
 
-
-
-        case MULTIPLY:
-            if(INSTR->a!=NULL)
-            {
-             if(INFUN==0)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            else
-            {
-                stack_top_ramec(stackramec,&RAMEC);
-                temp=hashtable_search(RAMEC,INSTR->a);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a);
-            }
-            switch(temp->type){
-            case INTEGER_hash:
-            INSTR->b =temp->value.i;
-            break;
-            case REAL_hash:
-            INSTR->b =temp->value.d;
-            break;
-             }
-            }
-            if(INSTR->a2!=NULL)
-            {
-
-             if(INFUN==0)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
-            else
-            {
-                stack_top_ramec(stackramec,&RAMEC);
-                temp=hashtable_search(RAMEC,INSTR->a2);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
-            }
-            switch(temp->type){
-            case INTEGER_hash:
-            INSTR->c =temp->value.i;
-            break;
-            case REAL_hash:
-            INSTR->c =temp->value.d;
-            break;
-             }
-            }
-            if(INSTR->specialcode==0)
-            {if(hodnota==0)
-            {hodnota=INSTR->b*INSTR->c;
-             hodnota3=1;
-            }
-            else
-            {
-            hodnota2=INSTR->b*INSTR->c;
-            hodnota3=2;
-            }}
-            else if(INSTR->specialcode==1)
-            {
-                if(hodnota3==1 || hodnota3==0)
-                hodnota=hodnota*INSTR->b;
-                else
-                hodnota2=hodnota2*INSTR->b;
-            }
-            break;
-
-
-        case MINUS:
-
-               if(INSTR->a!=NULL)
-            {
+    case MULTIPLY:                                                      ///Instrukcia robi nasobenie s 2x float, 2xID
+        if(INSTR->a!=NULL)
+        {
             if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
             else
             {
                 stack_top_ramec(stackramec,&RAMEC);
                 temp=hashtable_search(RAMEC,INSTR->a);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a);
             }
-            switch(temp->type){
-            case INTEGER_hash:
-            INSTR->b =temp->value.i;
-            break;
-            case REAL_hash:
-            INSTR->b =temp->value.d;
-            break;
-            case BOOLEAN_hash:
-            INSTR->b =temp->value.i;
-            break;
-             }
-            }
-
-            if(INSTR->a2!=NULL)
+            switch(temp->type)
             {
+                case INTEGER_hash:
+                INSTR->b =temp->value.i;
+                break;
+
+                case REAL_hash:
+                INSTR->b =temp->value.d;
+                break;
+            }
+        }
+        if(INSTR->a2!=NULL)
+        {
              if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             else
             {
                 stack_top_ramec(stackramec,&RAMEC);
                 temp=hashtable_search(RAMEC,INSTR->a2);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             }
-            switch(temp->type){
+            switch(temp->type)
+            {
             case INTEGER_hash:
             INSTR->c =temp->value.i;
             break;
+
             case REAL_hash:
             INSTR->c =temp->value.d;
             break;
-             }
             }
-
+        }
             if(INSTR->specialcode==0)
-            {if(hodnota==0)
-            hodnota=INSTR->b-INSTR->c;
+            {
+                if(hodnota==0)
+                {
+                hodnota=INSTR->b*INSTR->c;
+                hodnota3=1;
+                }
+                else
+                {
+                hodnota2=INSTR->b*INSTR->c;
+                hodnota3=2;
+                }
+            }
+            else if(INSTR->specialcode==1)
+            {
+                if(hodnota3==1 || hodnota3==0)
+                    hodnota=hodnota*INSTR->b;
+                else
+                    hodnota2=hodnota2*INSTR->b;
+            }
+            break;
+
+
+    case MINUS:                                   ///Instrukcia robi Minus s 2x float a 2x ID
+        if(INSTR->a!=NULL)
+        {
+            if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a);
             else
-            hodnota2=INSTR->b-INSTR->c;}
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a);
+            }
+            switch(temp->type)
+            {
+            case INTEGER_hash:
+            INSTR->b =temp->value.i;
+            break;
+
+            case REAL_hash:
+            INSTR->b =temp->value.d;
+            break;
+
+            case BOOLEAN_hash:
+            INSTR->b =temp->value.i;
+            break;
+            }
+        }
+
+        if(INSTR->a2!=NULL)
+        {
+            if(INFUN==0)
+                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            else
+            {
+                stack_top_ramec(stackramec,&RAMEC);
+                temp=hashtable_search(RAMEC,INSTR->a2);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+            }
+            switch(temp->type)
+            {
+            case INTEGER_hash:
+            INSTR->c =temp->value.i;
+            break;
+
+            case REAL_hash:
+            INSTR->c =temp->value.d;
+            break;
+
+            }
+        }
+            if(INSTR->specialcode==0)
+            {
+                if(hodnota==0)
+                    hodnota=INSTR->b-INSTR->c;
+                else
+                    hodnota2=INSTR->b-INSTR->c;}
             else if(INSTR->specialcode==1)
             {
                 hodnota=hodnota-INSTR->b;
@@ -495,12 +519,12 @@ int g2;
             {
               hodnota=hodnota-hodnota2;
             }
-          break;
+        break;
 
-       case DIVIDE:
-                if(INSTR->a!=NULL)
-            {
-             if(INFUN==0)
+   case DIVIDE:                       ///Instrukcia robi DIV s 2xfloat a 2xID
+        if(INSTR->a!=NULL)
+        {
+            if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
             else
             {
@@ -509,63 +533,70 @@ int g2;
             if(temp==NULL)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
             }
-            switch(temp->type){
+            switch(temp->type)
+            {
             case INTEGER_hash:
             INSTR->b =temp->value.i;
             break;
+
             case REAL_hash:
             INSTR->b =temp->value.d;
             break;
-             }
-            }
-            if(INSTR->a2!=NULL)
-            {
 
-             if(INFUN==0)
+            }
+        }
+        if(INSTR->a2!=NULL)
+        {
+            if(INFUN==0)
                 temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             else
             {
                 stack_top_ramec(stackramec,&RAMEC);
                 temp=hashtable_search(RAMEC,INSTR->a2);
-            if(temp==NULL)
-                temp = hashtable_search(GlobalnaTAB,INSTR->a2);
+                if(temp==NULL)
+                    temp = hashtable_search(GlobalnaTAB,INSTR->a2);
             }
-            switch(temp->type){
+            switch(temp->type)
+            {
             case INTEGER_hash:
             INSTR->c =temp->value.i;
             break;
+
             case REAL_hash:
             INSTR->c =temp->value.d;
             break;
-             }
+
             }
-             if(INSTR->specialcode==0)
-             {
-            if(hodnota==0)
-            {hodnota=INSTR->b/INSTR->c;
-             if(INSTR->c==0)
-             {
-                 free_sources();
-                 exit(E_DIVISION_BY_ZERO);
-             }
-             hodnota3=1;
-            }
-            else
+        }
+            if(INSTR->specialcode==0)
             {
-            hodnota2=INSTR->b/INSTR->c;
-             if(INSTR->c==0)
-             {
-                 free_sources();
-                 exit(E_DIVISION_BY_ZERO);
-             }
-            hodnota3=2;
-            }}
+                if(hodnota==0)
+                {
+                    hodnota=INSTR->b/INSTR->c;
+                    if(INSTR->c==0)
+                    {
+                    free_sources();          ///chyba delenie nulou
+                    exit(E_DIVISION_BY_ZERO);
+                    }
+                hodnota3=1;   ///pomocna premenna
+                }
+                else
+                {
+                    hodnota2=INSTR->b/INSTR->c;
+                    if(INSTR->c==0)
+                    {
+                        free_sources();
+                        exit(E_DIVISION_BY_ZERO);
+                    }
+                hodnota3=2;
+                }
+            }
             else if(INSTR->specialcode==1)
             {
                 if(hodnota3==1 || hodnota3==0)
-                hodnota=hodnota/INSTR->b;
+                    hodnota=hodnota/INSTR->b;
                 else
-                hodnota2=hodnota2/INSTR->b;
+                    hodnota2=hodnota2/INSTR->b;
                 if(INSTR->b==0)
                 {
                     free_sources();
@@ -574,26 +605,25 @@ int g2;
             }
             break;
 
-       case EQUAL:
-            hodnota=0;
-            hodnota2=0;
-            hodnota3=0;
+   case EQUAL:                                 ///vola sa po kazdom MOV kedy sa vycisti cela pamat
+        hodnota=0;
+        hodnota2=0;
+        hodnota3=0;
+        if (globalne_pole!=NULL)
             free(globalne_pole);
+        break;
 
-            break;
-
-       case JUMP:
-       if(hodnota==0)
+    case JUMP:                                      ///Instrukcia na skok IF skaceme len ked je false 0
+        if(hodnota==0)
         {
-            LABEL=INSTR->specialcode;
+            LABEL=INSTR->specialcode;                   ///ukladame si specialcode na zasobnik, specialne  cislo navestia
             stack_push(stackADRESS,LABEL);
             return JUMP;
         }
         else
             return NOTJUMP;
 
-
-       case SAVE:
+   case SAVE:                                           ///ukladame si medzivysledok vypoctu, pouziva sa hlavne pri porovnaniach
         globalne_pole1=globalne_pole;
         globalne_pole=NULL;
         hodnota4=hodnota;
@@ -602,97 +632,96 @@ int g2;
         hodnota3=0;
         break;
 
-       case LESS:
+    case LESS:                                            ///Instrukcia less odcitava od seba hodnoty a pozera sa na vysledok
         if(globalne_pole!=NULL && globalne_pole1!=NULL)
-       {
+        {
             g1=strlen(globalne_pole1);
-             g2=strlen(globalne_pole);
-           if((g1-g2)< 0)
-           {
-            hodnota=1;
-            }
-        else hodnota=0;
-       }
-       else if((hodnota4-hodnota)< 0)
-           {
-            hodnota=1;
-            }
-        else hodnota=0;
-        break;
-
-
- case GREATER:
-        if(globalne_pole!=NULL && globalne_pole1!=NULL)
-       {
-             g1=strlen(globalne_pole1);
-             g2=strlen(globalne_pole);
-           if((g1-g2)>0)
-           {
-            hodnota=1;
-            }
-        else hodnota=0;
-       }
-      else  if((hodnota4-hodnota)> 0)
-           {
-            hodnota=1;
-            }
-        else hodnota=0;
-        break;
-
-
-case LESSEQUAL:
-        if(globalne_pole!=NULL && globalne_pole1!=NULL)
-       {
-             g1=strlen(globalne_pole1);
             g2=strlen(globalne_pole);
-           if((g1-g2)<= 0)
-           {
-            hodnota=1;
+            if((g1-g2)< 0)
+            {
+                hodnota=1;
             }
-        else hodnota=0;
-       }
-      else  if((hodnota4-hodnota)<= 0)
-           {
+            else hodnota=0;
+        }
+        else if((hodnota4-hodnota)< 0)
+            {
             hodnota=1;
             }
         else hodnota=0;
         break;
 
- case GREATEREQUAL:
+
+    case GREATER:                                                   ///Instrukcia Greater porovnava  dve hodnoty
         if(globalne_pole!=NULL && globalne_pole1!=NULL)
-       {
+        {
+             g1=strlen(globalne_pole1);             ///dlzka poli ak sa porovnavaju stringy
+             g2=strlen(globalne_pole);
+            if((g1-g2)>0)
+            {
+            hodnota=1;
+            }
+            else hodnota=0;
+        }
+        else  if((hodnota4-hodnota)> 0)
+            {
+            hodnota=1;
+            }
+        else hodnota=0;
+        break;
+
+    case LESSEQUAL:
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+        {
+            g1=strlen(globalne_pole1);
+            g2=strlen(globalne_pole);
+            if((g1-g2)<= 0)
+            {
+            hodnota=1;
+            }
+            else hodnota=0;
+       }
+       else  if((hodnota4-hodnota)<= 0)
+            {
+            hodnota=1;
+            }
+       else hodnota=0;
+       break;
+
+    case GREATEREQUAL:
+        if(globalne_pole!=NULL && globalne_pole1!=NULL)
+        {
             g1=strlen(globalne_pole1);
             g2=strlen(globalne_pole);
            if((g1-g2)>= 0)
-           {
+            {
             hodnota=1;
             }
         else hodnota=0;
-       }
-      else  if((hodnota4-hodnota)>= 0)
-           {
+        }
+        else  if((hodnota4-hodnota)>= 0)
+            {
             hodnota=1;
             }
         else hodnota=0;
         break;
 
-case NOTEQUAL:
+    case NOTEQUAL:
         if(globalne_pole!=NULL && globalne_pole1!=NULL)
-       {
+        {
              g1=strlen(globalne_pole1);
              g2=strlen(globalne_pole);
             if(strcmp(globalne_pole,globalne_pole1)!=0)
                 hodnota=1;
-        else hodnota=0;
-       }
-       else if((hodnota4!=hodnota))
-           {
+            else hodnota=0;
+        }
+        else if((hodnota4!=hodnota))
+            {
             hodnota=1;
             }
         else hodnota=0;
         break;
 
-        case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
+    case COPYSTRINGID_:         //copy('ahoj', i, 52);                  ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
             if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a2);
@@ -707,10 +736,7 @@ case NOTEQUAL:
             globalne_pole = copy(INSTR->a, temp->value.i, INSTR->c);
             break;
 
-
-
-
-        case COPYSTRING_ID:         //copy('ahoj', 52, i);                 ///ok
+    case COPYSTRING_ID:         //copy('ahoj', 52, i);                 ///ok
             if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a2);
         else
@@ -725,7 +751,7 @@ case NOTEQUAL:
             globalne_pole = copy(INSTR->a, INSTR->b, temp->value.i);
             break;
 
-        case COPYSTRINGIDID:         //copy('ahoj', i, i);                //ok
+    case COPYSTRINGIDID:         //copy('ahoj', i, i);                //ok
             if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a2);
         else
@@ -751,7 +777,7 @@ case NOTEQUAL:
             break;
 
 
-        case COPYIDID_:             //copy(id,id,52);                      ///ok
+    case COPYIDID_:             //copy(id,id,52);                      ///ok
             globalne_pole = malloc(INSTR->c * sizeof(char) + 1);
             if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
@@ -777,7 +803,7 @@ case NOTEQUAL:
             break;
 
 
-        case COPYID_ID:             //copy(id,52,id);                     //ok
+    case COPYID_ID:             //copy(id,52,id);                     //ok
                  if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
@@ -803,7 +829,7 @@ case NOTEQUAL:
             break;
 
 
-        case COPYIDIDID:             //copy(id,id,id);
+    case COPYIDIDID:             //copy(id,id,id);
         if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
@@ -842,11 +868,11 @@ case NOTEQUAL:
             break;
 
 
-        case FINDSTRSTR:
+    case FINDSTRSTR:
             hodnota = find(INSTR->a,INSTR->a2);
             break;
 
-        case FINDIDSTR:
+    case FINDIDSTR:
         if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
@@ -860,7 +886,7 @@ case NOTEQUAL:
             hodnota = find(temp->value.str, INSTR->a2);
             break;
 
-        case FINDSTRID:
+    case FINDSTRID:
              if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a2);
         else
@@ -874,7 +900,7 @@ case NOTEQUAL:
             hodnota = find(INSTR->a,temp->value.str);
             break;
 
-        case FINDIDID:
+    case FINDIDID:
         if(INFUN!=1)
         temp = hashtable_search(GlobalnaTAB,INSTR->a);
         else
@@ -886,7 +912,7 @@ case NOTEQUAL:
                 temp = hashtable_search(GlobalnaTAB,INSTR->a);
         }
 
-             if(INFUN!=1)
+        if(INFUN!=1)
         temp2 = hashtable_search(GlobalnaTAB,INSTR->a2);
         else
         {
@@ -900,19 +926,16 @@ case NOTEQUAL:
         hodnota = find(temp->value.str,temp2->value.str);
         break;
 
-
-
-        case ELSE:
+    case ELSE:                                          ///Else dalsi mozny skok pre IF
             LABEL=INSTR->specialcode;
-            stack_push(stackADRESS,LABEL);
-
+            stack_push(stackADRESS,LABEL);                   ///ulozime si na zasobnik adresu
             return ELSE;
             break;
 
-        case WHILE:
+    case WHILE:
             return WHILE;
 
-        case LOOP:
+    case LOOP:
           LABEL=INSTR->specialcode;
           stack_push(stackADRESS,LABEL);
           if (hodnota==0)
@@ -920,41 +943,52 @@ case NOTEQUAL:
           else return LOOP;
           break;
 
-            case CALLFUN:
-           return CALLFUN;
+    case CALLFUN:                                       ///Instrukcia prichadza volanie funkcie  f()
+        return CALLFUN;
+
+    case VALUE:
+        break;
+
+    case DECLARE:                                             ///Vkladame nove ID do najvysieho ramca
+        stack_top_ramec(stackramec,&RAMEC);
+        hashtable_add(RAMEC,VARIABLE_hash,INSTR->a,(int)INSTR->b,0);
+        break;
+
+    case FMOF:                                        /// FUNNY FUNCTION FOR YOU <3  Do not try to understand
+        temp=hashtable_search(GlobalnaTAB,INSTR->a);
+        switch(temp->type)
+        {
+        case INTEGER_hash:
+        hodnota=temp->value.i;
+        break;
+
+        case REAL_hash:
+        hodnota=temp->value.d;
+        break;
+
+        case BOOLEAN_hash:
+        hodnota=temp->value.i;
+        break;
+
+        case  STRING_hash:
+        globalne_pole=temp->value.str;
+        break;
+
+        }
+        break;
 
 
-            case VALUE:
-                break;
-            case DECLARE:
-            stack_top_ramec(stackramec,&RAMEC);
-            hashtable_add(RAMEC,VARIABLE_hash,INSTR->a,(int)INSTR->b,0);
-            break;
-
-            case FMOF:                                        /// FUNNY FUNCTION FOR YOU <3
-                temp=hashtable_search(GlobalnaTAB,INSTR->a);
-                switch(temp->type)
-                {
-                case INTEGER_hash:
-                hodnota=temp->value.i;
-                break;
-                case REAL_hash:
-                hodnota=temp->value.d;
-                break;
-                case BOOLEAN_hash:
-                hodnota=temp->value.i;
-                break;
-                case  STRING_hash:
-                globalne_pole=temp->value.str;
-                break;
-                }
-                break;
 
     }
-///*-+/ hotovo bez premennych
-
 return 0;
 }
+
+/** \brief Fukcia prechadza Instrukcnu pasku a vykonava jednotlive instrukcie
+ *
+ * \param ukazatel na instruknu pasku
+ * \return  vsetko ok 0
+ */
+
 int searchrecord(inf_pointer_array* beh_programu)
 {
 
@@ -1117,7 +1151,7 @@ int BREAKPOINT=0;
         if (RESULT1==JUMP)
         RESULT1=JUMP;
         i++;
-        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+        while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
         i++;
         stack_pop(stackADRESS);
         break;
@@ -1128,7 +1162,7 @@ int BREAKPOINT=0;
         stack_pop(StackBreak);
         stack_top(stackADRESS,&TOP);
         i++;
-        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+        while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
         i++;
         stack_pop(stackADRESS);
         break;
@@ -1144,7 +1178,7 @@ int BREAKPOINT=0;
             else
             {
                 i++;
-                while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
                     i++;
             }
             stack_pop(stackADRESS);
@@ -1188,7 +1222,7 @@ int RESULT1=0;
                         if (RESULT1==JUMP)
                         RESULT1=JUMP;
                         i++;
-                        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                        while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
                         i++;
                         stack_pop(stackADRESS);
                         stack_top(stackADRESS,&TOP);
@@ -1206,7 +1240,7 @@ int RESULT1=0;
                         else
                     {
                             i++;
-                        while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                        while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
                             i++;
                     }
                     stack_pop(stackADRESS);
@@ -1216,13 +1250,15 @@ int RESULT1=0;
                     case NOTJUMP:
                         RESULT1=0;
                     break;
-/*
+
                case WHILE:
                     stack_push(StackBreak,i);
                     break;
                case LOOP:
                     stack_top(stackADRESS,&TOP);
                         i=LOOPER(beh_programu,BREAKPOINT,i+1);
+                        stack_pop(stackADRESS);
+                        stack_top(stackADRESS,&TOP);
                           break;
 
              case LOOPJUMP:
@@ -1231,9 +1267,11 @@ int RESULT1=0;
                     stack_top(StackBreak,&BREAKPOINT);
                     stack_top(stackADRESS,&TOP);
                     i++;
-                    while (beh_programu->pole[i]->specialcode!=TOP && beh_programu->pole[i]->CODE!=ENDJUMP)
+                    while (beh_programu->pole[i]->specialcode!=TOP || beh_programu->pole[i]->CODE!=ENDJUMP)
                     i++;
-                    break;*/
+                    stack_pop(stackADRESS);
+                    stack_top(stackADRESS,&TOP);
+                    break;
         }
 
 
@@ -1271,7 +1309,7 @@ RESULT=foo(beh_programu->pole[j]);
                         if (RESULT1==JUMP)
                         RESULT1=JUMP;
                         j++;
-                        while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                        while (beh_programu->pole[j]->specialcode!=TOP || beh_programu->pole[j]->CODE!=ENDJUMP)
                         j++;
                         stack_pop(stackADRESS);
                         stack_top(stackADRESS,&TOP);
@@ -1288,7 +1326,7 @@ RESULT=foo(beh_programu->pole[j]);
                         else
                         {
                         j++;
-                        while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                        while (beh_programu->pole[j]->specialcode!=TOP || beh_programu->pole[j]->CODE!=ENDJUMP)
                             j++;
                         }
                         stack_pop(stackADRESS);
@@ -1308,7 +1346,7 @@ RESULT=foo(beh_programu->pole[j]);
                             stack_pop(StackBreak);
                             stack_top(stackADRESS,&TOP);
                             j++;
-                            while (beh_programu->pole[j]->specialcode!=TOP && beh_programu->pole[j]->CODE!=ENDJUMP)
+                            while (beh_programu->pole[j]->specialcode!=TOP || beh_programu->pole[j]->CODE!=ENDJUMP)
                             j++;
                             break;
 

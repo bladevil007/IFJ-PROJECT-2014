@@ -406,7 +406,6 @@ token = getnextToken(LEX_STRUCTPTR);
 
         else if(token==ELSE && IF_ENABLE==1)
         {
-             generate_inst(0,0,0,0,ENDJUMP,0,0);
              generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
@@ -499,7 +498,6 @@ token = getnextToken(LEX_STRUCTPTR);
 
     else if(token==ELSE && IF_ENABLE==1)
         {
-            generate_inst(0,0,0,0,ENDJUMP,0,0);
             generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
@@ -590,7 +588,6 @@ token = getnextToken(LEX_STRUCTPTR);
         ///if podmienka s else + vnorene IF
         else if(token==ELSE && IF_ENABLE==1)
         {
-             generate_inst(0,0,0,0,ENDJUMP,0,0);
             generate_inst(0,0,0,0,ELSE,0,0);
              IF_ENABLE=0;
              token=getnextToken(LEX_STRUCTPTR);
