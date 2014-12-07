@@ -1173,6 +1173,7 @@ int BREAKPOINT=0;
             {
                 RESULT1=0;
                 stack_pop(stackADRESS);
+                stack_top(stackADRESS,&TOP);
                 break;
             }
             else
@@ -1234,6 +1235,7 @@ int RESULT1=0;
                         if (RESULT1==JUMP)
                     {
                             RESULT1=0;
+                            stack_pop(stackADRESS);
                             stack_top(stackADRESS,&TOP);
                             break;
                     }
@@ -1317,10 +1319,13 @@ RESULT=foo(beh_programu->pole[j]);
 
 
                     case ELSE:
+                        exit(10);
                         stack_top(stackADRESS,&TOP);
                         if (RESULT1==JUMP)
                         {
                         RESULT1=0;
+                        stack_pop(stackADRESS);
+                        stack_top(stackADRESS,&TOP);
                         break;
                         }
                         else
