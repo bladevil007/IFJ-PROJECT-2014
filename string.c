@@ -23,9 +23,9 @@
 #include "scaner.h"
 #include "err.h"
 
-#define INIT_SIZE 20 //Velikost inicializovaneho pole, pri reallocu budeme pole zvetsovat o tuto hodnotu
+#define INIT_SIZE 20 ///Velikost inicializovaneho pole, pri reallocu budeme pole zvetsovat o tuto hodnotu
 
-//VSECHNY FUNKCE PRI NEUSPECHU VRACI HODNOTU 1, PRI USPECHU HODNOTU 0
+///VSECHNY FUNKCE PRI NEUSPECHU VRACI HODNOTU 1, PRI USPECHU HODNOTU 0
 
 Tpole_int *IntArrayInit() //inicializace pole
 {
@@ -131,7 +131,7 @@ int CmpConst_str(LEX_STRUCT *LEX_STRUCTPTR, char* CONST_STR)
 }
 
 
-/** \brief Funkcia alokuje pole a inicializuje jeho strukturu
+/** \brief Funkcia alokuje nekonecne pole identifikatorov a inicializuje jeho strukturu
 */
 int init_array(inf_array *a)
 {
@@ -141,78 +141,84 @@ int init_array(inf_array *a)
     a->str[0] = '\0';
     a->length = 0;
     a->act_pos = 0;
-    a->allocSize = 100;    ///opravit velkost lebo hadze chyby
+    a->allocSize = 100;    ///prvotna velkost
 
     return 1;
 }
 
-/** \brief Funkcia uvolni alokovanu pamat
+/** \brief Funkcia uvolni alokovanu pamat pola
 */
 void free_array(inf_array *a)
 {
     free(a->str);
 }
 
-/** \brief  Funkcia pridava string do nekonecneho pola
-            Navratova hodnota je index v poli, na ktorom zacina pridany string
+/** \brief  Funkcia pridava string do nekonecneho pola parametrov funkcie
+*           Navratova hodnota je index v poli, na ktorom zacina pridany string
 */
 int add_str_param(inf_array *a, char* strin)
 {
-    if((a->allocSize - a->length) <= (strlen(strin) + 1))       //ak je nedostatok volneho miesta v poli tak realokuj
+    if((a->allocSize - a->length) <= (strlen(strin) + 1))       ///ak je nedostatok volneho miesta v poli tak realokuj
     {
         if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC + strlen(strin))) == NULL)
             return -1;
 
-        a->allocSize = a->allocSize + ARR_INC + strlen(strin);                  //aktualizacia premennej
+        a->allocSize = a->allocSize + ARR_INC + strlen(strin);  ///aktualizacia premennej
     }
 
 
     int i;
-    int ret_val = a->act_pos;                                   //navratova hodnota
+    int ret_val = a->act_pos;                                   ///navratova hodnota
 
-    for (i=0; i<strlen(strin); i++)                             //pridavanie retazca po znakoch
+    for (i=0; i<strlen(strin); i++)                             ///pridavanie retazca po znakoch
     {
         a->str[a->act_pos + i] = strin[i];
     }
 
-    a->str[a->act_pos + strlen(strin)] = '$';                  //ukoncit nulovym znakom
-
-    a->act_pos = a->act_pos + (strlen(strin) + 1);              //aktualizovat premenne v strkture
+    a->str[a->act_pos + strlen(strin)] = '$';                   ///ukoncit specialne zadefinovanym znakom
+    a->act_pos = a->act_pos + (strlen(strin) + 1);              ///aktualizovat premenne v strukture
     a->length = a->length + strlen(strin);
 
     return ret_val;
 }
 
-/** \brief  Funkcia pridava string do nekonecneho pola
+/** \brief  Funkcia pridava string do nekonecneho pola identifikatorov
             Navratova hodnota je index v poli, na ktorom zacina pridany string
 */
 int add_str(inf_array *a, char* strin)
 {
-    if((a->allocSize - a->length) <= (strlen(strin) + 1))       //ak je nedostatok volneho miesta v poli tak realokuj
+    if((a->allocSize - a->length) <= (strlen(strin) + 1))       ///ak je nedostatok volneho miesta v poli tak realokuj
     {
         if ((a->str = (char*) realloc(a->str, a->allocSize + ARR_INC + strlen(strin))) == NULL)
             exit(E_INTERNAL);
 
-        a->allocSize = a->allocSize + ARR_INC + strlen(strin);                  //aktualizacia premennej
+        a->allocSize = a->allocSize + ARR_INC + strlen(strin);  ///aktualizacia premennej
     }
 
     int i;
-    int ret_val = a->act_pos;                                   //navratova hodnota
+    int ret_val = a->act_pos;                                   ///navratova hodnota
 
-    for (i=0; i<strlen(strin); i++)                             //pridavanie retazca po znakoch
+    for (i=0; i<strlen(strin); i++)                             ///pridavanie retazca po znakoch
     {
         a->str[a->act_pos + i] = strin[i];
     }
 
-    a->str[a->act_pos + strlen(strin)] = '\0';                  //ukoncit nulovym znakom
+    a->str[a->act_pos + strlen(strin)] = '\0';                  ///ukoncit nulovym znakom
 
-    a->act_pos = a->act_pos + (strlen(strin) + 1);              //aktualizovat premenne v strkture
+    a->act_pos = a->act_pos + (strlen(strin) + 1);              ///aktualizovat premenne v strkture
     a->length = a->length + strlen(strin);
 
     return ret_val;
 }
 
-char *concatenate(const char *s1, const char *s2) //funkce na konkatenaci dvou retezcu, vraci NULL v pripade chyby
+/** \brief  Funkce na konkatenaci dvou retezcu.
+ *
+ * \param   Dva ukazatele na retazce ktore konkatenujeme.
+ * \return  Ukazatel na zaciatok retazca ktory je vystupom a NULL v pripade chyby.
+ *
+ */
+
+char *concatenate(const char *s1, const char *s2)
 {
 	char *concatenated; //ukazatel na konkatenovany retezec
 	if (s1 != NULL && s2 != NULL) //pokud ani jeden z retezcu neni NULL

@@ -1,6 +1,5 @@
-
-
-
+#ifndef CODEGENERATE_H_
+#define CODEGENERATE_H_
 
 typedef struct {
 char *a;
@@ -12,21 +11,17 @@ int specialcode;
 int CODE;
 }INSTape;
 
-
-
 typedef struct{
-    int length;
-    int allocSize; // velikost alokovane pameti
-    INSTape** pole; // misto pro dany retezec ukonceny znakem '\0'
+    int length;     // pocet naplnenych indexov
+    int allocSize;  // velikost alokovane pameti
+    INSTape** pole; // pole
 } inf_pointer_array;
 
 inf_pointer_array *InstructionTape;
 
-
-
-int init_pointer_array(inf_pointer_array *a);
+// hlavicky funkcii
+void init_pointer_array(inf_pointer_array *a);
 void free_pointer_array(inf_pointer_array *a);
-
 int add_new_pointer(inf_pointer_array *a, INSTape* pointer);
 int generate_inst(char *,char *,float ,float ,int ,int,char * );
 int init_generate();
@@ -73,3 +68,5 @@ int searchrecord(inf_pointer_array* beh_programu);
 #define DECLARE 237
 #define FMOF 238
 #define NOTJUMP 239
+
+#endif
