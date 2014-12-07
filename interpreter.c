@@ -47,8 +47,6 @@ THash_table *RAMEC;
 int g1;
 int g2;
 
-
-
     switch(INSTR->CODE)
     {
     case LENGTH:
@@ -152,8 +150,9 @@ int g2;
             temp->value.b=temp->value.b+1;               ///true je 1 false je 0
             break;
         case(STRING_hash):
+            if(temp->value.str!=NULL)                          ///najprv overit
             free(temp->value.str);
-            temp->value.str=(char*)malloc(sizeof(char)*256);
+            temp->value.str=(char*)malloc(sizeof(char)*256);     ///size of one line
             if((scanf("%s",(temp->value.str)))==0)
             {
                 free_sources();

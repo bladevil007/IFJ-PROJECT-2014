@@ -1065,7 +1065,6 @@ else if(PODMIENKA_POD!=PODMIENKA_POD1 && Vysledok==PODMIENKA)
 if((Vysledok==PODMIENKA && PODMIENKA_POD!=BOOLEAN_hash )  && (LLAST!=10 && LLAST!=9 && LLAST!=8 && LLAST!=7 && LLAST!=6 && LLAST!=4 && LAST!=10 && LAST!=9 && LAST!=8 && LAST!=7&& LAST!=6 && LAST!=4))
 exit(E_SEMANTIC_TYPE);
 }
-
 if(type==ID && Vysledok!=PODMIENKA_POD)
 exit(E_SEMANTIC_TYPE);
 
@@ -1159,10 +1158,13 @@ int VysledokID(int Vysledok,int id )
             exit(E_SEMANTIC_TYPE);
             break;
     case REAL_hash:
-        if(id==STRING_hash || id==BOOLEAN_hash)
+        if(id==STRING_hash || id==BOOLEAN_hash )
            exit(E_SEMANTIC_TYPE);
         else
-           PODMIENKA_POD=REAL_hash;
+            if(id==INTEGER_hash && PODMIENKA_POD!=REAL_hash)
+            PODMIENKA_POD=INTEGER_hash;
+            else
+            PODMIENKA_POD=REAL_hash;
            break;
     case BOOLEAN_hash:
            if(id!=BOOLEAN_hash)
