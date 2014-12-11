@@ -121,7 +121,7 @@ Interpret se skládá ze tří hlavních částí: (1) lexikální analyzátor (
 
 Kromě toho interpret poskytuje některé vestavěné funkce včetně vyhledávání podřetězce v řetězci a řazení znaků v řetězci.
 
-Níš tým řešil variantu zadání projektu a/2/II:
+Náš tým řešil variantu zadání projektu a/2/II:
 \begin{itemize}
 \item Knuth-Morris-Prattův vyhledávací algoritmus
 \item Řazení metodou Heap sort
@@ -136,7 +136,7 @@ V této kapitole je popsána implementace jednotlivých částí programu.
 \section{Lexikální analyzátor}
 Lexikální analyzátor (scanner) rozpoznává jednotlivé lexémy (lexikální jednotky) zdrojového programů a vytváří korespondující tokeny, přičemž komentáře a bílé znaky jsou vynechány (nikam se neukládají). Tokeny odpovídají lexikálním prvkům zdrojového kódu (například identifikátory, datové typy, klíčová slova, literály atd.) a kromě typu lexému obsahují důležité doplňující informace pro sémantickou analýzu a interpretaci (např. jméno identifikátoru, konkrétní hodnotu konstanty apod.).
 
-Implementace lexikálního analyzátoru je založena na využití konečného automatu, který je realizován pomocí řídící konstrukce switch spolu s řídící proměnnou, která uchovává aktuální stav automatu. Scanner vrácí na požádání jeden token, který následuje za předešlým již načteným tokenem. Implementace je prováděna funkcí \texttt{getnextToken}, která přijímá ukazatel na strukturu reprezentující poslední načtený token a vrací celé číslo reprezentující buď kód chyby, v případě, že na něj narazí, nebo typ aktuálního tokenu a současně strukturu jej reprezentující (prostřednictvím parametru) v případě úspěchu.
+Implementace lexikálního analyzátoru je založena na využití konečného automatu, který je realizován pomocí řídící konstrukce switch spolu s řídící proměnnou, která uchovává aktuální stav automatu. Scanner vrácí na požádání jeden token, který následuje za předešlým již načteným tokenem. Implementace je prováděna funkcí \texttt{getnextToken}, která přijímá ukazatel na strukturu reprezentující poslední načtený token a vrací celé číslo reprezentující buď kód chyby, v případě, že na chybu narazí, nebo typ aktuálního tokenu a současně strukturu jej reprezentující (prostřednictvím parametru) v případě úspěchu.
 
 Diagram konečného automatu, který specifikuje lexikální analyzátor je příloze č. 1.
 
@@ -150,9 +150,9 @@ Pravidla LL gramatiky jsou v příloze č. 2, precedenční tabulka je v přílo
 
 %=================================================================%
 \section{Interpret}
-Základní funkce interpretu je vykonání vnitřního kódu vygenerovaného syntaktickým analyzátorem. Interpret tedy podle instrukcí zpracuje vstup programu a vygeneruje vystup.
+Základní funkce interpretu je vykonání vnitřního kódu vygenerovaného syntaktickým analyzátorem. Interpret tedy podle instrukcí zpracuje vstup programu a vygeneruje výstup.
 
-Implementace je založena na tom, že interpret prochází Instrukčním listem vnitřního kódu (který je implementován pomocí nekonečného pole) a postupně vykoná jednotlivé instrukce. Podpora instrukcí skoku je zajištěna použitím zásobníku a tabulek symbolů.
+Implementace je založena na tom, že interpret prochází instrukčním listem vnitřního kódu (který je implementován pomocí nekonečného pole) a postupně vykoná jednotlivé instrukce. Podpora instrukcí skoku je zajištěna použitím zásobníku a tabulek symbolů.
 
 Samotná instrukce je reprezentována strukturou, která obsahuje operandy instrukce a některé další pomocné informace.
 
@@ -178,7 +178,7 @@ Tabulka symbolů v našem řešení byla realizována pomocí hashovací tabulky
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Práce v týmu} \label{tym}
-Ke komunikaci v týmu jsme využívali prvidelné schůze, kde jsme diskutovali o řešení projektu, a vedoucí kontroloval stav plnění jednotlivých úkolů členy týmu. Kromě toho se používaly i jiné komunikační nástroje jako skype a soukromá diskusní skupina.
+Ke komunikaci v týmu jsme využívali pravidelné schůze, kde jsme diskutovali řešení projektu, a vedoucí kontroloval stav plnění jednotlivých úkolů členy týmu. Kromě toho se používaly i jiné komunikační nástroje jako Skype a soukromá diskusní skupina.
 
 Pro management zdrojového kódu jsme využívali systém správy verzí Git.
 
@@ -293,9 +293,9 @@ $\leq$                  & \textless    & \textless    & \textless    & \textless
 \newpage
 %=================================================================%
 \section{Metriky kódu}
-\paragraph{Počet souborů:}  souborů
-\paragraph{Počet řádků zdrojového textu:}  řádků
-\paragraph{Velikost spustitelného souboru:} B  (systém Linux, 32 bitová architektura, při překladu bez ladicích informací)
+\paragraph{Počet souborů:}  20 souborů
+\paragraph{Počet řádků zdrojového textu:} 6564 řádků
+\paragraph{Velikost spustitelného souboru:} 124.1 kB  (systém Linux, 32 bitová architektura, při překladu bez ladicích informací)
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
