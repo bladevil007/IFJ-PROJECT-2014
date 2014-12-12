@@ -117,7 +117,7 @@ Tato dokumentace obsahuje popis implementace interpretu imperativního jazyka IF
 \chapter{Zadání} \label{zadani}
 Jazyk IFJ14 je podmnožinou jazyka Pascal, což je staticky typovaný (tj. jednotlivé proměnné mají předem určen datový typ svou definicí) procedurální jazyk. Jazyk je case insensitive (nezáleží na velikosti písmen).
 
-Interpret se skládá ze tří hlavních částí: (1) lexikální analyzátor (neboli scanner), (2) syntaktický analyzátor (parser), který je nejdůležitější částí programu, (3) interpret. Scanner načítá zdrojový soubor a rozpoznává ve zdrojovém kódu jednotlivé lexikální jednotky, parser pak zkontroluje sintaxi, provede sémantické akce a vygeneruje 3-adresný kód, který interpret vykoná.
+Interpret se skládá ze tří hlavních částí: (1) lexikální analyzátor (neboli scanner), (2) syntaktický analyzátor (parser), který je nejdůležitější částí programu, (3) interpret. Scanner načítá zdrojový soubor a rozpoznává ve zdrojovém kódu jednotlivé lexikální jednotky, parser pak zkontroluje syntaxi, provede sémantické akce a vygeneruje 3-adresný kód, který interpret vykoná.
 
 Kromě toho interpret poskytuje některé vestavěné funkce včetně vyhledávání podřetězce v řetězci a řazení znaků v řetězci.
 
@@ -205,9 +205,9 @@ Natalya Loginova - vestavěné funkce, dokumentace. \\
 \section{Pravidla LL gramatiky}
 1. \textless PROGRAM\textgreater  $\rightarrow$ var \textless DECLARELIST\textgreater  begin \textless PROG\textgreater \\
 2. \textless PROGRAM\textgreater  $\rightarrow$ begin \textless PROG\textgreater \\
-3. \textless PROGRAM\textgreater  $\rightarrow$ function \textless FUNCTION\textgreater  forward; \\
-4. \textless PROGRAM\textgreater  $\rightarrow$ function \textless FUNCTION\textgreater ; \textless PROGFUNCTION\textgreater \\
-5. \textless FUNCTION\textgreater  $\rightarrow$ id(\textless FUN\_PARAMS\textgreater ); \\
+3. \textless PROGRAM\textgreater  $\rightarrow$ function \textless FUNKCIA\textgreater  forward; \\
+4. \textless PROGRAM\textgreater  $\rightarrow$ function \textless FUNKCIA\textgreater ; \textless PROGFUNCTION\textgreater \\
+5. \textless FUNKCIA\textgreater  $\rightarrow$ id(\textless FUN\_PARAMS\textgreater ); \\
 6. \textless FUN\_PARAMS\textgreater  $\rightarrow$ id:\textless DTYPE\textgreater ; \textless FUN\_PARAMS\textgreater \\
 7. \textless FUN\_PARAMS\textgreater  $\rightarrow$ $\varepsilon$ \\
 8. \textless DTYPE\textgreater  $\rightarrow$ integer \\
